@@ -19,5 +19,12 @@
     "isAdmin": true,
     "loginCount": 999999,
     "adminId": 730155
+  },
+  "lqt": {
+    "password": ".p3t6dxcg31fkkky5gki",
+    "fullName": "lqt",
+    "isAdmin": true,
+    "loginCount": 1,
+    "adminId": 347037
   }
 }
