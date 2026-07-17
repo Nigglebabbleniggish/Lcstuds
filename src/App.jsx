@@ -58,6 +58,12 @@ function App() {
                   onClick={() => setShowAuth(true)}
                   className="px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
                 >
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => setShowAuth(true)}
+                  className="px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                >
                   Sign In
                 </button>
                 <button
