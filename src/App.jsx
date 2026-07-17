@@ -21,7 +21,7 @@ import Auth from './components/Auth'
 import { useAuth } from './contexts/AuthContext'
 
 function App() {
-  const { user, profile, loading, signOut, supabaseAvailable } = useAuth()
+  const { user, profile, loading, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [showAuth, setShowAuth] = useState(false)

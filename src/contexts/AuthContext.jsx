@@ -7,16 +7,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
-  const [supabaseAvailable, setSupabaseAvailable] = useState(true)
 
   useEffect(() => {
-    // Check if Supabase is configured
-    if (!supabase) {
-      setSupabaseAvailable(false)
-      setLoading(false)
-      return
-    }
-
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
@@ -25,7 +17,6 @@ export function AuthProvider({ children }) {
       }
       setLoading(false)
     }).catch(() => {
-      setSupabaseAvailable(false)
       setLoading(false)
     })
 
@@ -61,9 +52,6 @@ export function AuthProvider({ children }) {
   }
 
   const signUp = async (email, password, fullName) => {
-    if (!supabaseAvailable) {
-      return { data: null, error: { message: 'Supabase not configured' } }
-    }
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -77,9 +65,6 @@ export function AuthProvider({ children }) {
   }
 
   const signIn = async (email, password) => {
-    if (!supabaseAvailable) {
-      return { data: null, error: { message: 'Supabase not configured' } }
-    }
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -88,7 +73,6 @@ export function AuthProvider({ children }) {
   }
 
   const signOut = async () => {
-    if (!supabaseAvailable) return
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }
@@ -97,7 +81,6 @@ export function AuthProvider({ children }) {
     user,
     profile,
     loading,
-    supabaseAvailable,
     signUp,
     signIn,
     signOut,
