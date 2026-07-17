@@ -1,18 +1,16 @@
-import { Facebook, Twitter, Instagram, Linkedin, TrendingUp, Users, Share2, Heart } from 'lucide-react'
+import { Facebook, Twitter, Instagram, TrendingUp, Users, Share2, Heart } from 'lucide-react'
 
 function SocialMedia() {
   const platforms = [
     { name: 'Facebook', icon: Facebook, followers: '12.5K', engagement: '4.2%', color: 'bg-blue-600' },
     { name: 'Twitter', icon: Twitter, followers: '8.3K', engagement: '3.8%', color: 'bg-sky-500' },
     { name: 'Instagram', icon: Instagram, followers: '25.7K', engagement: '5.1%', color: 'bg-pink-600' },
-    { name: 'LinkedIn', icon: Linkedin, followers: '5.2K', engagement: '2.9%', color: 'bg-blue-700' },
   ]
 
   const recentPosts = [
     { id: 1, platform: 'Instagram', content: 'New affiliate program launch! 🚀', likes: 234, shares: 45, date: '2 hours ago' },
     { id: 2, platform: 'Twitter', content: 'Join our affiliate network and earn commissions', likes: 156, shares: 89, date: '5 hours ago' },
     { id: 3, platform: 'Facebook', content: 'Success story: How our top affiliate earned $10K', likes: 432, shares: 67, date: '1 day ago' },
-    { id: 4, platform: 'LinkedIn', content: 'Building strategic partnerships in 2024', likes: 98, shares: 23, date: '2 days ago' },
   ]
 
   const getPlatformIcon = (platform) => {
@@ -23,8 +21,6 @@ function SocialMedia() {
         return Twitter
       case 'Instagram':
         return Instagram
-      case 'LinkedIn':
-        return Linkedin
       default:
         return Share2
     }
@@ -38,8 +34,6 @@ function SocialMedia() {
         return 'bg-sky-500'
       case 'Instagram':
         return 'bg-pink-600'
-      case 'LinkedIn':
-        return 'bg-blue-700'
       default:
         return 'bg-gray-600'
     }

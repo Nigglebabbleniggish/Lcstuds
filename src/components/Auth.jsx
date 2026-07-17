@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Mail, Lock, User, Eye, EyeOff, Loader2, ArrowLeft, MailCheck, CheckCircle } from 'lucide-react'
 
-function Auth({ onBack }) {
-  const [isLogin, setIsLogin] = useState(true)
+function Auth({ onBack, initialMode = 'login' }) {
+  const [isLogin, setIsLogin] = useState(initialMode === 'login')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')

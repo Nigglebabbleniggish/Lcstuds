@@ -11,7 +11,8 @@ import {
   DollarSign,
   Zap,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  Settings
 } from 'lucide-react'
 import Affiliates from './components/Affiliates'
 import Verifier from './components/Verifier'
@@ -25,6 +26,9 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [showAuth, setShowAuth] = useState(false)
+  const [authMode, setAuthMode] = useState('login')
+  const [showSettings, setShowSettings] = useState(false)
+  const [theme, setTheme] = useState('dark')
 
   if (loading) {
     return (
@@ -40,7 +44,7 @@ function App() {
   // Show landing page if not logged in
   if (!user) {
     if (showAuth) {
-      return <Auth onBack={() => setShowAuth(false)} />
+      return <Auth onBack={() => setShowAuth(false)} initialMode={authMode} />
     }
     
     return (
@@ -55,19 +59,28 @@ function App() {
               </div>
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => setShowAuth(true)}
+                  onClick={() => {
+                    setAuthMode('login')
+                    setShowAuth(true)
+                  }}
                   className="px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
                 >
                   Dashboard
                 </button>
                 <button
-                  onClick={() => setShowAuth(true)}
+                  onClick={() => {
+                    setAuthMode('login')
+                    setShowAuth(true)
+                  }}
                   className="px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
                 >
                   Sign In
                 </button>
                 <button
-                  onClick={() => setShowAuth(true)}
+                  onClick={() => {
+                    setAuthMode('signup')
+                    setShowAuth(true)
+                  }}
                   className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                 >
                   Sign Up
@@ -80,13 +93,13 @@ function App() {
         {/* Hero Section */}
         <section className="py-20 px-4">
           <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 slide-in">
               Start Earning Today
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto slide-in-delay-1">
               Join our affiliate program and earn commissions by promoting products you love. Simple signup, great rewards, and real-time tracking.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center slide-in-delay-2">
               <button
                 onClick={() => setShowAuth(true)}
                 className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
@@ -186,15 +199,15 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex`}>
       {/* Sidebar */}
-      <aside 
-        className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 z-50 transition-all duration-300 ${
+      <aside
+        className={`fixed left-0 top-0 h-full ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r z-50 transition-all duration-300 ${
           sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'
         }`}
       >
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-primary-600 mb-8">
+          <h1 className={`text-2xl font-bold mb-8 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>
             Affiliate Hub
           </h1>
           <nav className="space-y-2">
@@ -206,8 +219,8 @@ function App() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-primary-50 text-primary-700 font-medium'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      ? theme === 'dark' ? 'bg-primary-900/30 text-primary-400' : 'bg-primary-50 text-primary-700'
+                      : theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
                   <Icon size={20} />
@@ -224,31 +237,71 @@ function App() {
         sidebarOpen ? 'ml-64' : 'ml-0'
       }`}>
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
+        <header className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40`}>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'}`}
           >
             {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'}`}
+              title="Settings"
+            >
+              <Settings size={20} />
+            </button>
             <div className="text-right">
-              <p className="font-medium text-gray-900">{profile?.full_name || user?.email}</p>
-              <p className="text-sm text-gray-500">{profile?.email || user?.email}</p>
+              <p className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{profile?.full_name || user?.email}</p>
+              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{profile?.email || user?.email}</p>
             </div>
-            <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-              <span className="text-primary-700 font-semibold">
+            <div className={`w-10 h-10 ${theme === 'dark' ? 'bg-primary-900/30' : 'bg-primary-100'} rounded-full flex items-center justify-center`}>
+              <span className={`${theme === 'dark' ? 'text-primary-400' : 'text-primary-700'} font-semibold`}>
                 {(profile?.full_name || user?.email)?.charAt(0).toUpperCase()}
               </span>
             </div>
             <button
               onClick={signOut}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-red-600"
+              className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-300 hover:text-red-400' : 'hover:bg-gray-100 text-gray-500 hover:text-red-600'}`}
               title="Sign out"
             >
               <LogOut size={20} />
             </button>
           </div>
+
+          {showSettings && (
+            <div className={`absolute top-16 right-6 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-lg shadow-lg p-4 z-50 w-64`}>
+              <h3 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Settings</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Theme</label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setTheme('dark')}
+                      className={`flex-1 py-2 px-3 rounded-lg border-2 transition-colors ${
+                        theme === 'dark'
+                          ? 'border-primary-500 bg-primary-900/30 text-primary-400'
+                          : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                      }`}
+                    >
+                      Dark
+                    </button>
+                    <button
+                      onClick={() => setTheme('light')}
+                      className={`flex-1 py-2 px-3 rounded-lg border-2 transition-colors ${
+                        theme === 'light'
+                          ? 'border-primary-600 bg-primary-50 text-primary-700'
+                          : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                      }`}
+                    >
+                      Light
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </header>
 
         {/* Page Content */}
