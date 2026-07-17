@@ -79,6 +79,15 @@ export function AuthProvider({ children }) {
     if (error) throw error
   }
 
+  const verifyOtp = async (email, token) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'signup'
+    })
+    return { error }
+  }
+
   const value = {
     user,
     profile,
@@ -86,6 +95,7 @@ export function AuthProvider({ children }) {
     signUp,
     signIn,
     signOut,
+    verifyOtp,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
