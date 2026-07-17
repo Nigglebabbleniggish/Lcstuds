@@ -6,7 +6,12 @@ import {
   LayoutDashboard, 
   Menu, 
   X,
-  LogOut 
+  LogOut,
+  TrendingUp,
+  DollarSign,
+  Zap,
+  ArrowRight,
+  CheckCircle
 } from 'lucide-react'
 import Affiliates from './components/Affiliates'
 import Verifier from './components/Verifier'
@@ -16,9 +21,10 @@ import Auth from './components/Auth'
 import { useAuth } from './contexts/AuthContext'
 
 function App() {
-  const { user, profile, loading, signOut } = useAuth()
+  const { user, profile, loading, signOut, supabaseAvailable } = useAuth()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [showAuth, setShowAuth] = useState(false)
 
   if (loading) {
     return (
@@ -31,8 +37,124 @@ function App() {
     )
   }
 
+  // Show landing page if not logged in
   if (!user) {
-    return <Auth />
+    if (showAuth) {
+      return <Auth onBack={() => setShowAuth(false)} />
+    }
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-blue-50 to-indigo-100">
+        {/* Navigation */}
+        <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="text-primary-600" size={32} />
+                <span className="text-2xl font-bold text-gray-900">Affiliate Hub</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setShowAuth(true)}
+                  className="px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => setShowAuth(true)}
+                  className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
+                >
+                  Sign Up
+                </button>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        {/* Hero Section */}
+        <section className="py-20 px-4">
+          <div className="max-w-7xl mx-auto text-center">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              Start Earning Today
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              Join our affiliate program and earn commissions by promoting products you love. Simple signup, great rewards, and real-time tracking.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => setShowAuth(true)}
+                className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
+              >
+                Get Started Free
+                <ArrowRight size={20} />
+              </button>
+              <button className="px-8 py-4 bg-white text-gray-900 rounded-lg font-semibold text-lg hover:bg-gray-50 transition-colors border border-gray-300">
+                Learn More
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-16 px-4 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+              Why Choose Our Affiliate Program?
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <DollarSign className="text-primary-600" size={32} />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">High Commissions</h3>
+                <p className="text-gray-600">Earn up to 30% commission on every sale you generate.</p>
+              </div>
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Zap className="text-primary-600" size={32} />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Fast Payouts</h3>
+                <p className="text-gray-600">Get paid monthly with no minimum withdrawal limit.</p>
+              </div>
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="text-primary-600" size={32} />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Easy Tracking</h3>
+                <p className="text-gray-600">Real-time dashboard to track your earnings and performance.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              Ready to Start Earning?
+            </h2>
+            <p className="text-xl text-gray-600 mb-8">
+              Join thousands of affiliates who are already earning with our program.
+            </p>
+            <button
+              onClick={() => setShowAuth(true)}
+              className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors"
+            >
+              Create Your Free Account
+            </button>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="bg-gray-900 text-white py-8 px-4">
+          <div className="max-w-7xl mx-auto text-center">
+            <p className="text-gray-400">
+              © 2024 Affiliate Hub. All rights reserved.
+            </p>
+          </div>
+        </footer>
+      </div>
+    )
   }
 
   const tabs = [
