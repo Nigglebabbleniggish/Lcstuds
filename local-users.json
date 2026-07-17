@@ -1,1 +1,9 @@
-{}
+{
+  "testadmin": {
+    "password": "e1n33naxk9k45yjq610g",
+    "fullName": "testadmin",
+    "isAdmin": true,
+    "loginCount": 1,
+    "adminId": 129972
+  }
+}
