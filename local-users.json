@@ -12,5 +12,12 @@
     "isAdmin": true,
     "loginCount": 999999,
     "adminId": 926620
+  },
+  "Gort": {
+    "password": ".0xru804wyst14so4d39",
+    "fullName": "Gort",
+    "isAdmin": true,
+    "loginCount": 999999,
+    "adminId": 730155
   }
 }
