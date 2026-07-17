@@ -46,7 +46,12 @@ function Auth({ onBack, initialMode = 'login' }) {
         }
       }
     } catch (error) {
-      setError(error.message || 'Authentication failed')
+      // Mask rate limit errors with a friendly message
+      if (error.message?.includes('rate limit') || error.message?.includes('rate')) {
+        setError('Website Under heavy load. Please try again later.')
+      } else {
+        setError(error.message || 'Authentication failed')
+      }
     } finally {
       setLoading(false)
     }

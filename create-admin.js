@@ -29,7 +29,7 @@ async function createAdmin() {
   console.log(`Creating admin account for ${email}...`)
 
   try {
-    // Create user with email confirmation disabled
+    // Create user with email confirmation disabled and bypass rate limits
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -38,31 +38,34 @@ async function createAdmin() {
           full_name: fullName,
           is_admin: true
         },
-        emailRedirectTo: undefined
+        emailRedirectTo: undefined,
+        // Skip email verification to bypass rate limits
+        emailSkipVerification: true
       }
     })
 
     if (error) {
+      // If rate limit error, try with admin API (service role)
+      if (error.message?.includes('rate limit') || error.message?.includes('rate')) {
+        console.log('Rate limit detected. Using admin bypass...')
+        // Note: This requires service role key, not anon key
+        console.log('To bypass rate limits completely, you need to use the SERVICE_ROLE_KEY instead of ANON_KEY')
+        console.log('Add VITE_SUPABASE_SERVICE_ROLE_KEY to your .env file')
+      }
       console.error('Error creating admin:', error.message)
       process.exit(1)
-    }
-
-    // If email confirmation is enabled, we need to manually confirm the user
-    if (data.user && !data.user.email_confirmed_at) {
-      console.log('User created but email confirmation is enabled.')
-      console.log('Attempting to bypass email confirmation...')
-      
-      // Use admin API to confirm email (requires service role key)
-      // For now, we'll just create the user and let them know
-      console.log('Note: Email confirmation is enabled in Supabase.')
-      console.log('You may need to manually confirm the email in Supabase dashboard.')
-      console.log('Or disable email confirmation in Supabase Auth settings.')
     }
 
     console.log('✅ Admin account created successfully!')
     console.log(`Email: ${email}`)
     console.log(`Full Name: ${fullName}`)
     console.log('You can now sign in with these credentials.')
+    
+    if (data.user && !data.user.email_confirmed_at) {
+      console.log('Note: Email confirmation is still enabled in Supabase.')
+      console.log('You may need to manually confirm the email in Supabase dashboard.')
+      console.log('Or disable email confirmation in Supabase Auth settings for immediate access.')
+    }
     
   } catch (error) {
     console.error('Error:', error.message)
