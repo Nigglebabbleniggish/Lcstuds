@@ -59,7 +59,7 @@ export function AuthProvider({ children }) {
         data: {
           full_name: fullName,
         },
-        emailRedirectTo: window.location.origin
+        emailRedirectTo: `${window.location.origin}?verified=true`
       }
     })
     // If email verification is not enabled, user will be created immediately

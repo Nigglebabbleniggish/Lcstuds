@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { Mail, Lock, User, Eye, EyeOff, Loader2, ArrowLeft, MailCheck } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff, Loader2, ArrowLeft, MailCheck, CheckCircle } from 'lucide-react'
 
 function Auth({ onBack }) {
   const [isLogin, setIsLogin] = useState(true)
@@ -8,6 +8,7 @@ function Auth({ onBack }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showEmailSent, setShowEmailSent] = useState(false)
+  const [showVerified, setShowVerified] = useState(false)
   const { signIn, signUp } = useAuth()
 
   const [formData, setFormData] = useState({
@@ -15,6 +16,17 @@ function Auth({ onBack }) {
     email: '',
     password: '',
   })
+
+  // Check if user was redirected after email verification
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('verified') === 'true') {
+      setShowVerified(true)
+      setIsLogin(true)
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -53,7 +65,28 @@ function Auth({ onBack }) {
           </button>
         )}
 
-        {showEmailSent ? (
+        {showVerified ? (
+          <>
+            <div className="text-center mb-8">
+              <CheckCircle className="mx-auto mb-4 text-green-600" size={48} />
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Email Verified!</h1>
+              <p className="text-gray-600">
+                Your email has been successfully verified. You can now sign in to your account.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                setShowVerified(false)
+                setIsLogin(true)
+                setError('')
+              }}
+              className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
+            >
+              Sign In
+            </button>
+          </>
+        ) : showEmailSent ? (
           <>
             <div className="text-center mb-8">
               <MailCheck className="mx-auto mb-4 text-primary-600" size={48} />
