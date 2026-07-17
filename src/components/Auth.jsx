@@ -28,9 +28,12 @@ function Auth({ onBack }) {
         const { error } = await signIn(formData.email, formData.password)
         if (error) throw error
       } else {
-        const { error } = await signUp(formData.email, formData.password, formData.fullName)
+        const { data, error } = await signUp(formData.email, formData.password, formData.fullName)
         if (error) throw error
-        setShowVerification(true)
+        // Only show verification if email confirmation is required
+        if (data?.user && !data.user.email_confirmed_at) {
+          setShowVerification(true)
+        }
       }
     } catch (error) {
       setError(error.message || 'Authentication failed')

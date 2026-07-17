@@ -62,6 +62,7 @@ export function AuthProvider({ children }) {
         emailRedirectTo: window.location.origin
       }
     })
+    // If email verification is not enabled, user will be created immediately
     return { data, error }
   }
 
