@@ -55,7 +55,7 @@ function App() {
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center gap-2">
                 <TrendingUp className={theme === 'dark' ? 'text-primary-400' : 'text-primary-600'} size={32} />
-                <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>LC Studio</span>
+                <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Lc Studio</span>
               </div>
               <div className="flex items-center gap-4">
                 <button
@@ -131,44 +131,44 @@ function App() {
         </nav>
 
         {/* Hero Section */}
-        <section className="py-20 px-4">
+        <section className="py-32 px-4">
           <div className="max-w-7xl mx-auto text-center">
-            <h1 className={`text-5xl md:text-6xl font-bold mb-6 slide-in ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-              Latest Trending Streamer Clips
+            <h1 className={`text-6xl md:text-8xl font-bold mb-6 slide-in ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+              Latest Trending
             </h1>
-            <p className={`text-xl mb-8 max-w-2xl mx-auto slide-in-delay-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-              Discover and share the best moments from your favorite streamers. Join our community of content creators and clip enthusiasts.
+            <h1 className={`text-6xl md:text-8xl font-bold mb-8 slide-in-delay-1 text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-purple-500`}>
+              Streamer Clips
+            </h1>
+            <p className={`text-2xl mb-12 max-w-3xl mx-auto slide-in-delay-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+              Discover and share the best moments from your favorite streamers
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center slide-in-delay-2">
               <button
                 onClick={() => setShowAuth(true)}
-                className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
+                className="px-10 py-4 bg-primary-600 text-white rounded-xl font-semibold text-lg hover:bg-primary-700 transition-all hover:scale-105 flex items-center justify-center gap-2"
               >
                 Start Clipping
                 <ArrowRight size={20} />
-              </button>
-              <button className={`px-8 py-4 rounded-lg font-semibold text-lg transition-colors border ${theme === 'dark' ? 'bg-gray-800 text-gray-100 border-gray-700 hover:bg-gray-700' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}>
-                Learn More
               </button>
             </div>
           </div>
         </section>
 
         {/* Stats Section */}
-        <section className={`py-16 px-4 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-white'}`}>
+        <section className={`py-16 px-4 ${theme === 'dark' ? 'bg-gray-800/30' : 'bg-white'}`}>
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center p-6">
-                <div className={`text-4xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>600k+</div>
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Paid out to clippers</p>
+              <div className="text-center p-8">
+                <div className={`text-5xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>$600K+</div>
+                <p className={`text-xl ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Paid to Clippers</p>
               </div>
-              <div className="text-center p-6">
-                <div className={`text-4xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>10M+</div>
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Clips created</p>
+              <div className="text-center p-8">
+                <div className={`text-5xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>10K+</div>
+                <p className={`text-xl ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Active Clippers</p>
               </div>
-              <div className="text-center p-6">
-                <div className={`text-4xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>50k+</div>
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Active clippers</p>
+              <div className="text-center p-8">
+                <div className={`text-5xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>1M+</div>
+                <p className={`text-xl ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Clips Created</p>
               </div>
             </div>
           </div>
@@ -178,10 +178,10 @@ function App() {
         <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className={`text-4xl font-bold mb-6 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-              Ready to Start Clipping?
+              Start Earning Today
             </h2>
             <p className={`text-xl mb-8 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-              Join thousands of clippers creating and sharing the best streamer moments.
+              Join thousands of clippers earning money from streamer content
             </p>
             <button
               onClick={() => setShowAuth(true)}
@@ -193,10 +193,10 @@ function App() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-gray-900 text-white py-8 px-4">
+        <footer className="bg-gray-950 text-white py-8 px-4">
           <div className="max-w-7xl mx-auto text-center">
             <p className="text-gray-400">
-              © 2024 LC Studio. All rights reserved.
+              © 2024 Lc Studio. All rights reserved.
             </p>
           </div>
         </footer>
@@ -236,7 +236,7 @@ function App() {
       >
         <div className="p-6">
           <h1 className={`text-2xl font-bold mb-8 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>
-            LC Studio
+            Lc Studio
           </h1>
           <nav className="space-y-2">
             {tabs.map((tab) => {
