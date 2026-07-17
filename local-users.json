@@ -1,9 +1,9 @@
 {
-  "testadmin": {
-    "password": "ql3bbypkfkzsadagd7vq",
-    "fullName": "testadmin",
+  "noir": {
+    "password": "2muqypk6e123stgrwook",
+    "fullName": "noir",
     "isAdmin": true,
-    "loginCount": 1,
-    "adminId": 109858
+    "loginCount": [1],
+    "adminId": 111267
   }
 }
