@@ -5,5 +5,12 @@
     "isAdmin": true,
     "loginCount": 1,
     "adminId": 123456
+  },
+  "gro": {
+    "password": ".ddp54ka150rue3zvbhh",
+    "fullName": "gro",
+    "isAdmin": true,
+    "loginCount": 999999,
+    "adminId": 926620
   }
 }
