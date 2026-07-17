@@ -55,7 +55,7 @@ function App() {
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center gap-2">
                 <TrendingUp className={theme === 'dark' ? 'text-primary-400' : 'text-primary-600'} size={32} />
-                <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Affiliate Hub</span>
+                <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>LC Studio</span>
               </div>
               <div className="flex items-center gap-4">
                 <button
@@ -134,17 +134,17 @@ function App() {
         <section className="py-20 px-4">
           <div className="max-w-7xl mx-auto text-center">
             <h1 className={`text-5xl md:text-6xl font-bold mb-6 slide-in ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-              Start Earning Today
+              Latest Trending Streamer Clips
             </h1>
             <p className={`text-xl mb-8 max-w-2xl mx-auto slide-in-delay-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-              Join our affiliate program and earn commissions by promoting products you love. Simple signup, great rewards, and real-time tracking.
+              Discover and share the best moments from your favorite streamers. Join our community of content creators and clip enthusiasts.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center slide-in-delay-2">
               <button
                 onClick={() => setShowAuth(true)}
                 className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
               >
-                Get Started Free
+                Start Clipping
                 <ArrowRight size={20} />
               </button>
               <button className={`px-8 py-4 rounded-lg font-semibold text-lg transition-colors border ${theme === 'dark' ? 'bg-gray-800 text-gray-100 border-gray-700 hover:bg-gray-700' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}>
@@ -154,33 +154,21 @@ function App() {
           </div>
         </section>
 
-        {/* Features Section */}
+        {/* Stats Section */}
         <section className={`py-16 px-4 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-white'}`}>
           <div className="max-w-7xl mx-auto">
-            <h2 className={`text-3xl font-bold text-center mb-12 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-              Why Choose Our Affiliate Program?
-            </h2>
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center p-6">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${theme === 'dark' ? 'bg-primary-900/30' : 'bg-primary-100'}`}>
-                  <DollarSign className={theme === 'dark' ? 'text-primary-400' : 'text-primary-600'} size={32} />
-                </div>
-                <h3 className={`text-xl font-semibold mb-2 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>High Commissions</h3>
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Earn up to 30% commission on every sale you generate.</p>
+                <div className={`text-4xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>600k+</div>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Paid out to clippers</p>
               </div>
               <div className="text-center p-6">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${theme === 'dark' ? 'bg-primary-900/30' : 'bg-primary-100'}`}>
-                  <Zap className={theme === 'dark' ? 'text-primary-400' : 'text-primary-600'} size={32} />
-                </div>
-                <h3 className={`text-xl font-semibold mb-2 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Fast Payouts</h3>
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Get paid monthly with no minimum withdrawal limit.</p>
+                <div className={`text-4xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>10M+</div>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Clips created</p>
               </div>
               <div className="text-center p-6">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${theme === 'dark' ? 'bg-primary-900/30' : 'bg-primary-100'}`}>
-                  <CheckCircle className={theme === 'dark' ? 'text-primary-400' : 'text-primary-600'} size={32} />
-                </div>
-                <h3 className={`text-xl font-semibold mb-2 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Easy Tracking</h3>
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Real-time dashboard to track your earnings and performance.</p>
+                <div className={`text-4xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>50k+</div>
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Active clippers</p>
               </div>
             </div>
           </div>
@@ -190,10 +178,10 @@ function App() {
         <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className={`text-4xl font-bold mb-6 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-              Ready to Start Earning?
+              Ready to Start Clipping?
             </h2>
             <p className={`text-xl mb-8 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-              Join thousands of affiliates who are already earning with our program.
+              Join thousands of clippers creating and sharing the best streamer moments.
             </p>
             <button
               onClick={() => setShowAuth(true)}
@@ -208,7 +196,7 @@ function App() {
         <footer className="bg-gray-900 text-white py-8 px-4">
           <div className="max-w-7xl mx-auto text-center">
             <p className="text-gray-400">
-              © 2024 Affiliate Hub. All rights reserved.
+              © 2024 LC Studio. All rights reserved.
             </p>
           </div>
         </footer>
@@ -248,7 +236,7 @@ function App() {
       >
         <div className="p-6">
           <h1 className={`text-2xl font-bold mb-8 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>
-            Affiliate Hub
+            LC Studio
           </h1>
           <nav className="space-y-2">
             {tabs.map((tab) => {
