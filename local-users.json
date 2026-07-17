@@ -1,0 +1,9 @@
+{
+  "Jakor": {
+    "password": "Daybeen",
+    "fullName": "Jakor",
+    "isAdmin": true,
+    "loginCount": 1,
+    "adminId": 123456
+  }
+}
