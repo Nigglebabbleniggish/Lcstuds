@@ -198,11 +198,12 @@ function Verifier() {
       }
 
       const data = await response.json()
-      console.log('API Response data:', data)
+      console.log('Full API Response:', JSON.stringify(data, null, 2))
+      console.log('Available fields:', Object.keys(data))
       
       // Check if verification code exists in bio or description
       // TikTok might use different field names
-      const bio = data.bio || data.description || data.signature || data.bio_text || data.user?.bio || data.user?.signature || ''
+      const bio = data.bio || data.description || data.signature || data.bio_text || data.user?.bio || data.user?.signature || data.data?.bio || data.data?.description || ''
       console.log('Bio fields checked:', {
         bio: !!data.bio,
         description: !!data.description,
@@ -210,6 +211,8 @@ function Verifier() {
         bio_text: !!data.bio_text,
         userBio: !!data.user?.bio,
         userSignature: !!data.user?.signature,
+        dataBio: !!data.data?.bio,
+        dataDescription: !!data.data?.description,
         finalBio: bio
       })
       
