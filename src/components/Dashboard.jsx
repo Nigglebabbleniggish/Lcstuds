@@ -11,7 +11,10 @@ function Dashboard() {
     totalViews: 0,
     totalFollowers: 0,
     engagementRate: 0,
-    socialAccounts: 0
+    socialAccounts: 0,
+    totalLikes: 0,
+    totalComments: 0,
+    totalShares: 0
   })
   const [recentActivity, setRecentActivity] = useState([])
   const [loading, setLoading] = useState(true)
@@ -36,11 +39,15 @@ function Dashboard() {
         profile?.id ? supabase.from('social_accounts').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] })
       ])
 
-      const totalViews = campaignsData.data?.reduce((sum, c) => sum + (c.views_required || 0), 0) || 0
+      // Calculate total views from social accounts instead of campaigns
+      const totalViews = socialData.data?.reduce((sum, s) => sum + (s.views || 0), 0) || 0
       const totalFollowers = socialData.data?.reduce((sum, s) => sum + (s.followers || 0), 0) || 0
       const avgEngagement = socialData.data?.length > 0 
         ? socialData.data.reduce((sum, s) => sum + (s.engagement_rate || 0), 0) / socialData.data.length 
         : 0
+      const totalLikes = socialData.data?.reduce((sum, s) => sum + (s.likes || 0), 0) || 0
+      const totalComments = socialData.data?.reduce((sum, s) => sum + (s.comments || 0), 0) || 0
+      const totalShares = socialData.data?.reduce((sum, s) => sum + (s.shares || 0), 0) || 0
 
       setStats({
         totalEarnings: earningsData.data?.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0) || 0,
@@ -48,7 +55,10 @@ function Dashboard() {
         totalViews,
         totalFollowers,
         engagementRate: avgEngagement,
-        socialAccounts: socialData.data?.length || 0
+        socialAccounts: socialData.data?.length || 0,
+        totalLikes,
+        totalComments,
+        totalShares
       })
 
       setRecentActivity(earningsData.data || [])
@@ -64,6 +74,10 @@ function Dashboard() {
     { label: 'Active Campaigns', value: stats.activeCampaigns, icon: Target, color: 'from-blue-500 to-cyan-600', bg: 'bg-blue-500/10' },
     { label: 'Total Followers', value: stats.totalFollowers.toLocaleString(), icon: Users, color: 'from-purple-500 to-violet-600', bg: 'bg-purple-500/10' },
     { label: 'Engagement Rate', value: `${stats.engagementRate.toFixed(1)}%`, icon: Heart, color: 'from-pink-500 to-rose-600', bg: 'bg-pink-500/10' },
+    { label: 'Total Views', value: stats.totalViews.toLocaleString(), icon: Eye, color: 'from-indigo-500 to-blue-600', bg: 'bg-indigo-500/10' },
+    { label: 'Total Likes', value: stats.totalLikes.toLocaleString(), icon: Heart, color: 'from-red-500 to-orange-600', bg: 'bg-red-500/10' },
+    { label: 'Total Comments', value: stats.totalComments.toLocaleString(), icon: MessageCircle, color: 'from-teal-500 to-cyan-600', bg: 'bg-teal-500/10' },
+    { label: 'Total Shares', value: stats.totalShares.toLocaleString(), icon: Share2, color: 'from-amber-500 to-yellow-600', bg: 'bg-amber-500/10' },
   ]
 
   if (loading) {
@@ -84,7 +98,7 @@ function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {statCards.map((stat) => {
           const Icon = stat.icon
           return (

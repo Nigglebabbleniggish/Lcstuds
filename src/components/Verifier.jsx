@@ -8,6 +8,8 @@ function Verifier() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [newAccount, setNewAccount] = useState({ platform: '', username: '', link: '' })
   const [loading, setLoading] = useState(true)
+  const [verificationCode, setVerificationCode] = useState(null)
+  const [showVerificationModal, setShowVerificationModal] = useState(false)
 
   useEffect(() => {
     // Skip Supabase fetch for local users
@@ -82,11 +84,27 @@ function Verifier() {
     },
   ]
 
+  const generateVerificationCode = () => {
+    const code = Math.floor(100000 + Math.random() * 900000).toString()
+    setVerificationCode(code)
+    return code
+  }
+
   const handleAddAccount = (e) => {
     e.preventDefault()
-    setAccounts([...accounts, { ...newAccount, id: Date.now() }])
+    const code = generateVerificationCode()
+    const accountWithCode = { 
+      ...newAccount, 
+      id: Date.now(),
+      verificationCode: code,
+      verified: false,
+      views: 0,
+      performance: 0
+    }
+    setAccounts([...accounts, accountWithCode])
     setNewAccount({ platform: '', username: '', link: '' })
     setShowAddModal(false)
+    setShowVerificationModal(true)
   }
 
   const handleDeleteAccount = (id) => {
@@ -144,13 +162,23 @@ function Verifier() {
                 ) : (
                   platformAccounts.map((account) => (
                     <div key={account.id} className="bg-zinc-800 rounded-lg p-3 flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
-                      <div>
-                        <p className="text-white font-medium">{account.username}</p>
-                        {account.link && (
-                          <a href={account.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-sm hover:underline">
-                            View Profile
-                          </a>
-                        )}
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 ${platform.color} rounded-lg`}>
+                          <div className="text-white w-4 h-4">
+                            {Icon}
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-white font-medium">{account.username}</p>
+                          <div className="flex items-center gap-2">
+                            {account.verified ? (
+                              <span className="text-green-400 text-xs">✓ Verified</span>
+                            ) : (
+                              <span className="text-yellow-400 text-xs">Pending verification</span>
+                            )}
+                            <span className="text-gray-500 text-xs">• {account.views?.toLocaleString() || 0} views</span>
+                          </div>
+                        </div>
                       </div>
                       <button
                         onClick={(e) => {
@@ -233,6 +261,47 @@ function Verifier() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Verification Code Modal */}
+      {showVerificationModal && verificationCode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+          <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-white">Verify Your Account</h3>
+              <button
+                onClick={() => setShowVerificationModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="bg-zinc-800 rounded-lg p-4 mb-4">
+              <p className="text-gray-400 text-sm mb-2">Your verification code:</p>
+              <div className="bg-zinc-900 rounded-lg p-4 text-center">
+                <p className="text-3xl font-bold text-white tracking-widest">{verificationCode}</p>
+              </div>
+            </div>
+            
+            <div className="space-y-3 text-sm text-gray-400">
+              <p>To verify your account ownership:</p>
+              <ol className="list-decimal list-inside space-y-2">
+                <li>Post this code on your social media profile (bio, story, or post)</li>
+                <li>Make the post public for at least 24 hours</li>
+                <li>We'll detect the code and verify your account automatically</li>
+              </ol>
+              <p className="text-yellow-400 text-xs mt-4">Note: This code is unique to your account. Do not share it with others.</p>
+            </div>
+            
+            <button
+              onClick={() => setShowVerificationModal(false)}
+              className="w-full mt-4 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              I've Posted the Code
+            </button>
           </div>
         </div>
       )}
