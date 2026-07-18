@@ -17,6 +17,7 @@ function Affiliates() {
   const [userSubmissions, setUserSubmissions] = useState([])
   const [videoSubmissions, setVideoSubmissions] = useState([])
   const [allVideoSubmissions, setAllVideoSubmissions] = useState([])
+  const [profiles, setProfiles] = useState([])
   const [showVideoSubmitModal, setShowVideoSubmitModal] = useState(false)
   const [newVideoSubmission, setNewVideoSubmission] = useState({
     video_url: '',
@@ -42,12 +43,13 @@ function Affiliates() {
 
   const fetchData = async () => {
     try {
-      const [rewardsData, affiliatesData, submissionsData, videoSubmissionsData, allVideoSubmissionsData] = await Promise.all([
+      const [rewardsData, affiliatesData, submissionsData, videoSubmissionsData, allVideoSubmissionsData, profilesData] = await Promise.all([
         supabase.from('content_rewards').select('*').order('created_at', { ascending: false }),
         supabase.from('affiliates').select('*').order('created_at', { ascending: false }),
         profile ? supabase.from('campaign_submissions').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] }),
         profile ? supabase.from('video_submissions').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] }),
-        profile?.is_admin ? supabase.from('video_submissions').select('*').order('submitted_at', { ascending: false }) : Promise.resolve({ data: [] })
+        profile?.is_admin ? supabase.from('video_submissions').select('*').order('submitted_at', { ascending: false }) : Promise.resolve({ data: [] }),
+        profile?.is_admin ? supabase.from('profiles').select('id, username, full_name') : Promise.resolve({ data: [] })
       ])
       
       if (rewardsData.error) throw rewardsData.error
@@ -55,12 +57,14 @@ function Affiliates() {
       if (submissionsData.error) throw submissionsData.error
       if (videoSubmissionsData.error) throw videoSubmissionsData.error
       if (allVideoSubmissionsData.error) throw allVideoSubmissionsData.error
+      if (profilesData.error) throw profilesData.error
       
       setRewards(rewardsData.data || [])
       setAffiliates(affiliatesData.data || [])
       setUserSubmissions(submissionsData.data || [])
       setVideoSubmissions(videoSubmissionsData.data || [])
       setAllVideoSubmissions(allVideoSubmissionsData.data || [])
+      setProfiles(profilesData.data || [])
     } catch (error) {
       console.error('Error fetching data:', error.message)
     } finally {
@@ -415,7 +419,10 @@ function Affiliates() {
                       {submission.video_url}
                     </a>
                     <p className="text-gray-500 text-xs mt-1">
-                      User ID: {submission.user_id} • Submitted: {new Date(submission.submitted_at).toLocaleDateString()}
+                      {(() => {
+                        const userProfile = profiles.find(p => p.id === submission.user_id)
+                        return userProfile ? (userProfile.full_name || userProfile.username) : 'Unknown User'
+                      })()} • Submitted: {new Date(submission.submitted_at).toLocaleDateString()}
                     </p>
                   </div>
                   {submission.status === 'pending' && (
