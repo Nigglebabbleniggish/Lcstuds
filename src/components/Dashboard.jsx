@@ -14,7 +14,6 @@ function Dashboard() {
     socialAccounts: 0
   })
   const [socialAccounts, setSocialAccounts] = useState([])
-  const [showAllAccounts, setShowAllAccounts] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -178,39 +177,32 @@ function Dashboard() {
       </div>
 
       {/* Social Accounts Section */}
-      <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-white">Connected Social Accounts</h3>
-          <button
-            onClick={() => setShowAllAccounts(!showAllAccounts)}
-            className="text-sm text-blue-400 hover:text-blue-300"
-          >
-            {showAllAccounts ? 'Collapse' : 'Expand All'}
-          </button>
-        </div>
+      <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-4">
+        <h3 className="text-lg font-bold text-white mb-3">Connected Social Accounts</h3>
         
         {socialAccounts.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <Share2 size={32} className="mx-auto mb-3 opacity-50" />
+          <div className="text-center py-6 text-gray-500">
+            <Share2 size={24} className="mx-auto mb-2 opacity-50" />
             <p>No social accounts connected yet</p>
           </div>
         ) : (
-          <div className={`grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 ${showAllAccounts ? '' : 'max-h-24 overflow-hidden'}`}>
+          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
             {socialAccounts.map((account, index) => {
               const IconComponent = getPlatformIcon(account.platform)
               const color = getPlatformColor(account.platform)
               return (
                 <div 
                   key={account.id} 
-                  className="bg-zinc-800/50 rounded-md p-2 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in aspect-square flex flex-col justify-center items-center"
+                  className="bg-zinc-800/50 rounded-sm p-1.5 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in aspect-square flex flex-col justify-center items-center"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className={`p-1.5 rounded-md bg-gradient-to-br ${color} w-fit mb-1`}>
-                    <IconComponent />
+                  <div className={`p-1 rounded-sm bg-gradient-to-br ${color} w-fit mb-1`}>
+                    <div className="w-4 h-4">
+                      <IconComponent />
+                    </div>
                   </div>
                   <div className="text-center">
-                    <p className="text-white font-semibold capitalize text-[10px]">{account.platform}</p>
-                    <p className="text-gray-400 text-[10px]">@{account.username}</p>
+                    <p className="text-white font-semibold capitalize text-[8px] leading-tight">{account.platform}</p>
                   </div>
                 </div>
               )
