@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   Users, 
   ShieldCheck, 
@@ -31,6 +31,7 @@ import SubmissionsManagement from './components/SubmissionsManagement'
 import Earnings from './components/Earnings'
 import Auth from './components/Auth'
 import { useAuth } from './contexts/AuthContext'
+import { supabase } from './lib/supabase'
 
 function App() {
   const { user, profile, loading, signOut } = useAuth()
@@ -42,6 +43,30 @@ function App() {
   const [showRules, setShowRules] = useState(false)
   const [theme, setTheme] = useState('dark')
   const [isBanned, setIsBanned] = useState(new URLSearchParams(window.location.search).get('banned') === 'true')
+  const [notifications, setNotifications] = useState([])
+  const [showNotifications, setShowNotifications] = useState(false)
+
+  useEffect(() => {
+    if (user && profile && !profile.id.startsWith('local_')) {
+      fetchNotifications()
+    }
+  }, [user, profile])
+
+  const fetchNotifications = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('video_submissions')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('submitted_at', { ascending: false })
+        .limit(10)
+      
+      if (error) throw error
+      setNotifications(data || [])
+    } catch (error) {
+      console.error('Error fetching notifications:', error)
+    }
+  }
 
   if (isBanned) {
     return (
@@ -467,10 +492,16 @@ function App() {
               <Settings size={20} />
             </button>
             <button
+              onClick={() => setShowNotifications(!showNotifications)}
               className="p-2 rounded-lg transition-colors hover:bg-zinc-800 text-gray-400 relative"
               title="Notifications"
             >
               <Bell size={20} />
+              {notifications.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {notifications.length}
+                </span>
+              )}
             </button>
             <div className="text-right">
               <p className="font-medium text-white">{profile?.full_name || user?.email}</p>
@@ -543,6 +574,54 @@ function App() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {showNotifications && (
+            <div className="absolute top-16 right-6 bg-zinc-900 border-zinc-800 border rounded-lg shadow-lg p-4 z-50 w-96 max-h-[80vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-white">Video Submissions</h3>
+                <button
+                  onClick={() => setShowNotifications(false)}
+                  className="p-1 rounded hover:bg-zinc-800 text-gray-400"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              {notifications.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Bell size={32} className="mx-auto mb-3 opacity-50" />
+                  <p>No video submissions</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {notifications.map((notification) => (
+                    <div key={notification.id} className="bg-zinc-800/50 rounded-lg p-4 border border-zinc-700">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-white font-medium capitalize">{notification.platform}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          notification.status === 'approved' ? 'bg-green-500/20 text-green-400' :
+                          notification.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
+                          'bg-yellow-500/20 text-yellow-400'
+                        }`}>
+                          {notification.status}
+                        </span>
+                      </div>
+                      <a 
+                        href={notification.video_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-400 text-sm hover:underline block truncate"
+                      >
+                        {notification.video_url}
+                      </a>
+                      <p className="text-gray-500 text-xs mt-1">
+                        Submitted: {new Date(notification.submitted_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
