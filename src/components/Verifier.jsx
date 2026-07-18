@@ -12,6 +12,18 @@ function Verifier() {
   const [showVerificationModal, setShowVerificationModal] = useState(false)
 
   useEffect(() => {
+    // Load accounts from localStorage
+    const savedAccounts = localStorage.getItem('social_accounts')
+    if (savedAccounts) {
+      setAccounts(JSON.parse(savedAccounts))
+    }
+
+    // Pre-load API key to localStorage if available in env
+    const envApiKey = import.meta.env.VITE_SOCIAL_FETCH_API_KEY
+    if (envApiKey && !localStorage.getItem('SOCIAL_FETCH_API_KEY')) {
+      localStorage.setItem('SOCIAL_FETCH_API_KEY', envApiKey)
+    }
+
     // Skip Supabase fetch for local users
     if (profile?.id?.startsWith('local_')) {
       setLoading(false)
@@ -20,6 +32,11 @@ function Verifier() {
 
     setLoading(false)
   }, [profile?.id])
+
+  // Save accounts to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('social_accounts', JSON.stringify(accounts))
+  }, [accounts])
 
   const platforms = [
     {
