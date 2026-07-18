@@ -202,17 +202,34 @@ function Verifier() {
       console.log('Available fields:', Object.keys(data))
       
       // Check if verification code exists in bio or description
-      // TikTok might use different field names
-      const bio = data.bio || data.description || data.signature || data.bio_text || data.user?.bio || data.user?.signature || data.data?.bio || data.data?.description || ''
+      // TikTok might use different field names, check nested data structure
+      let bio = ''
+      
+      // Try direct fields
+      bio = data.bio || data.description || data.signature || data.bio_text || ''
+      
+      // Try nested in data object
+      if (!bio && data.data) {
+        bio = data.data.bio || data.data.description || data.data.signature || data.data.bio_text || ''
+      }
+      
+      // Try nested in user object
+      if (!bio && data.user) {
+        bio = data.user.bio || data.user.signature || ''
+      }
+      
+      // Try nested in data.user object
+      if (!bio && data.data?.user) {
+        bio = data.data.user.bio || data.data.user.signature || ''
+      }
+      
       console.log('Bio fields checked:', {
-        bio: !!data.bio,
-        description: !!data.description,
-        signature: !!data.signature,
-        bio_text: !!data.bio_text,
-        userBio: !!data.user?.bio,
-        userSignature: !!data.user?.signature,
+        directBio: !!data.bio,
+        directDescription: !!data.description,
         dataBio: !!data.data?.bio,
         dataDescription: !!data.data?.description,
+        userBio: !!data.user?.bio,
+        dataUserBio: !!data.data?.user?.bio,
         finalBio: bio
       })
       
