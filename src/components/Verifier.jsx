@@ -165,7 +165,14 @@ function Verifier() {
           break
         case 'youtube':
           // Use YouTube Data API instead of Social Fetch
-          const youtubeApiKey = localStorage.getItem('YOUTUBE_API_KEY') || import.meta.env.VITE_YOUTUBE_API_KEY
+          let youtubeApiKey = localStorage.getItem('YOUTUBE_API_KEY') || import.meta.env.VITE_YOUTUBE_API_KEY
+          
+          // Hardcoded fallback
+          if (!youtubeApiKey) {
+            youtubeApiKey = 'AIzaSyA7NWd90TxdR1PPDSKZWSPdZiRfb8OzAEQ'
+            localStorage.setItem('YOUTUBE_API_KEY', youtubeApiKey)
+          }
+          
           if (!youtubeApiKey) {
             throw new Error('YouTube API key not found. Please add VITE_YOUTUBE_API_KEY to environment variables.')
           }
@@ -220,7 +227,12 @@ function Verifier() {
         // For YouTube, try alternative endpoint formats
         if (response.status === 404 && account.platform === 'youtube') {
           console.log('YouTube 404, trying alternative endpoint formats...')
-          const youtubeApiKey = localStorage.getItem('YOUTUBE_API_KEY') || import.meta.env.VITE_YOUTUBE_API_KEY
+          let youtubeApiKey = localStorage.getItem('YOUTUBE_API_KEY') || import.meta.env.VITE_YOUTUBE_API_KEY
+          
+          // Hardcoded fallback
+          if (!youtubeApiKey) {
+            youtubeApiKey = 'AIzaSyA7NWd90TxdR1PPDSKZWSPdZiRfb8OzAEQ'
+          }
           
           // Try with @ prefix
           const altEndpoint = `https://www.googleapis.com/youtube/v3/channels?part=snippet&forUsername=@${account.username.replace('@', '')}&key=${youtubeApiKey}`
