@@ -109,11 +109,21 @@ function Verifier() {
 
   const handleCheckVerification = async (account) => {
     const platform = platforms.find(p => p.id === account.platform)
-    const apiKey = import.meta.env.VITE_SOCIAL_FETCH_API_KEY
+    let apiKey = import.meta.env.VITE_SOCIAL_FETCH_API_KEY
     
     if (!apiKey) {
-      alert('Social Fetch API key not configured. Please add VITE_SOCIAL_FETCH_API_KEY to your environment variables.')
-      return
+      // Try to get from localStorage as fallback
+      apiKey = localStorage.getItem('SOCIAL_FETCH_API_KEY')
+    }
+    
+    if (!apiKey) {
+      const inputKey = prompt('Please enter your Social Fetch API key:')
+      if (inputKey) {
+        apiKey = inputKey
+        localStorage.setItem('SOCIAL_FETCH_API_KEY', inputKey)
+      } else {
+        return
+      }
     }
 
     try {
