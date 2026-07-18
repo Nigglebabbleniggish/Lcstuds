@@ -20,8 +20,17 @@ function Verifier() {
 
     // Pre-load API key to localStorage if available in env
     const envApiKey = import.meta.env.VITE_SOCIAL_FETCH_API_KEY
+    console.log('Env API Key check:', envApiKey ? 'Found' : 'Not found')
+    
+    // Hardcode the API key as fallback since env loading isn't working
+    const hardcodedKey = 'sfk_QNNJJnuVMglhNAHJOMbpoDUvDDjmhnqEUajTdygcCPrccWufqisJeIPPwRkZmLyr'
+    
     if (envApiKey && !localStorage.getItem('SOCIAL_FETCH_API_KEY')) {
       localStorage.setItem('SOCIAL_FETCH_API_KEY', envApiKey)
+      console.log('API key saved to localStorage from env')
+    } else if (!localStorage.getItem('SOCIAL_FETCH_API_KEY')) {
+      localStorage.setItem('SOCIAL_FETCH_API_KEY', hardcodedKey)
+      console.log('API key saved to localStorage from hardcoded value')
     }
 
     // Skip Supabase fetch for local users
@@ -134,13 +143,8 @@ function Verifier() {
     }
     
     if (!apiKey) {
-      const inputKey = prompt('Please enter your Social Fetch API key:')
-      if (inputKey) {
-        apiKey = inputKey
-        localStorage.setItem('SOCIAL_FETCH_API_KEY', inputKey)
-      } else {
-        return
-      }
+      alert('Social Fetch API key not configured. Please add VITE_SOCIAL_FETCH_API_KEY to your .env file or enter it in localStorage.')
+      return
     }
 
     try {
