@@ -16,7 +16,8 @@ import {
   MessageCircle,
   Shield,
   Briefcase,
-  FileText
+  FileText,
+  Target
 } from 'lucide-react'
 import Affiliates from './components/Affiliates'
 import Verifier from './components/Verifier'
