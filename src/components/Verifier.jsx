@@ -117,7 +117,18 @@ function Verifier() {
           const Icon = platform.icon
 
           return (
-            <div key={platform.id} className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
+            <div 
+              key={platform.id} 
+              className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 cursor-pointer hover:border-zinc-700 transition-all"
+              onClick={() => {
+                if (platformAccounts.length > 0) {
+                  window.open(platformAccounts[0].link, '_blank')
+                } else {
+                  setShowAddModal(true)
+                  setNewAccount({ ...newAccount, platform: platform.id })
+                }
+              }}
+            >
               <div className="flex items-center gap-3 mb-4">
                 <div className={`p-3 ${platform.color} rounded-lg`}>
                   <div className="text-white w-6 h-6">
@@ -132,7 +143,7 @@ function Verifier() {
                   <p className="text-gray-500 text-sm">No accounts added</p>
                 ) : (
                   platformAccounts.map((account) => (
-                    <div key={account.id} className="bg-zinc-800 rounded-lg p-3 flex items-center justify-between">
+                    <div key={account.id} className="bg-zinc-800 rounded-lg p-3 flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
                       <div>
                         <p className="text-white font-medium">{account.username}</p>
                         {account.link && (
@@ -142,7 +153,10 @@ function Verifier() {
                         )}
                       </div>
                       <button
-                        onClick={() => handleDeleteAccount(account.id)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteAccount(account.id)
+                        }}
                         className="text-red-400 hover:text-red-300"
                       >
                         ×

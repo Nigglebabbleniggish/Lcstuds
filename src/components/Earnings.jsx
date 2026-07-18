@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { DollarSign, TrendingUp, Calendar, Search } from 'lucide-react'
+import { DollarSign, Search, HelpCircle, CreditCard } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -8,6 +8,7 @@ function Earnings() {
   const [earnings, setEarnings] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [showRequirements, setShowRequirements] = useState(false)
 
   useEffect(() => {
     // Skip Supabase fetch for local users
@@ -53,56 +54,136 @@ function Earnings() {
 
   return (
     <div className="p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <DollarSign className="text-green-400" size={32} />
-        <h2 className="text-3xl font-bold text-white">Earnings</h2>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <h2 className="text-3xl font-bold text-white">Earnings</h2>
+          <button
+            onClick={() => setShowRequirements(!showRequirements)}
+            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-zinc-800 transition-colors"
+            title="Platform Requirements"
+          >
+            <HelpCircle size={24} />
+          </button>
+        </div>
+        <button
+          onClick={async () => {
+            if (totalEarnings < 10) {
+              alert('Minimum payout amount is $10')
+              return
+            }
+            if (!confirm(`Request payout of $${totalEarnings.toFixed(2)}?`)) return
+            try {
+              const { error } = await supabase
+                .from('payout_requests')
+                .insert({
+                  user_id: profile.id,
+                  amount: totalEarnings,
+                  status: 'pending'
+                })
+              if (error) throw error
+              alert('Payout request submitted successfully')
+            } catch (error) {
+              console.error('Error requesting payout:', error)
+              alert('Failed to request payout')
+            }
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          <CreditCard size={20} />
+          Request Payout
+        </button>
       </div>
+
+      {/* Platform Requirements Modal */}
+      {showRequirements && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+          <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-white">Platform Requirements</h3>
+              <button
+                onClick={() => setShowRequirements(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="bg-zinc-800 rounded-lg p-4">
+                <h4 className="font-semibold text-white mb-2">TikTok - $0.80 per 1k views</h4>
+                <ul className="text-sm text-gray-400 space-y-1">
+                  <li>• 60% US Audience</li>
+                  <li>• 30k Views in the past month</li>
+                </ul>
+              </div>
+              
+              <div className="bg-zinc-800 rounded-lg p-4">
+                <h4 className="font-semibold text-white mb-2">Threads - $0.25 per 1k views</h4>
+                <ul className="text-sm text-gray-400 space-y-1">
+                  <li>• 20k views in the past month</li>
+                </ul>
+              </div>
+              
+              <div className="bg-zinc-800 rounded-lg p-4">
+                <h4 className="font-semibold text-white mb-2">Instagram Reels - $0.85 per 1k views</h4>
+                <ul className="text-sm text-gray-400 space-y-1">
+                  <li>• 50k Views in the past month</li>
+                  <li>• 50% US Audience</li>
+                </ul>
+              </div>
+              
+              <div className="bg-zinc-800 rounded-lg p-4">
+                <h4 className="font-semibold text-white mb-2">Twitter/X - $0.35 per 1k views</h4>
+                <ul className="text-sm text-gray-400 space-y-1">
+                  <li>• 60k views in the past month</li>
+                </ul>
+              </div>
+              
+              <div className="bg-zinc-800 rounded-lg p-4">
+                <h4 className="font-semibold text-white mb-2">Facebook - $0.65 per 1k views</h4>
+                <ul className="text-sm text-gray-400 space-y-1">
+                  <li>• 35k views in the past month</li>
+                </ul>
+              </div>
+              
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                <p className="text-blue-400 text-sm font-medium">All platforms must meet requirements to be eligible. Transfers are delivered same day as promised.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-500/20 rounded-lg">
-              <DollarSign className="text-green-400" size={24} />
-            </div>
-            <div>
-              <p className="text-gray-400 text-sm">Total Earnings (Crypto)</p>
-              <p className="text-2xl font-bold text-white">${totalEarnings.toFixed(2)}</p>
-            </div>
+          <div>
+            <p className="text-gray-400 text-sm">Total Earnings</p>
+            <p className="text-2xl font-bold text-white">${totalEarnings.toFixed(2)}</p>
           </div>
         </div>
         <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-500/20 rounded-lg">
-              <TrendingUp className="text-blue-400" size={24} />
-            </div>
-            <div>
-              <p className="text-gray-400 text-sm">Transactions</p>
-              <p className="text-2xl font-bold text-white">{earnings.length}</p>
-            </div>
+          <div>
+            <p className="text-gray-400 text-sm">Transactions</p>
+            <p className="text-2xl font-bold text-white">{earnings.length}</p>
           </div>
         </div>
         <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-purple-500/20 rounded-lg">
-              <Calendar className="text-purple-400" size={24} />
-            </div>
-            <div>
-              <p className="text-gray-400 text-sm">This Month</p>
-              <p className="text-2xl font-bold text-white">
-                ${earnings
-                  .filter(e => new Date(e.created_at).getMonth() === new Date().getMonth())
-                  .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0)
-                  .toFixed(2)}
-              </p>
-            </div>
+          <div>
+            <p className="text-gray-400 text-sm">This Month</p>
+            <p className="text-2xl font-bold text-white">
+              ${earnings
+                .filter(e => new Date(e.created_at).getMonth() === new Date().getMonth())
+                .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0)
+                .toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Payment Method Notice */}
       <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
-        <p className="text-yellow-400 text-sm font-medium">💰 All payments are made in cryptocurrency (USDT/USDC)</p>
+        <p className="text-yellow-400 text-sm font-medium">All payments are made in cryptocurrency (USDT/USDC)</p>
       </div>
 
       {/* Search */}

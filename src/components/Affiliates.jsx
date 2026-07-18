@@ -943,10 +943,47 @@ function Affiliates() {
                     </div>
 
                     <div className="mt-4">
-                      <div className="flex justify-between text-sm text-gray-400 mb-2">
-                        <span>Progress</span>
-                        <span>${(selectedReward.progress || 0).toFixed(2)} / ${selectedReward.budget?.toFixed(2) || '0.00'}</span>
-                      </div>
+                      {profile?.is_admin ? (
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Update Progress ($)</label>
+                          <div className="flex gap-2 mb-3">
+                            <input
+                              type="number"
+                              min="0"
+                              max={selectedReward.budget}
+                              step="0.01"
+                              value={selectedReward.progress || 0}
+                              onChange={(e) => setSelectedReward({ ...selectedReward, progress: parseFloat(e.target.value) })}
+                              className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                              placeholder="0.00"
+                            />
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const { error } = await supabase
+                                    .from('content_rewards')
+                                    .update({ progress: selectedReward.progress })
+                                    .eq('id', selectedReward.id)
+                                  if (error) throw error
+                                  fetchData()
+                                  alert('Progress updated successfully')
+                                } catch (error) {
+                                  console.error('Error updating progress:', error)
+                                  alert('Failed to update progress')
+                                }
+                              }}
+                              className="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
+                            >
+                              Update
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex justify-between text-sm text-gray-400 mb-2">
+                          <span>Progress</span>
+                          <span>${(selectedReward.progress || 0).toFixed(2)} / ${selectedReward.budget?.toFixed(2) || '0.00'}</span>
+                        </div>
+                      )}
                       <div className="w-full bg-zinc-800 rounded-full h-3">
                         <div 
                           className="bg-blue-500 h-3 rounded-full transition-all" 
