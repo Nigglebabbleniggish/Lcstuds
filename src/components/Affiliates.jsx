@@ -101,18 +101,24 @@ function Affiliates() {
   const handleEditReward = async (e) => {
     e.preventDefault()
     try {
+      const updateData = {
+        title: newReward.title,
+        description: newReward.description,
+        budget: parseFloat(newReward.budget),
+        cover_image: newReward.coverImage,
+        font_style: newReward.fontStyle,
+        questions: newReward.questions,
+        resources: newReward.resources
+      }
+
+      // Only update views_required if it has a value
+      if (newReward.viewsRequired) {
+        updateData.views_required = parseFloat(newReward.viewsRequired)
+      }
+
       const { error } = await supabase
         .from('content_rewards')
-        .update({
-          title: newReward.title,
-          description: newReward.description,
-          budget: parseFloat(newReward.budget),
-          views_required: parseFloat(newReward.viewsRequired),
-          cover_image: newReward.coverImage,
-          font_style: newReward.fontStyle,
-          questions: newReward.questions,
-          resources: newReward.resources
-        })
+        .update(updateData)
         .eq('id', selectedReward.id)
 
       if (error) throw error
@@ -122,9 +128,12 @@ function Affiliates() {
       setNewQuestion('')
       setNewResource({ title: '', content: '' })
       fetchData()
+      
+      // Update the selected reward with new data
+      setSelectedReward({ ...selectedReward, ...updateData })
     } catch (error) {
       console.error('Error updating reward:', error.message)
-      alert('Failed to update campaign')
+      alert('Failed to update campaign: ' + error.message)
     }
   }
 
@@ -370,12 +379,6 @@ function Affiliates() {
                   <div>
                     <p className="text-xs text-gray-500">RPM</p>
                     <p className="text-sm font-bold text-blue-400">${reward.views_required?.toFixed(2)} / 1k views</p>
-                  </div>
-                )}
-                {reward.views_required && reward.budget && (
-                  <div>
-                    <p className="text-xs text-gray-500">Views Needed</p>
-                    <p className="text-sm font-bold text-purple-400">{Math.ceil(reward.budget / reward.views_required * 1000).toLocaleString()}</p>
                   </div>
                 )}
                 <div className="w-full mt-2">
@@ -935,12 +938,6 @@ function Affiliates() {
                         <div>
                           <p className="text-gray-400 text-sm mb-1">RPM</p>
                           <p className="text-xl font-bold text-blue-400">${selectedReward.views_required?.toFixed(2)} / 1k views</p>
-                        </div>
-                      )}
-                      {selectedReward.views_required && selectedReward.budget && (
-                        <div>
-                          <p className="text-gray-400 text-sm mb-1">Views Needed</p>
-                          <p className="text-xl font-bold text-purple-400">{Math.ceil(selectedReward.budget / selectedReward.views_required * 1000).toLocaleString()}</p>
                         </div>
                       )}
                     </div>
