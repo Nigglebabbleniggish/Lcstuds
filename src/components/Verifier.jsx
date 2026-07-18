@@ -201,7 +201,17 @@ function Verifier() {
       console.log('API Response data:', data)
       
       // Check if verification code exists in bio or description
-      const bio = data.bio || data.description || ''
+      // TikTok might use different field names
+      const bio = data.bio || data.description || data.signature || data.bio_text || data.user?.bio || data.user?.signature || ''
+      console.log('Bio fields checked:', {
+        bio: !!data.bio,
+        description: !!data.description,
+        signature: !!data.signature,
+        bio_text: !!data.bio_text,
+        userBio: !!data.user?.bio,
+        userSignature: !!data.user?.signature,
+        finalBio: bio
+      })
       
       if (!bio) {
         alert(`No bio or description found for ${account.username}. Please make sure your profile has a bio and post the verification code "${account.verificationCode}" in it.`)
