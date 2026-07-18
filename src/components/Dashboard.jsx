@@ -89,13 +89,13 @@ function Dashboard() {
 
   const getPlatformColor = (platform) => {
     const colors = {
-      instagram: 'from-pink-500 to-purple-600',
-      youtube: 'from-red-500 to-red-600',
-      twitter: 'from-blue-400 to-blue-500',
-      facebook: 'from-blue-600 to-blue-800',
-      linkedin: 'from-blue-700 to-blue-900',
-      tiktok: 'from-gray-800 to-black',
-      threads: 'from-gray-600 to-gray-800'
+      instagram: 'from-pink-500 via-purple-500 to-orange-500',
+      youtube: 'from-red-600 via-red-500 to-red-600',
+      twitter: 'from-blue-400 via-blue-500 to-blue-600',
+      facebook: 'from-blue-600 via-blue-700 to-blue-800',
+      linkedin: 'from-blue-700 via-blue-800 to-blue-900',
+      tiktok: 'from-gray-900 via-black to-gray-800',
+      threads: 'from-gray-600 via-gray-700 to-gray-800'
     }
     return colors[platform.toLowerCase()] || 'from-gray-500 to-gray-600'
   }
@@ -121,7 +121,7 @@ function Dashboard() {
 
       {/* Unified Stats Display */}
       <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-3xl border border-zinc-700 p-8 mb-8 animate-fade-in">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           <div className="text-center">
             <p className="text-gray-400 text-sm mb-2">Total Earnings</p>
             <p className="text-3xl font-bold text-white">${stats.totalEarnings.toFixed(2)}</p>
@@ -130,11 +130,6 @@ function Dashboard() {
           <div className="text-center">
             <p className="text-gray-400 text-sm mb-2">Active Campaigns</p>
             <p className="text-3xl font-bold text-white">{stats.activeCampaigns}</p>
-          </div>
-
-          <div className="text-center">
-            <p className="text-gray-400 text-sm mb-2">Total Followers</p>
-            <p className="text-3xl font-bold text-white">{stats.totalFollowers.toLocaleString()}</p>
           </div>
 
           <div className="text-center">
@@ -157,32 +152,22 @@ function Dashboard() {
             <p>No social accounts connected yet</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {socialAccounts.map((account, index) => {
               const Icon = getPlatformIcon(account.platform)
               const color = getPlatformColor(account.platform)
               return (
                 <div 
                   key={account.id} 
-                  className="bg-zinc-800/50 rounded-2xl p-6 border border-zinc-700 hover:border-zinc-600 transition-all hover:scale-105 animate-fade-in"
+                  className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className={`p-4 rounded-xl bg-gradient-to-br ${color} w-fit mb-4`}>
-                    <Icon size={28} className="text-white" />
+                  <div className={`p-3 rounded-lg bg-gradient-to-br ${color} w-fit mb-3`}>
+                    <Icon size={24} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-semibold text-lg capitalize">{account.platform}</p>
+                    <p className="text-white font-semibold capitalize">{account.platform}</p>
                     <p className="text-gray-400 text-sm">@{account.username}</p>
-                    <div className="mt-3 flex items-center gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-500">Followers</p>
-                        <p className="text-white font-semibold">{account.followers?.toLocaleString() || 0}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500">Engagement</p>
-                        <p className="text-white font-semibold">{account.engagement_rate?.toFixed(1) || 0}%</p>
-                      </div>
-                    </div>
                   </div>
                 </div>
               )

@@ -459,24 +459,24 @@ function Affiliates() {
             <div 
               key={reward.id} 
               onClick={() => { setSelectedReward(reward); setIsCampaignView(true) }}
-              className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden hover:border-zinc-700 transition-colors cursor-pointer"
+              className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden hover:border-zinc-700 transition-colors cursor-pointer h-80 flex flex-col"
             >
               {reward.cover_image && (
-                <img src={reward.cover_image} alt={reward.title} className="w-full h-40 object-cover" />
+                <img src={reward.cover_image} alt={reward.title} className="w-full h-32 object-cover flex-shrink-0" />
               )}
-              <div className="p-5">
-                <div className="flex items-start justify-between mb-3">
+              <div className="p-4 flex-1 flex flex-col">
+                <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
-                    <h3 className={`font-semibold text-white mb-1 ${reward.font_style === 'bold' ? 'font-bold' : reward.font_style === 'italic' ? 'italic' : reward.font_style === 'serif' ? 'font-serif' : reward.font_style === 'mono' ? 'font-mono' : ''}`}>{reward.title}</h3>
+                    <h3 className={`font-semibold text-white mb-1 text-sm ${reward.font_style === 'bold' ? 'font-bold' : reward.font_style === 'italic' ? 'italic' : reward.font_style === 'serif' ? 'font-serif' : reward.font_style === 'mono' ? 'font-mono' : ''}`}>{reward.title}</h3>
                     {affiliate ? (
                       <button 
                         onClick={(e) => { e.stopPropagation(); setSelectedAffiliate(affiliate) }}
-                        className="text-sm text-blue-400 hover:text-blue-300 cursor-pointer"
+                        className="text-xs text-blue-400 hover:text-blue-300 cursor-pointer"
                       >
                         {affiliate.name}
                       </button>
                     ) : (
-                      <p className="text-sm text-gray-500">General</p>
+                      <p className="text-xs text-gray-500">General</p>
                     )}
                   </div>
                 </div>
@@ -1151,7 +1151,7 @@ function Affiliates() {
                           <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
                             <CheckCircle className="text-green-400" size={32} />
                           </div>
-                          <p className="text-green-400 font-semibold text-lg mb-2">Joined</p>
+                          <p className="text-yellow-400 font-semibold text-lg mb-2">Pending</p>
                           <p className="text-gray-400 text-sm">You have already applied to this campaign</p>
                         </div>
                       ) : selectedReward.questions && selectedReward.questions.length > 0 ? (

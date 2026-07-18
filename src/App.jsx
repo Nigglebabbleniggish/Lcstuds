@@ -408,7 +408,7 @@ function App() {
         <div className="p-6">
           <button
             onClick={() => {
-              window.location.reload()
+              window.location.href = '/'
             }}
             className="text-2xl font-bold mb-8 text-white hover:text-gray-300 transition-colors"
           >
@@ -647,7 +647,7 @@ function App() {
                 </div>
                 <div>
                   <h4 className="font-medium text-white mb-2">3. Payment Terms</h4>
-                  <p>Payments are processed within 30 days of campaign completion. Minimum payout is $10.</p>
+                  <p>Payments are processed within 30 days of campaign completion. Minimum payout is $20.</p>
                 </div>
                 <div>
                   <h4 className="font-medium text-white mb-2">4. Prohibited Activities</h4>
