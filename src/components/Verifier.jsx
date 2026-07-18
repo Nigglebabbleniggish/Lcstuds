@@ -202,7 +202,7 @@ function Verifier() {
       console.log('Available fields:', Object.keys(data))
       
       // Check if verification code exists in bio or description
-      // TikTok might use different field names, check nested data structure
+      // TikTok uses data.profile.bio structure
       let bio = ''
       
       // Try direct fields
@@ -223,13 +223,17 @@ function Verifier() {
         bio = data.data.user.bio || data.data.user.signature || ''
       }
       
+      // Try TikTok specific structure: data.profile.bio
+      if (!bio && data.data?.profile) {
+        bio = data.data.profile.bio || ''
+      }
+      
       console.log('Bio fields checked:', {
         directBio: !!data.bio,
         directDescription: !!data.description,
         dataBio: !!data.data?.bio,
         dataDescription: !!data.data?.description,
-        userBio: !!data.user?.bio,
-        dataUserBio: !!data.data?.user?.bio,
+        dataProfileBio: !!data.data?.profile?.bio,
         finalBio: bio
       })
       
