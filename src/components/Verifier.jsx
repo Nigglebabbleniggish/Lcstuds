@@ -149,6 +149,7 @@ function Verifier() {
           endpoint = `https://api.socialfetch.dev/v1/tiktok/profiles/${account.username.replace('@', '')}`
           break
         case 'youtube':
+          // Try both with and without @ prefix
           endpoint = `https://api.socialfetch.dev/v1/youtube/profiles/${account.username.replace('@', '')}`
           break
         case 'twitter':
@@ -185,8 +186,35 @@ function Verifier() {
       if (!response.ok) {
         const errorText = await response.text()
         console.error('API Error:', errorText)
+        
+        // For YouTube, try with @ prefix if first attempt fails
+        if (response.status === 404 && account.platform === 'youtube' && !endpoint.includes('@')) {
+          console.log('Retrying with @ prefix for YouTube...')
+          const endpointWithAt = `https://api.socialfetch.dev/v1/youtube/profiles/@${account.username.replace('@', '')}`
+          const proxyEndpointWithAt = `https://corsproxy.io/?${encodeURIComponent(endpointWithAt + '?t=' + Date.now())}`
+          
+          const retryResponse = await fetch(proxyEndpointWithAt, {
+            headers: { 
+              'x-api-key': apiKey,
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            },
+            cache: 'no-store'
+          })
+          
+          console.log('Retry response status:', retryResponse.status)
+          
+          if (retryResponse.ok) {
+            const data = await retryResponse.json()
+            console.log('Retry API Response data:', data)
+            // Continue with the retry data
+            return processVerificationData(data, account, apiKey)
+          }
+        }
+        
         if (response.status === 404) {
-          throw new Error(`Profile not found. Please check that the username is correct and the profile exists on ${platform.name}.`)
+          throw new Error(`Profile not found. Please check that the username is correct and the profile exists on ${platform.name}. For YouTube, make sure your channel has a custom URL (@username).`)
         }
         throw new Error(`API returned ${response.status}: ${errorText}`)
       }
@@ -194,6 +222,19 @@ function Verifier() {
       const data = await response.json()
       console.log('Full API Response:', JSON.stringify(data, null, 2))
       console.log('Available fields:', Object.keys(data))
+      
+      return processVerificationData(data, account, apiKey)
+    } catch (error) {
+      console.error('Verification check failed:', error)
+      if (error.message.includes('Failed to fetch')) {
+        alert('Network error: Could not connect to verification service. Please check your internet connection and try again.')
+      } else {
+        alert(error.message || 'Verification check failed. Please try again later.')
+      }
+    }
+  }
+
+  const processVerificationData = (data, account, apiKey) => {
       
       // Check if verification code exists in bio or description
       // TikTok uses data.profile.bio structure, Instagram may differ
@@ -264,14 +305,6 @@ function Verifier() {
       } else {
         alert(`Verification code not found in profile. Please make sure you've posted "${account.verificationCode}" in your bio.`)
       }
-    } catch (error) {
-      console.error('Verification check failed:', error)
-      if (error.message.includes('Failed to fetch')) {
-        alert('Network error: Could not connect to verification service. Please check your internet connection and try again.')
-      } else {
-        alert('Verification check failed. Please try again later.')
-      }
-    }
   }
 
   const handleDeleteAccount = (id) => {
