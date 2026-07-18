@@ -407,10 +407,7 @@ function App() {
       >
         <div className="p-6">
           <button
-            onClick={async () => {
-              await signOut()
-              window.location.reload()
-            }}
+            onClick={() => setActiveTab('dashboard')}
             className="text-2xl font-bold mb-8 text-white hover:text-gray-300 transition-colors"
           >
             LC Studio
