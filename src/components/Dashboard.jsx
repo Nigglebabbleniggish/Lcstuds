@@ -117,7 +117,7 @@ function Dashboard() {
       ),
       threads: () => (
         <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
         </svg>
       )
     }
@@ -195,22 +195,22 @@ function Dashboard() {
             <p>No social accounts connected yet</p>
           </div>
         ) : (
-          <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 ${showAllAccounts ? '' : 'max-h-32 overflow-hidden'}`}>
+          <div className={`grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 ${showAllAccounts ? '' : 'max-h-24 overflow-hidden'}`}>
             {socialAccounts.map((account, index) => {
               const IconComponent = getPlatformIcon(account.platform)
               const color = getPlatformColor(account.platform)
               return (
                 <div 
                   key={account.id} 
-                  className="bg-zinc-800/50 rounded-lg p-3 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in aspect-square flex flex-col justify-center items-center"
+                  className="bg-zinc-800/50 rounded-md p-2 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in aspect-square flex flex-col justify-center items-center"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className={`p-2 rounded-lg bg-gradient-to-br ${color} w-fit mb-2`}>
+                  <div className={`p-1.5 rounded-md bg-gradient-to-br ${color} w-fit mb-1`}>
                     <IconComponent />
                   </div>
                   <div className="text-center">
-                    <p className="text-white font-semibold capitalize text-xs">{account.platform}</p>
-                    <p className="text-gray-400 text-xs">@{account.username}</p>
+                    <p className="text-white font-semibold capitalize text-[10px]">{account.platform}</p>
+                    <p className="text-gray-400 text-[10px]">@{account.username}</p>
                   </div>
                 </div>
               )
