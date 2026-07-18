@@ -39,15 +39,8 @@ export function AuthProvider({ children }) {
       }
     }
 
-    // Set a timeout to ensure loading is always set to false
-    const timeoutId = setTimeout(() => {
-      console.log('Auth timeout - setting loading to false')
-      setLoading(false)
-    }, 5000)
-
     // Get initial session from Supabase
     supabase.auth.getSession().then(({ data: { session } }) => {
-      clearTimeout(timeoutId)
       setUser(session?.user ?? null)
       if (session?.user) {
         fetchProfile(session.user.id)
@@ -55,7 +48,6 @@ export function AuthProvider({ children }) {
       setLoading(false)
     }).catch((error) => {
       console.error('Error getting session:', error)
-      clearTimeout(timeoutId)
       setLoading(false)
     })
 
@@ -73,7 +65,6 @@ export function AuthProvider({ children }) {
     })
 
     return () => {
-      clearTimeout(timeoutId)
       subscription.unsubscribe()
     }
   }, [])
