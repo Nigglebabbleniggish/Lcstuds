@@ -174,15 +174,24 @@ function Verifier() {
           return
       }
 
+      console.log('Fetching from endpoint:', endpoint)
+      console.log('API Key:', apiKey.substring(0, 10) + '...')
+
       const response = await fetch(endpoint, {
         headers: { 'x-api-key': apiKey }
       })
 
+      console.log('Response status:', response.status)
+      console.log('Response ok:', response.ok)
+
       if (!response.ok) {
-        throw new Error('Failed to fetch profile data')
+        const errorText = await response.text()
+        console.error('API Error:', errorText)
+        throw new Error(`API returned ${response.status}: ${errorText}`)
       }
 
       const data = await response.json()
+      console.log('API Response data:', data)
       
       // Check if verification code exists in bio or description
       const bio = data.bio || data.description || ''
