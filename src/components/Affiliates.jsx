@@ -994,34 +994,36 @@ function Affiliates() {
                   </div>
 
                   {/* Campaign Templates Section */}
-                  <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
-                    <h3 className="text-xl font-semibold text-white mb-4">Campaign Resources</h3>
-                    {selectedReward.resources && selectedReward.resources.length > 0 ? (
-                      <div className="space-y-4">
-                        {selectedReward.resources.map((res, index) => (
-                          <div key={index} className="bg-zinc-800 rounded-lg p-4">
-                            <h4 className="font-medium text-white mb-2">{res.title}</h4>
-                            <p className="text-sm text-gray-400">{res.content}</p>
+                  {userSubmissions.some(sub => sub.campaign_id === selectedReward.id) && (
+                    <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
+                      <h3 className="text-xl font-semibold text-white mb-4">Campaign Resources</h3>
+                      {selectedReward.resources && selectedReward.resources.length > 0 ? (
+                        <div className="space-y-4">
+                          {selectedReward.resources.map((res, index) => (
+                            <div key={index} className="bg-zinc-800 rounded-lg p-4">
+                              <h4 className="font-medium text-white mb-2">{res.title}</h4>
+                              <p className="text-sm text-gray-400">{res.content}</p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="bg-zinc-800 rounded-lg p-4">
+                            <h4 className="font-medium text-white mb-2">📋 Campaign Guidelines</h4>
+                            <p className="text-sm text-gray-400">Follow these guidelines when creating content for this campaign...</p>
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="bg-zinc-800 rounded-lg p-4">
-                          <h4 className="font-medium text-white mb-2">📋 Campaign Guidelines</h4>
-                          <p className="text-sm text-gray-400">Follow these guidelines when creating content for this campaign...</p>
+                          <div className="bg-zinc-800 rounded-lg p-4">
+                            <h4 className="font-medium text-white mb-2">🎨 Brand Assets</h4>
+                            <p className="text-sm text-gray-400">Download logos, fonts, and brand colors...</p>
+                          </div>
+                          <div className="bg-zinc-800 rounded-lg p-4">
+                            <h4 className="font-medium text-white mb-2">📊 Performance Tracking</h4>
+                            <p className="text-sm text-gray-400">Track your campaign performance and earnings...</p>
+                          </div>
                         </div>
-                        <div className="bg-zinc-800 rounded-lg p-4">
-                          <h4 className="font-medium text-white mb-2">🎨 Brand Assets</h4>
-                          <p className="text-sm text-gray-400">Download logos, fonts, and brand colors...</p>
-                        </div>
-                        <div className="bg-zinc-800 rounded-lg p-4">
-                          <h4 className="font-medium text-white mb-2">📊 Performance Tracking</h4>
-                          <p className="text-sm text-gray-400">Track your campaign performance and earnings...</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Sidebar */}
