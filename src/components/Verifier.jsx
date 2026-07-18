@@ -177,8 +177,15 @@ function Verifier() {
       console.log('Fetching from endpoint:', endpoint)
       console.log('API Key:', apiKey.substring(0, 10) + '...')
 
-      const response = await fetch(endpoint, {
-        headers: { 'x-api-key': apiKey }
+      // Use CORS proxy to bypass CORS restrictions
+      const proxyEndpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`
+      console.log('Proxy endpoint:', proxyEndpoint)
+
+      const response = await fetch(proxyEndpoint, {
+        headers: { 
+          'x-api-key': apiKey,
+          'Content-Type': 'application/json'
+        }
       })
 
       console.log('Response status:', response.status)
