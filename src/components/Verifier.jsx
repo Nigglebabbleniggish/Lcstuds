@@ -224,6 +224,11 @@ function Verifier() {
       }
       
       // Try TikTok specific structure: data.profile.bio
+      if (!bio && data.profile) {
+        bio = data.profile.bio || ''
+      }
+      
+      // Try data.data.profile.bio (some APIs double nest)
       if (!bio && data.data?.profile) {
         bio = data.data.profile.bio || ''
       }
@@ -233,6 +238,7 @@ function Verifier() {
         directDescription: !!data.description,
         dataBio: !!data.data?.bio,
         dataDescription: !!data.data?.description,
+        profileBio: !!data.profile?.bio,
         dataProfileBio: !!data.data?.profile?.bio,
         finalBio: bio
       })
