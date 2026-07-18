@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 
 function Verifier() {
   const { profile } = useAuth()
@@ -11,12 +12,18 @@ function Verifier() {
   const [verificationCode, setVerificationCode] = useState(null)
   const [showVerificationModal, setShowVerificationModal] = useState(false)
   const [selectedAccount, setSelectedAccount] = useState(null)
+  const [videoSubmissions, setVideoSubmissions] = useState([])
 
   useEffect(() => {
     // Load accounts from localStorage
     const savedAccounts = localStorage.getItem('social_accounts')
     if (savedAccounts) {
       setAccounts(JSON.parse(savedAccounts))
+    }
+
+    // Load video submissions from Supabase
+    if (profile?.id && !profile.id.startsWith('local_')) {
+      loadVideoSubmissions()
     }
 
     // Pre-load API key to localStorage if available in env
@@ -57,6 +64,21 @@ function Verifier() {
 
     setLoading(false)
   }, [profile?.id])
+
+  const loadVideoSubmissions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('video_submissions')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('submitted_at', { ascending: false })
+      
+      if (error) throw error
+      setVideoSubmissions(data || [])
+    } catch (error) {
+      console.error('Error loading video submissions:', error)
+    }
+  }
 
   // Save accounts to localStorage whenever they change
   useEffect(() => {
@@ -517,6 +539,44 @@ function Verifier() {
           )
         })}
       </div>
+
+      {/* Video Submissions Section */}
+      {videoSubmissions.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-xl font-bold text-white mb-4">Submitted Videos</h3>
+          <div className="space-y-3">
+            {videoSubmissions.map((submission) => (
+              <div key={submission.id} className="bg-zinc-900 rounded-lg border border-zinc-800 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-white font-medium capitalize">{submission.platform}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded ${
+                        submission.status === 'approved' ? 'bg-green-500/20 text-green-400' :
+                        submission.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
+                        'bg-yellow-500/20 text-yellow-400'
+                      }`}>
+                        {submission.status}
+                      </span>
+                    </div>
+                    <a 
+                      href={submission.video_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-400 text-sm hover:underline block truncate"
+                    >
+                      {submission.video_url}
+                    </a>
+                    <p className="text-gray-500 text-xs mt-1">
+                      Submitted: {new Date(submission.submitted_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Add Account Modal */}
       {showAddModal && (

@@ -15,6 +15,13 @@ function Affiliates() {
   const [selectedReward, setSelectedReward] = useState(null)
   const [isCampaignView, setIsCampaignView] = useState(false)
   const [userSubmissions, setUserSubmissions] = useState([])
+  const [videoSubmissions, setVideoSubmissions] = useState([])
+  const [allVideoSubmissions, setAllVideoSubmissions] = useState([])
+  const [showVideoSubmitModal, setShowVideoSubmitModal] = useState(false)
+  const [newVideoSubmission, setNewVideoSubmission] = useState({
+    video_url: '',
+    platform: 'youtube'
+  })
   const [newReward, setNewReward] = useState({
     title: '',
     description: '',
@@ -35,19 +42,25 @@ function Affiliates() {
 
   const fetchData = async () => {
     try {
-      const [rewardsData, affiliatesData, submissionsData] = await Promise.all([
+      const [rewardsData, affiliatesData, submissionsData, videoSubmissionsData, allVideoSubmissionsData] = await Promise.all([
         supabase.from('content_rewards').select('*').order('created_at', { ascending: false }),
         supabase.from('affiliates').select('*').order('created_at', { ascending: false }),
-        profile ? supabase.from('campaign_submissions').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] })
+        profile ? supabase.from('campaign_submissions').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] }),
+        profile ? supabase.from('video_submissions').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] }),
+        profile?.is_admin ? supabase.from('video_submissions').select('*').order('submitted_at', { ascending: false }) : Promise.resolve({ data: [] })
       ])
       
       if (rewardsData.error) throw rewardsData.error
       if (affiliatesData.error) throw affiliatesData.error
       if (submissionsData.error) throw submissionsData.error
+      if (videoSubmissionsData.error) throw videoSubmissionsData.error
+      if (allVideoSubmissionsData.error) throw allVideoSubmissionsData.error
       
       setRewards(rewardsData.data || [])
       setAffiliates(affiliatesData.data || [])
       setUserSubmissions(submissionsData.data || [])
+      setVideoSubmissions(videoSubmissionsData.data || [])
+      setAllVideoSubmissions(allVideoSubmissionsData.data || [])
     } catch (error) {
       console.error('Error fetching data:', error.message)
     } finally {
@@ -94,6 +107,44 @@ function Affiliates() {
       fetchData()
     } catch (error) {
       console.error('Error updating status:', error.message)
+      alert('Failed to update status')
+    }
+  }
+
+  const handleVideoSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const { error } = await supabase.from('video_submissions').insert({
+        user_id: profile.id,
+        campaign_id: selectedReward.id,
+        video_url: newVideoSubmission.video_url,
+        platform: newVideoSubmission.platform,
+        status: 'pending'
+      })
+
+      if (error) throw error
+
+      setShowVideoSubmitModal(false)
+      setNewVideoSubmission({ video_url: '', platform: 'youtube' })
+      fetchData()
+      alert('Video submitted successfully!')
+    } catch (error) {
+      console.error('Error submitting video:', error.message)
+      alert('Failed to submit video')
+    }
+  }
+
+  const handleVideoStatusChange = async (submissionId, newStatus) => {
+    try {
+      const { error } = await supabase
+        .from('video_submissions')
+        .update({ status: newStatus, reviewed_at: new Date().toISOString() })
+        .eq('id', submissionId)
+
+      if (error) throw error
+      fetchData()
+    } catch (error) {
+      console.error('Error updating video status:', error.message)
       alert('Failed to update status')
     }
   }
@@ -335,6 +386,60 @@ function Affiliates() {
           />
         </div>
       </div>
+
+      {/* Admin Video Submissions Review */}
+      {profile?.is_admin && allVideoSubmissions.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Video Submissions Review</h2>
+          <div className="space-y-3">
+            {allVideoSubmissions.map((submission) => (
+              <div key={submission.id} className="bg-zinc-900 rounded-xl border border-zinc-800 p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-white font-medium capitalize">{submission.platform}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded ${
+                        submission.status === 'approved' ? 'bg-green-500/20 text-green-400' :
+                        submission.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
+                        'bg-yellow-500/20 text-yellow-400'
+                      }`}>
+                        {submission.status}
+                      </span>
+                    </div>
+                    <a 
+                      href={submission.video_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-400 text-sm hover:underline block truncate"
+                    >
+                      {submission.video_url}
+                    </a>
+                    <p className="text-gray-500 text-xs mt-1">
+                      User ID: {submission.user_id} • Submitted: {new Date(submission.submitted_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  {submission.status === 'pending' && (
+                    <div className="flex gap-2 ml-4">
+                      <button
+                        onClick={() => handleVideoStatusChange(submission.id, 'approved')}
+                        className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleVideoStatusChange(submission.id, 'rejected')}
+                        className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Rewards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1085,6 +1190,19 @@ function Affiliates() {
                     </div>
                   )}
 
+                  {/* Video Submission Section - Only for users who have joined */}
+                  {!profile?.is_admin && userSubmissions.some(s => s.campaign_id === selectedReward.id) && (
+                    <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
+                      <h3 className="text-lg font-semibold text-white mb-4">Submit Video</h3>
+                      <button
+                        onClick={() => setShowVideoSubmitModal(true)}
+                        className="w-full px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        Submit New Video
+                      </button>
+                    </div>
+                  )}
+
                   {profile?.is_admin && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Admin Actions</h3>
@@ -1107,6 +1225,60 @@ function Affiliates() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Submission Modal */}
+      {showVideoSubmitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-xl border border-gray-700 p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-gray-100">Submit Video</h3>
+              <button
+                onClick={() => setShowVideoSubmitModal(false)}
+                className="p-2 rounded-lg hover:bg-gray-700 text-gray-400"
+              >
+                <XCircle size={24} />
+              </button>
+            </div>
+
+            <form onSubmit={handleVideoSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Video URL</label>
+                <input
+                  type="url"
+                  required
+                  value={newVideoSubmission.video_url}
+                  onChange={(e) => setNewVideoSubmission({ ...newVideoSubmission, video_url: e.target.value })}
+                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                  placeholder="https://youtube.com/watch?v=..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Platform</label>
+                <select
+                  required
+                  value={newVideoSubmission.platform}
+                  onChange={(e) => setNewVideoSubmission({ ...newVideoSubmission, platform: e.target.value })}
+                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                >
+                  <option value="youtube">YouTube</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="twitter">Twitter</option>
+                  <option value="tiktok">TikTok</option>
+                  <option value="threads">Threads</option>
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Submit Video
+              </button>
+            </form>
           </div>
         </div>
       )}
