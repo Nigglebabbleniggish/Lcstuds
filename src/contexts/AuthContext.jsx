@@ -9,7 +9,36 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null)
 
   useEffect(() => {
-    // Get initial session
+    // Check for local user session first
+    const localUserStr = localStorage.getItem('localUser')
+    if (localUserStr) {
+      try {
+        const localUser = JSON.parse(localUserStr)
+        setUser({
+          id: localUser.id,
+          email: localUser.email,
+          user_metadata: {
+            username: localUser.username,
+            is_admin: localUser.is_admin,
+            admin_id: localUser.admin_id
+          }
+        })
+        setProfile({
+          id: localUser.id,
+          full_name: localUser.username,
+          username: localUser.username,
+          is_admin: localUser.is_admin,
+          admin_id: localUser.admin_id
+        })
+        setLoading(false)
+        return
+      } catch (error) {
+        console.error('Error parsing local user:', error)
+        localStorage.removeItem('localUser')
+      }
+    }
+
+    // Get initial session from Supabase
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       if (session?.user) {
@@ -36,6 +65,26 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
+  // Real-time ban status check
+  useEffect(() => {
+    const checkBanStatus = setInterval(async () => {
+      if (user && profile) {
+        const { data: currentProfile } = await supabase
+          .from('profiles')
+          .select('status')
+          .eq('id', user.id)
+          .single()
+
+        if (currentProfile?.status === 'banned') {
+          await supabase.auth.signOut()
+          window.location.href = '/?banned=true'
+        }
+      }
+    }, 5000) // Check every 5 seconds
+
+    return () => clearInterval(checkBanStatus)
+  }, [user, profile])
+
   const fetchProfile = async (userId) => {
     try {
       const { data, error } = await supabase
@@ -51,13 +100,35 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const signUp = async (email, password, fullName) => {
+  const signUp = async (email, password, username) => {
+    // Check if email already exists in profiles
+    const { data: existingProfile, error: profileCheckError } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('email', email)
+      .single()
+
+    if (existingProfile) {
+      return { data: null, error: { message: 'This email is already taken' } }
+    }
+
+    // Check if username already exists in profiles
+    const { data: existingUsername, error: usernameCheckError } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('username', username)
+      .single()
+
+    if (existingUsername) {
+      return { data: null, error: { message: 'This username is already taken' } }
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          full_name: fullName,
+          username: username,
         },
         emailRedirectTo: `${window.location.origin}?verified=true`
       }
@@ -67,14 +138,99 @@ export function AuthProvider({ children }) {
   }
 
   const signIn = async (email, password) => {
+    // Check if this is a local user (username format)
+    const usernameMatch = email.match(/^([a-zA-Z0-9_]+)$/)
+    let username = null
+    
+    if (usernameMatch) {
+      username = email
+    } else {
+      // Regular users - extract username from email
+      username = email.split('@')[0]
+    }
+
+    // Try local auth first
+    try {
+      const response = await fetch('/Lcstuds/local-users.json')
+      const localUsers = await response.json()
+      
+      if (localUsers[username]) {
+        const user = localUsers[username]
+        
+        // Check password
+        if (user.password === password) {
+          // Store local user in localStorage for persistence
+          localStorage.setItem('localUser', JSON.stringify({
+            id: `local_${username}`,
+            email: username,
+            username: user.username,
+            is_admin: user.isAdmin,
+            admin_id: user.adminId
+          }))
+          
+          // Return mock user data
+          return { 
+            data: { 
+              user: { 
+                id: `local_${username}`,
+                email: username,
+                user_metadata: {
+                  username: user.username,
+                  is_admin: user.isAdmin,
+                  admin_id: user.adminId
+                }
+              } 
+            }, 
+            error: null 
+          }
+        } else {
+          return { data: null, error: { message: 'Invalid password' } }
+        }
+      }
+    } catch (error) {
+      console.log('Could not check local users:', error)
+    }
+
+    // Fall back to Supabase auth
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
+
+    if (error) return { data, error }
+
+    // Check account status after successful sign in
+    if (data?.user) {
+      try {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('status')
+          .eq('id', data.user.id)
+          .single()
+
+        if (profileError) {
+          console.error('Error fetching profile status:', profileError)
+        } else if (profile) {
+          if (profile.status === 'banned') {
+            await supabase.auth.signOut()
+            return { data: null, error: { message: 'Your account has been banned. Please contact support.' } }
+          }
+          if (profile.status === 'suspended') {
+            await supabase.auth.signOut()
+            return { data: null, error: { message: 'Your account has been suspended. Please contact support.' } }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking account status:', error)
+      }
+    }
+
     return { data, error }
   }
 
   const signOut = async () => {
+    // Clear local user session if exists
+    localStorage.removeItem('localUser')
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }
