@@ -179,14 +179,17 @@ function Verifier() {
       console.log('API Key:', apiKey.substring(0, 10) + '...')
 
       // Use CORS proxy to bypass CORS restrictions
-      const proxyEndpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`
+      const proxyEndpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint + '?t=' + Date.now())}`
       console.log('Proxy endpoint:', proxyEndpoint)
 
       const response = await fetch(proxyEndpoint, {
         headers: { 
           'x-api-key': apiKey,
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        },
+        cache: 'no-store'
       })
 
       console.log('Response status:', response.status)
@@ -203,7 +206,7 @@ function Verifier() {
       console.log('Available fields:', Object.keys(data))
       
       // Check if verification code exists in bio or description
-      // TikTok uses data.profile.bio structure
+      // TikTok uses data.profile.bio structure, Instagram may differ
       let bio = ''
       
       // Try direct fields
@@ -216,22 +219,32 @@ function Verifier() {
       
       // Try nested in user object
       if (!bio && data.user) {
-        bio = data.user.bio || data.user.signature || ''
+        bio = data.user.bio || data.user.signature || data.user.description || ''
       }
       
       // Try nested in data.user object
       if (!bio && data.data?.user) {
-        bio = data.data.user.bio || data.data.user.signature || ''
+        bio = data.data.user.bio || data.data.user.signature || data.data.user.description || ''
       }
       
       // Try TikTok specific structure: data.profile.bio
       if (!bio && data.profile) {
-        bio = data.profile.bio || ''
+        bio = data.profile.bio || data.profile.description || ''
       }
       
       // Try data.data.profile.bio (some APIs double nest)
       if (!bio && data.data?.profile) {
-        bio = data.data.profile.bio || ''
+        bio = data.data.profile.bio || data.data.profile.description || ''
+      }
+      
+      // Try Instagram specific structure: data.data.biography
+      if (!bio && data.data?.biography) {
+        bio = data.data.biography || ''
+      }
+      
+      // Try other common Instagram fields
+      if (!bio && data.biography) {
+        bio = data.biography || ''
       }
       
       console.log('Bio fields checked:', {
@@ -241,6 +254,8 @@ function Verifier() {
         dataDescription: !!data.data?.description,
         profileBio: !!data.profile?.bio,
         dataProfileBio: !!data.data?.profile?.bio,
+        dataBiography: !!data.data?.biography,
+        biography: !!data.biography,
         finalBio: bio
       })
       
