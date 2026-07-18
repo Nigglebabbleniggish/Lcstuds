@@ -186,6 +186,12 @@ function Verifier() {
       
       // Check if verification code exists in bio or description
       const bio = data.bio || data.description || ''
+      
+      if (!bio) {
+        alert(`No bio or description found for ${account.username}. Please make sure your profile has a bio and post the verification code "${account.verificationCode}" in it.`)
+        return
+      }
+      
       const codeFound = bio.includes(account.verificationCode)
 
       if (codeFound) {
@@ -198,7 +204,11 @@ function Verifier() {
       }
     } catch (error) {
       console.error('Verification check failed:', error)
-      alert('Failed to check verification. Please try again later.')
+      if (error.message.includes('Failed to fetch')) {
+        alert('Network error: Could not connect to verification service. Please check your internet connection and try again.')
+      } else {
+        alert('Verification check failed. Please try again later.')
+      }
     }
   }
 
