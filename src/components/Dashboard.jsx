@@ -178,7 +178,7 @@ function Dashboard() {
 
       {/* Social Accounts Section */}
       <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-4">
-        <h3 className="text-lg font-bold text-white mb-3">Connected Social Accounts</h3>
+        <h3 className="text-lg font-bold text-white mb-3">Connected Accounts</h3>
         
         {socialAccounts.length === 0 ? (
           <div className="text-center py-6 text-gray-500">
@@ -197,12 +197,12 @@ function Dashboard() {
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className={`p-1.5 rounded-xl bg-gradient-to-br ${color} w-fit mb-1`}>
-                    <div className="w-6 h-6">
+                    <div className="w-8 h-8">
                       <IconComponent />
                     </div>
                   </div>
                   <div className="text-center">
-                    <p className="text-white font-semibold capitalize text-[10px] leading-tight">{account.platform}</p>
+                    <p className="text-white font-semibold capitalize text-[11px] leading-tight">{account.platform}</p>
                   </div>
                 </div>
               )
