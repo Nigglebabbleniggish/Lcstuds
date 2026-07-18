@@ -421,7 +421,10 @@ function Affiliates() {
                     <p className="text-gray-500 text-xs mt-1">
                       {(() => {
                         const userProfile = profiles.find(p => p.id === submission.user_id)
-                        return userProfile ? (userProfile.full_name || userProfile.username) : 'Unknown User'
+                        console.log('Submission user_id:', submission.user_id)
+                        console.log('Available profiles:', profiles)
+                        console.log('Found profile:', userProfile)
+                        return userProfile ? (userProfile.full_name || userProfile.username) : submission.user_id
                       })()} • Submitted: {new Date(submission.submitted_at).toLocaleDateString()}
                     </p>
                   </div>
