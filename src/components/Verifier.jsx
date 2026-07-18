@@ -195,7 +195,11 @@ function Verifier() {
             `https://api.socialfetch.dev/v1/youtube/profiles/@${account.username.replace('@', '')}`,
             `https://api.socialfetch.dev/v1/youtube/profiles/UC${account.username.replace('@', '')}`,
             `https://api.socialfetch.dev/v1/youtube/channels/${account.username.replace('@', '')}`,
-            `https://api.socialfetch.dev/v1/youtube/channels/@${account.username.replace('@', '')}`
+            `https://api.socialfetch.dev/v1/youtube/channels/@${account.username.replace('@', '')}`,
+            `https://api.socialfetch.dev/v1/youtube/user/${account.username.replace('@', '')}`,
+            `https://api.socialfetch.dev/v1/youtube/c/${account.username.replace('@', '')}`,
+            `https://api.socialfetch.dev/v1/youtube/channel/${account.username.replace('@', '')}`,
+            `https://api.socialfetch.dev/v1/youtube/@${account.username.replace('@', '')}`
           ]
           
           for (const altEndpoint of youtubeEndpoints) {
@@ -219,6 +223,25 @@ function Verifier() {
               console.log('Alternative endpoint API Response data:', data)
               return processVerificationData(data, account, apiKey)
             }
+          }
+          
+          // Try without proxy as last resort for YouTube
+          console.log('Trying YouTube without CORS proxy...')
+          const directEndpoint = `https://api.socialfetch.dev/v1/youtube/profiles/${account.username.replace('@', '')}?t=${Date.now()}`
+          const directResponse = await fetch(directEndpoint, {
+            headers: { 
+              'x-api-key': apiKey,
+              'Content-Type': 'application/json'
+            },
+            cache: 'no-store'
+          })
+          
+          console.log('Direct endpoint response status:', directResponse.status)
+          
+          if (directResponse.ok) {
+            const data = await directResponse.json()
+            console.log('Direct endpoint API Response data:', data)
+            return processVerificationData(data, account, apiKey)
           }
         }
         
