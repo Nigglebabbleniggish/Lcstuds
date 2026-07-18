@@ -193,16 +193,16 @@ function Dashboard() {
               return (
                 <div 
                   key={account.id} 
-                  className="bg-zinc-800/50 rounded-sm p-1.5 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in aspect-square flex flex-col justify-center items-center"
+                  className="bg-zinc-800/50 rounded-xl p-1.5 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in aspect-square flex flex-col justify-center items-center"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className={`p-1 rounded-sm bg-gradient-to-br ${color} w-fit mb-1`}>
-                    <div className="w-4 h-4">
+                  <div className={`p-1.5 rounded-xl bg-gradient-to-br ${color} w-fit mb-1`}>
+                    <div className="w-6 h-6">
                       <IconComponent />
                     </div>
                   </div>
                   <div className="text-center">
-                    <p className="text-white font-semibold capitalize text-[8px] leading-tight">{account.platform}</p>
+                    <p className="text-white font-semibold capitalize text-[10px] leading-tight">{account.platform}</p>
                   </div>
                 </div>
               )
