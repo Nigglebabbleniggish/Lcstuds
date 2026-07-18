@@ -149,7 +149,7 @@ function Verifier() {
           endpoint = `https://api.socialfetch.dev/v1/tiktok/profiles/${account.username.replace('@', '')}`
           break
         case 'youtube':
-          endpoint = `https://api.socialfetch.dev/v1/youtube/profiles/${account.username.replace('@', '')}`
+          endpoint = `https://api.socialfetch.dev/v1/youtube/profiles/@${account.username.replace('@', '')}`
           break
         case 'twitter':
           endpoint = `https://api.socialfetch.dev/v1/twitter/profiles/${account.username.replace('@', '')}`
@@ -185,6 +185,9 @@ function Verifier() {
       if (!response.ok) {
         const errorText = await response.text()
         console.error('API Error:', errorText)
+        if (response.status === 404) {
+          throw new Error(`Profile not found. Please check that the username is correct and the profile exists on ${platform.name}.`)
+        }
         throw new Error(`API returned ${response.status}: ${errorText}`)
       }
 
