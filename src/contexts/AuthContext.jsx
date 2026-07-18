@@ -31,7 +31,8 @@ export function AuthProvider({ children }) {
           admin_id: localUser.admin_id
         })
         setLoading(false)
-        return
+        // Don't set up Supabase listeners for local users
+        return () => {}
       } catch (error) {
         console.error('Error parsing local user:', error)
         localStorage.removeItem('localUser')
@@ -79,6 +80,11 @@ export function AuthProvider({ children }) {
 
   // Real-time ban status check
   useEffect(() => {
+    // Skip ban check for local users
+    if (user?.id?.startsWith('local_')) {
+      return () => {}
+    }
+
     const checkBanStatus = setInterval(async () => {
       if (user && profile) {
         const { data: currentProfile } = await supabase
