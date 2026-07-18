@@ -149,7 +149,7 @@ function Verifier() {
           endpoint = `https://api.socialfetch.dev/v1/tiktok/profiles/${account.username.replace('@', '')}`
           break
         case 'youtube':
-          endpoint = `https://api.socialfetch.dev/v1/youtube/profiles/@${account.username.replace('@', '')}`
+          endpoint = `https://api.socialfetch.dev/v1/youtube/profiles/${account.username.replace('@', '')}`
           break
         case 'twitter':
           endpoint = `https://api.socialfetch.dev/v1/twitter/profiles/${account.username.replace('@', '')}`
