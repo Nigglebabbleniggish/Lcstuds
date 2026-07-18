@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { TrendingUp, DollarSign, Activity, Calendar, BarChart3, Eye, Target, Users, Heart, MessageCircle, Share2 } from 'lucide-react'
+import { TrendingUp, DollarSign, Activity, Calendar, BarChart3, Eye, Target, Users, Heart, MessageCircle, Share2, Instagram, Youtube, Twitter, Facebook, Linkedin } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -11,12 +11,9 @@ function Dashboard() {
     totalViews: 0,
     totalFollowers: 0,
     engagementRate: 0,
-    socialAccounts: 0,
-    totalLikes: 0,
-    totalComments: 0,
-    totalShares: 0
+    socialAccounts: 0
   })
-  const [recentActivity, setRecentActivity] = useState([])
+  const [socialAccounts, setSocialAccounts] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -39,15 +36,11 @@ function Dashboard() {
         profile?.id ? supabase.from('social_accounts').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] })
       ])
 
-      // Calculate total views from social accounts instead of campaigns
       const totalViews = socialData.data?.reduce((sum, s) => sum + (s.views || 0), 0) || 0
       const totalFollowers = socialData.data?.reduce((sum, s) => sum + (s.followers || 0), 0) || 0
       const avgEngagement = socialData.data?.length > 0 
         ? socialData.data.reduce((sum, s) => sum + (s.engagement_rate || 0), 0) / socialData.data.length 
         : 0
-      const totalLikes = socialData.data?.reduce((sum, s) => sum + (s.likes || 0), 0) || 0
-      const totalComments = socialData.data?.reduce((sum, s) => sum + (s.comments || 0), 0) || 0
-      const totalShares = socialData.data?.reduce((sum, s) => sum + (s.shares || 0), 0) || 0
 
       setStats({
         totalEarnings: earningsData.data?.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0) || 0,
@@ -55,13 +48,10 @@ function Dashboard() {
         totalViews,
         totalFollowers,
         engagementRate: avgEngagement,
-        socialAccounts: socialData.data?.length || 0,
-        totalLikes,
-        totalComments,
-        totalShares
+        socialAccounts: socialData.data?.length || 0
       })
 
-      setRecentActivity(earningsData.data || [])
+      setSocialAccounts(socialData.data || [])
     } catch (error) {
       console.error('Error fetching dashboard data:', error.message)
     } finally {
@@ -69,16 +59,32 @@ function Dashboard() {
     }
   }
 
-  const statCards = [
-    { label: 'Total Earnings', value: `$${stats.totalEarnings.toFixed(2)}`, icon: DollarSign, color: 'from-green-500 to-emerald-600', bg: 'bg-green-500/10' },
-    { label: 'Active Campaigns', value: stats.activeCampaigns, icon: Target, color: 'from-blue-500 to-cyan-600', bg: 'bg-blue-500/10' },
-    { label: 'Total Followers', value: stats.totalFollowers.toLocaleString(), icon: Users, color: 'from-purple-500 to-violet-600', bg: 'bg-purple-500/10' },
-    { label: 'Engagement Rate', value: `${stats.engagementRate.toFixed(1)}%`, icon: Heart, color: 'from-pink-500 to-rose-600', bg: 'bg-pink-500/10' },
-    { label: 'Total Views', value: stats.totalViews.toLocaleString(), icon: Eye, color: 'from-indigo-500 to-blue-600', bg: 'bg-indigo-500/10' },
-    { label: 'Total Likes', value: stats.totalLikes.toLocaleString(), icon: Heart, color: 'from-red-500 to-orange-600', bg: 'bg-red-500/10' },
-    { label: 'Total Comments', value: stats.totalComments.toLocaleString(), icon: MessageCircle, color: 'from-teal-500 to-cyan-600', bg: 'bg-teal-500/10' },
-    { label: 'Total Shares', value: stats.totalShares.toLocaleString(), icon: Share2, color: 'from-amber-500 to-yellow-600', bg: 'bg-amber-500/10' },
-  ]
+  const getPlatformIcon = (platform) => {
+    const icons = {
+      instagram: Instagram,
+      youtube: Youtube,
+      twitter: Twitter,
+      facebook: Facebook,
+      linkedin: Linkedin,
+      tiktok: Activity,
+      threads: MessageCircle
+    }
+    const Icon = icons[platform.toLowerCase()] || Share2
+    return Icon
+  }
+
+  const getPlatformColor = (platform) => {
+    const colors = {
+      instagram: 'from-pink-500 to-purple-600',
+      youtube: 'from-red-500 to-red-600',
+      twitter: 'from-blue-400 to-blue-500',
+      facebook: 'from-blue-600 to-blue-800',
+      linkedin: 'from-blue-700 to-blue-900',
+      tiktok: 'from-gray-800 to-black',
+      threads: 'from-gray-600 to-gray-800'
+    }
+    return colors[platform.toLowerCase()] || 'from-gray-500 to-gray-600'
+  }
 
   if (loading) {
     return <div className="p-6 text-gray-400">Loading analytics...</div>
@@ -97,146 +103,86 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {statCards.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <div key={stat.label} className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 hover:border-zinc-700 transition-all">
-              <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} w-fit mb-4`}>
-                <Icon size={20} className="text-white" />
-              </div>
-              <p className="text-gray-400 text-sm mb-1">{stat.label}</p>
-              <p className="text-2xl font-bold text-white">{stat.value}</p>
+      {/* Main Stats Card */}
+      <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-3xl border border-zinc-700 p-8 mb-8 animate-fade-in">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-zinc-700 hover:border-zinc-600 transition-all hover:scale-105">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 w-fit mb-4">
+              <DollarSign size={24} className="text-white" />
             </div>
-          )
-        })}
-      </div>
+            <p className="text-gray-400 text-sm mb-1">Total Earnings</p>
+            <p className="text-3xl font-bold text-white">${stats.totalEarnings.toFixed(2)}</p>
+          </div>
 
-      {/* Analytics Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className="lg:col-span-2 bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-white">Social Media Performance</h3>
-            <BarChart3 className="text-gray-400" size={20} />
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-zinc-700 hover:border-zinc-600 transition-all hover:scale-105">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 w-fit mb-4">
+              <Target size={24} className="text-white" />
+            </div>
+            <p className="text-gray-400 text-sm mb-1">Active Campaigns</p>
+            <p className="text-3xl font-bold text-white">{stats.activeCampaigns}</p>
           </div>
-          <div className="h-48 flex items-end gap-3">
-            {[65, 45, 78, 52, 89, 67, 95, 72, 58, 84, 91, 76].map((height, i) => (
-              <div
-                key={i}
-                className="flex-1 bg-gradient-to-t from-zinc-800 to-zinc-700 rounded-t-lg transition-all hover:from-purple-900 hover:to-purple-700"
-                style={{ height: `${height}%` }}
-              />
-            ))}
-          </div>
-          <div className="flex justify-between mt-3 text-xs text-gray-500">
-            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(month => (
-              <span key={month}>{month}</span>
-            ))}
-          </div>
-        </div>
 
-        <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-white">Social Accounts</h3>
-            <Share2 className="text-gray-400" size={20} />
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-zinc-700 hover:border-zinc-600 transition-all hover:scale-105">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 w-fit mb-4">
+              <Users size={24} className="text-white" />
+            </div>
+            <p className="text-gray-400 text-sm mb-1">Total Followers</p>
+            <p className="text-3xl font-bold text-white">{stats.totalFollowers.toLocaleString()}</p>
           </div>
-          <div className="space-y-4">
-            {[
-              { name: 'Connected', count: stats.socialAccounts, color: 'bg-green-500' },
-              { name: 'Active', count: Math.floor(stats.socialAccounts * 0.8), color: 'bg-blue-500' },
-              { name: 'Pending', count: Math.floor(stats.socialAccounts * 0.2), color: 'bg-yellow-500' },
-            ].map((status) => (
-              <div key={status.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${status.color}`} />
-                  <span className="text-gray-300">{status.name}</span>
-                </div>
-                <span className="text-white font-semibold">{status.count}</span>
-              </div>
-            ))}
+
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-zinc-700 hover:border-zinc-600 transition-all hover:scale-105">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 w-fit mb-4">
+              <Eye size={24} className="text-white" />
+            </div>
+            <p className="text-gray-400 text-sm mb-1">Total Views</p>
+            <p className="text-3xl font-bold text-white">{stats.totalViews.toLocaleString()}</p>
           </div>
         </div>
       </div>
 
-      {/* Social Media Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-pink-500/10 rounded-xl">
-              <Heart className="text-pink-400" size={20} />
-            </div>
-            <div>
-              <p className="text-gray-400 text-sm">Total Likes</p>
-              <p className="text-2xl font-bold text-white">{(stats.totalFollowers * 12).toLocaleString()}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 text-green-400 text-sm">
-            <TrendingUp size={16} />
-            <span>+12.5%</span>
-          </div>
+      {/* Social Accounts Section */}
+      <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-white">Connected Social Accounts</h3>
+          <Share2 className="text-gray-400" size={24} />
         </div>
-
-        <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-blue-500/10 rounded-xl">
-              <MessageCircle className="text-blue-400" size={20} />
-            </div>
-            <div>
-              <p className="text-gray-400 text-sm">Total Comments</p>
-              <p className="text-2xl font-bold text-white">{(stats.totalFollowers * 3).toLocaleString()}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 text-green-400 text-sm">
-            <TrendingUp size={16} />
-            <span>+8.3%</span>
-          </div>
-        </div>
-
-        <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-purple-500/10 rounded-xl">
-              <Share2 className="text-purple-400" size={20} />
-            </div>
-            <div>
-              <p className="text-gray-400 text-sm">Total Shares</p>
-              <p className="text-2xl font-bold text-white">{(stats.totalFollowers * 5).toLocaleString()}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 text-green-400 text-sm">
-            <TrendingUp size={16} />
-            <span>+15.2%</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
-        <h3 className="text-lg font-semibold text-white mb-6">Recent Transactions</h3>
-        {recentActivity.length === 0 ? (
+        
+        {socialAccounts.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
-            <DollarSign size={48} className="mx-auto mb-4 opacity-50" />
-            <p>No recent transactions</p>
+            <Share2 size={48} className="mx-auto mb-4 opacity-50" />
+            <p>No social accounts connected yet</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-green-500/10 rounded-xl">
-                    <DollarSign className="text-green-400" size={20} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {socialAccounts.map((account, index) => {
+              const Icon = getPlatformIcon(account.platform)
+              const color = getPlatformColor(account.platform)
+              return (
+                <div 
+                  key={account.id} 
+                  className="bg-zinc-800/50 rounded-2xl p-6 border border-zinc-700 hover:border-zinc-600 transition-all hover:scale-105 animate-fade-in"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className={`p-4 rounded-xl bg-gradient-to-br ${color} w-fit mb-4`}>
+                    <Icon size={28} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">{activity.description || 'Campaign Earning'}</p>
-                    <p className="text-gray-500 text-sm">{new Date(activity.created_at).toLocaleDateString()}</p>
+                    <p className="text-white font-semibold text-lg capitalize">{account.platform}</p>
+                    <p className="text-gray-400 text-sm">@{account.username}</p>
+                    <div className="mt-3 flex items-center gap-4 text-sm">
+                      <div>
+                        <p className="text-gray-500">Followers</p>
+                        <p className="text-white font-semibold">{account.followers?.toLocaleString() || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Engagement</p>
+                        <p className="text-white font-semibold">{account.engagement_rate?.toFixed(1) || 0}%</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-green-400 font-bold text-lg">+${parseFloat(activity.amount).toFixed(2)}</p>
-                  <p className="text-gray-500 text-xs">{activity.payment_method || 'Crypto'}</p>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
