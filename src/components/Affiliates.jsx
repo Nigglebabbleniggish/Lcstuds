@@ -9,6 +9,7 @@ function Affiliates() {
   const [affiliates, setAffiliates] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedAffiliate, setSelectedAffiliate] = useState(null)
   const [selectedReward, setSelectedReward] = useState(null)
@@ -95,6 +96,50 @@ function Affiliates() {
       console.error('Error updating status:', error.message)
       alert('Failed to update status')
     }
+  }
+
+  const handleEditReward = async (e) => {
+    e.preventDefault()
+    try {
+      const { error } = await supabase
+        .from('content_rewards')
+        .update({
+          title: newReward.title,
+          description: newReward.description,
+          budget: parseFloat(newReward.budget),
+          views_required: parseFloat(newReward.viewsRequired),
+          cover_image: newReward.coverImage,
+          font_style: newReward.fontStyle,
+          questions: newReward.questions,
+          resources: newReward.resources
+        })
+        .eq('id', selectedReward.id)
+
+      if (error) throw error
+
+      setShowEditModal(false)
+      setNewReward({ title: '', description: '', budget: '', viewsRequired: '', coverImage: '', fontStyle: 'default', questions: [], resources: [] })
+      setNewQuestion('')
+      setNewResource({ title: '', content: '' })
+      fetchData()
+    } catch (error) {
+      console.error('Error updating reward:', error.message)
+      alert('Failed to update campaign')
+    }
+  }
+
+  const openEditModal = () => {
+    setNewReward({
+      title: selectedReward.title,
+      description: selectedReward.description,
+      budget: selectedReward.budget,
+      viewsRequired: selectedReward.views_required,
+      coverImage: selectedReward.cover_image,
+      fontStyle: selectedReward.font_style,
+      questions: selectedReward.questions || [],
+      resources: selectedReward.resources || []
+    })
+    setShowEditModal(true)
   }
 
   const handleDeleteReward = async (rewardId) => {
@@ -613,6 +658,237 @@ function Affiliates() {
         </div>
       )}
 
+      {/* Edit Campaign Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+          <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-white mb-4">Edit Campaign</h3>
+            
+            <form onSubmit={handleEditReward} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Title</label>
+                <input
+                  type="text"
+                  required
+                  value={newReward.title}
+                  onChange={(e) => setNewReward({ ...newReward, title: e.target.value })}
+                  className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                  placeholder="e.g., YouTube Video Promotion"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
+                <textarea
+                  required
+                  value={newReward.description}
+                  onChange={(e) => setNewReward({ ...newReward, description: e.target.value })}
+                  className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white resize-none"
+                  rows={3}
+                  placeholder="Describe the content..."
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Budget ($)</label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  step="0.01"
+                  value={newReward.budget}
+                  onChange={(e) => setNewReward({ ...newReward, budget: e.target.value })}
+                  className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                  placeholder="0.00"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">RPM ($ per 1000 views)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={newReward.viewsRequired}
+                  onChange={(e) => setNewReward({ ...newReward, viewsRequired: e.target.value })}
+                  className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                  placeholder="0.95"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Cover Image</label>
+                <div className="space-y-2">
+                  <input
+                    type="url"
+                    value={newReward.coverImage}
+                    onChange={(e) => setNewReward({ ...newReward, coverImage: e.target.value })}
+                    className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                    placeholder="Or paste image URL..."
+                  />
+                  {newReward.coverImage && (
+                    <img
+                      src={newReward.coverImage}
+                      alt="Preview"
+                      className="w-full h-32 object-cover rounded-lg mt-2"
+                      onError={(e) => e.target.style.display = 'none'}
+                    />
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Font Style</label>
+                <select
+                  value={newReward.fontStyle}
+                  onChange={(e) => setNewReward({ ...newReward, fontStyle: e.target.value })}
+                  className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                >
+                  <option value="default">Default</option>
+                  <option value="bold">Bold</option>
+                  <option value="italic">Italic</option>
+                  <option value="serif">Serif</option>
+                  <option value="mono">Mono</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Application Questions</label>
+                <div className="space-y-2 mb-2">
+                  {newReward.questions.map((q, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={q}
+                        onChange={(e) => {
+                          const updated = [...newReward.questions]
+                          updated[index] = e.target.value
+                          setNewReward({ ...newReward, questions: updated })
+                        }}
+                        className="flex-1 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                        placeholder={`Question ${index + 1}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = newReward.questions.filter((_, i) => i !== index)
+                          setNewReward({ ...newReward, questions: updated })
+                        }}
+                        className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newQuestion}
+                    onChange={(e) => setNewQuestion(e.target.value)}
+                    className="flex-1 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                    placeholder="Add a question..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newQuestion.trim()) {
+                        setNewReward({ ...newReward, questions: [...newReward.questions, newQuestion] })
+                        setNewQuestion('')
+                      }
+                    }}
+                    className="px-4 py-2 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Campaign Resources</label>
+                <div className="space-y-2 mb-2">
+                  {newReward.resources.map((res, index) => (
+                    <div key={index} className="bg-zinc-800 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <input
+                          type="text"
+                          value={res.title}
+                          onChange={(e) => {
+                            const updated = [...newReward.resources]
+                            updated[index].title = e.target.value
+                            setNewReward({ ...newReward, resources: updated })
+                          }}
+                          className="flex-1 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white text-sm"
+                          placeholder="Resource title..."
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = newReward.resources.filter((_, i) => i !== index)
+                            setNewReward({ ...newReward, resources: updated })
+                          }}
+                          className="p-1 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 ml-2"
+                        >
+                          ×
+                        </button>
+                      </div>
+                      <textarea
+                        value={res.content}
+                        onChange={(e) => {
+                          const updated = [...newReward.resources]
+                          updated[index].content = e.target.value
+                          setNewReward({ ...newReward, resources: updated })
+                        }}
+                        className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white resize-none text-sm"
+                        rows={2}
+                        placeholder="Resource description..."
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newResource.title}
+                    onChange={(e) => setNewResource({ ...newResource, title: e.target.value })}
+                    className="flex-1 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
+                    placeholder="Resource title..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newResource.title.trim()) {
+                        setNewReward({ ...newReward, resources: [...newReward.resources, { ...newResource }] })
+                        setNewResource({ title: '', content: '' })
+                      }
+                    }}
+                    className="px-4 py-2 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                  >
+                    Add Resource
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 px-4 py-2 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Update Campaign
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Campaign Full Screen View */}
       {selectedReward && isCampaignView && (
         <div className="fixed inset-0 z-50 bg-black overflow-y-auto">
@@ -776,12 +1052,20 @@ function Affiliates() {
                   {profile?.is_admin && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Admin Actions</h3>
-                      <button
-                        onClick={() => handleDeleteReward(selectedReward.id)}
-                        className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                      >
-                        Delete Campaign
-                      </button>
+                      <div className="space-y-3">
+                        <button
+                          onClick={openEditModal}
+                          className="w-full px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
+                        >
+                          Edit Campaign
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReward(selectedReward.id)}
+                          className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                          Delete Campaign
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
