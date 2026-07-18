@@ -578,9 +578,9 @@ function App() {
           )}
 
           {showNotifications && (
-            <div className="absolute top-16 right-6 bg-zinc-900 border-zinc-800 border rounded-lg shadow-lg p-4 z-50 w-96 max-h-[80vh] overflow-y-auto">
+            <div className="absolute top-16 right-6 bg-zinc-900 border-2 border-zinc-700 rounded-lg shadow-lg p-4 z-50 w-96 max-h-[80vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-white">Video Submissions</h3>
+                <h3 className="font-semibold text-white">Notifications</h3>
                 <button
                   onClick={() => setShowNotifications(false)}
                   className="p-1 rounded hover:bg-zinc-800 text-gray-400"
@@ -589,9 +589,9 @@ function App() {
                 </button>
               </div>
               {notifications.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-500 border-2 border-dashed border-zinc-700 rounded-lg">
                   <Bell size={32} className="mx-auto mb-3 opacity-50" />
-                  <p>No video submissions</p>
+                  <p>Inbox empty</p>
                 </div>
               ) : (
                 <div className="space-y-3">

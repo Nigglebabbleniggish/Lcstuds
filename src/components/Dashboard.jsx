@@ -24,7 +24,15 @@ function Dashboard() {
     }
 
     fetchDashboardData()
+    loadLocalSocialAccounts()
   }, [profile])
+
+  const loadLocalSocialAccounts = () => {
+    const savedAccounts = localStorage.getItem('social_accounts')
+    if (savedAccounts) {
+      setSocialAccounts(JSON.parse(savedAccounts))
+    }
+  }
 
   const fetchDashboardData = async () => {
     try {
@@ -51,7 +59,13 @@ function Dashboard() {
         socialAccounts: socialData.data?.length || 0
       })
 
-      setSocialAccounts(socialData.data || [])
+      // Use local accounts if available, otherwise use database accounts
+      const savedAccounts = localStorage.getItem('social_accounts')
+      if (savedAccounts) {
+        setSocialAccounts(JSON.parse(savedAccounts))
+      } else {
+        setSocialAccounts(socialData.data || [])
+      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error.message)
     } finally {
@@ -93,9 +107,11 @@ function Dashboard() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-1">Welcome back, {profile?.full_name || 'User'}</h1>
-          <p className="text-gray-400">Here's what's happening with your campaigns today.</p>
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-1">Welcome back, {profile?.full_name || 'User'}</h1>
+            <p className="text-gray-400">Here's what's happening with your campaigns today.</p>
+          </div>
         </div>
         <div className="flex items-center gap-2 text-gray-400 text-sm bg-zinc-900 px-4 py-2 rounded-lg border border-zinc-800">
           <Calendar size={16} />
@@ -103,38 +119,26 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Main Stats Card */}
+      {/* Unified Stats Display */}
       <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-3xl border border-zinc-700 p-8 mb-8 animate-fade-in">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-zinc-700 hover:border-zinc-600 transition-all hover:scale-105">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 w-fit mb-4">
-              <DollarSign size={24} className="text-white" />
-            </div>
-            <p className="text-gray-400 text-sm mb-1">Total Earnings</p>
+          <div className="text-center">
+            <p className="text-gray-400 text-sm mb-2">Total Earnings</p>
             <p className="text-3xl font-bold text-white">${stats.totalEarnings.toFixed(2)}</p>
           </div>
 
-          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-zinc-700 hover:border-zinc-600 transition-all hover:scale-105">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 w-fit mb-4">
-              <Target size={24} className="text-white" />
-            </div>
-            <p className="text-gray-400 text-sm mb-1">Active Campaigns</p>
+          <div className="text-center">
+            <p className="text-gray-400 text-sm mb-2">Active Campaigns</p>
             <p className="text-3xl font-bold text-white">{stats.activeCampaigns}</p>
           </div>
 
-          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-zinc-700 hover:border-zinc-600 transition-all hover:scale-105">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 w-fit mb-4">
-              <Users size={24} className="text-white" />
-            </div>
-            <p className="text-gray-400 text-sm mb-1">Total Followers</p>
+          <div className="text-center">
+            <p className="text-gray-400 text-sm mb-2">Total Followers</p>
             <p className="text-3xl font-bold text-white">{stats.totalFollowers.toLocaleString()}</p>
           </div>
 
-          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-zinc-700 hover:border-zinc-600 transition-all hover:scale-105">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 w-fit mb-4">
-              <Eye size={24} className="text-white" />
-            </div>
-            <p className="text-gray-400 text-sm mb-1">Total Views</p>
+          <div className="text-center">
+            <p className="text-gray-400 text-sm mb-2">Total Views</p>
             <p className="text-3xl font-bold text-white">{stats.totalViews.toLocaleString()}</p>
           </div>
         </div>
