@@ -23,6 +23,14 @@ function Verifier() {
     const envApiKey = import.meta.env.VITE_SOCIAL_FETCH_API_KEY
     console.log('Env API Key check:', envApiKey ? 'Found' : 'Not found')
     
+    // Pre-load YouTube API key to localStorage if available in env
+    const envYoutubeApiKey = import.meta.env.VITE_YOUTUBE_API_KEY
+    console.log('Env YouTube API Key check:', envYoutubeApiKey ? 'Found' : 'Not found')
+    if (envYoutubeApiKey && !localStorage.getItem('YOUTUBE_API_KEY')) {
+      localStorage.setItem('YOUTUBE_API_KEY', envYoutubeApiKey)
+      console.log('YouTube API key saved to localStorage from env')
+    }
+    
     // Hardcode the API key as fallback since env loading isn't working
     const hardcodedKey = 'sfk_QNNJJnuVMglhNAHJOMbpoDUvDDjmhnqEUajTdygcCPrccWufqisJeIPPwRkZmLyr'
     
@@ -149,8 +157,14 @@ function Verifier() {
           endpoint = `https://api.socialfetch.dev/v1/tiktok/profiles/${account.username.replace('@', '')}`
           break
         case 'youtube':
-          // YouTube might need different formats
-          endpoint = `https://api.socialfetch.dev/v1/youtube/profiles/${account.username.replace('@', '')}`
+          // Use YouTube Data API instead of Social Fetch
+          const youtubeApiKey = localStorage.getItem('YOUTUBE_API_KEY') || import.meta.env.VITE_YOUTUBE_API_KEY
+          if (!youtubeApiKey) {
+            throw new Error('YouTube API key not found. Please add VITE_YOUTUBE_API_KEY to environment variables.')
+          }
+          
+          // Try to get channel by username first
+          endpoint = `https://www.googleapis.com/youtube/v3/channels?part=snippet&forUsername=${account.username.replace('@', '')}&key=${youtubeApiKey}`
           break
         case 'twitter':
           endpoint = `https://api.socialfetch.dev/v1/twitter/profiles/${account.username.replace('@', '')}`
@@ -166,19 +180,28 @@ function Verifier() {
       console.log('Fetching from endpoint:', endpoint)
       console.log('API Key:', apiKey.substring(0, 10) + '...')
 
-      // Use CORS proxy to bypass CORS restrictions
-      const proxyEndpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint + '?t=' + Date.now())}`
-      console.log('Proxy endpoint:', proxyEndpoint)
+      // YouTube Data API doesn't need CORS proxy, others do
+      let response
+      if (account.platform === 'youtube') {
+        response = await fetch(endpoint, {
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store'
+        })
+      } else {
+        // Use CORS proxy to bypass CORS restrictions for other platforms
+        const proxyEndpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint + '?t=' + Date.now())}`
+        console.log('Proxy endpoint:', proxyEndpoint)
 
-      const response = await fetch(proxyEndpoint, {
-        headers: { 
-          'x-api-key': apiKey,
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        },
-        cache: 'no-store'
-      })
+        response = await fetch(proxyEndpoint, {
+          headers: { 
+            'x-api-key': apiKey,
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          },
+          cache: 'no-store'
+        })
+      }
 
       console.log('Response status:', response.status)
       console.log('Response ok:', response.ok)
@@ -187,66 +210,53 @@ function Verifier() {
         const errorText = await response.text()
         console.error('API Error:', errorText)
         
-        // For YouTube, try multiple formats if first attempt fails
+        // For YouTube, try alternative endpoint formats
         if (response.status === 404 && account.platform === 'youtube') {
-          console.log('YouTube 404, trying alternative formats...')
+          console.log('YouTube 404, trying alternative endpoint formats...')
+          const youtubeApiKey = localStorage.getItem('YOUTUBE_API_KEY') || import.meta.env.VITE_YOUTUBE_API_KEY
           
-          const youtubeEndpoints = [
-            `https://api.socialfetch.dev/v1/youtube/profiles/@${account.username.replace('@', '')}`,
-            `https://api.socialfetch.dev/v1/youtube/profiles/UC${account.username.replace('@', '')}`,
-            `https://api.socialfetch.dev/v1/youtube/channels/${account.username.replace('@', '')}`,
-            `https://api.socialfetch.dev/v1/youtube/channels/@${account.username.replace('@', '')}`,
-            `https://api.socialfetch.dev/v1/youtube/user/${account.username.replace('@', '')}`,
-            `https://api.socialfetch.dev/v1/youtube/c/${account.username.replace('@', '')}`,
-            `https://api.socialfetch.dev/v1/youtube/channel/${account.username.replace('@', '')}`,
-            `https://api.socialfetch.dev/v1/youtube/@${account.username.replace('@', '')}`
-          ]
-          
-          for (const altEndpoint of youtubeEndpoints) {
-            console.log('Trying alternative endpoint:', altEndpoint)
-            const proxyEndpoint = `https://corsproxy.io/?${encodeURIComponent(altEndpoint + '?t=' + Date.now())}`
-            
-            const retryResponse = await fetch(proxyEndpoint, {
-              headers: { 
-                'x-api-key': apiKey,
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
-              },
-              cache: 'no-store'
-            })
-            
-            console.log('Alternative endpoint response status:', retryResponse.status)
-            
-            if (retryResponse.ok) {
-              const data = await retryResponse.json()
-              console.log('Alternative endpoint API Response data:', data)
-              return processVerificationData(data, account, apiKey)
-            }
-          }
-          
-          // Try without proxy as last resort for YouTube
-          console.log('Trying YouTube without CORS proxy...')
-          const directEndpoint = `https://api.socialfetch.dev/v1/youtube/profiles/${account.username.replace('@', '')}?t=${Date.now()}`
-          const directResponse = await fetch(directEndpoint, {
-            headers: { 
-              'x-api-key': apiKey,
-              'Content-Type': 'application/json'
-            },
+          // Try with @ prefix
+          const altEndpoint = `https://www.googleapis.com/youtube/v3/channels?part=snippet&forUsername=@${account.username.replace('@', '')}&key=${youtubeApiKey}`
+          const altResponse = await fetch(altEndpoint, {
+            headers: { 'Content-Type': 'application/json' },
             cache: 'no-store'
           })
           
-          console.log('Direct endpoint response status:', directResponse.status)
-          
-          if (directResponse.ok) {
-            const data = await directResponse.json()
-            console.log('Direct endpoint API Response data:', data)
+          if (altResponse.ok) {
+            const data = await altResponse.json()
+            console.log('Alternative YouTube endpoint API Response data:', data)
             return processVerificationData(data, account, apiKey)
+          }
+          
+          // Try searching by channel name
+          const searchEndpoint = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${account.username.replace('@', '')}&type=channel&key=${youtubeApiKey}`
+          const searchResponse = await fetch(searchEndpoint, {
+            headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store'
+          })
+          
+          if (searchResponse.ok) {
+            const searchData = await searchResponse.json()
+            console.log('YouTube search API Response data:', searchData)
+            if (searchData.items && searchData.items.length > 0) {
+              const channelId = searchData.items[0].id.channelId
+              const channelEndpoint = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${youtubeApiKey}`
+              const channelResponse = await fetch(channelEndpoint, {
+                headers: { 'Content-Type': 'application/json' },
+                cache: 'no-store'
+              })
+              
+              if (channelResponse.ok) {
+                const channelData = await channelResponse.json()
+                console.log('YouTube channel API Response data:', channelData)
+                return processVerificationData(channelData, account, apiKey)
+              }
+            }
           }
         }
         
         if (response.status === 404) {
-          throw new Error(`Profile not found. Please check that the username is correct and the profile exists on ${platform.name}. For YouTube, make sure your channel has a custom URL (@username).`)
+          throw new Error(`Profile not found. Please check that the username is correct and the profile exists on ${platform.name}.`)
         }
         throw new Error(`API returned ${response.status}: ${errorText}`)
       }
@@ -270,10 +280,19 @@ function Verifier() {
       
       // Check if verification code exists in bio or description
       // TikTok uses data.profile.bio structure, Instagram may differ
+      // YouTube Data API uses data.items[0].snippet.description
       let bio = ''
       
-      // Try direct fields
-      bio = data.bio || data.description || data.signature || data.bio_text || ''
+      // YouTube Data API specific format
+      if (account.platform === 'youtube' && data.items && data.items.length > 0) {
+        bio = data.items[0].snippet.description || ''
+        console.log('YouTube description extracted:', bio)
+      }
+      
+      // Try direct fields (for other platforms)
+      if (!bio) {
+        bio = data.bio || data.description || data.signature || data.bio_text || ''
+      }
       
       // Try nested in data object
       if (!bio && data.data) {
