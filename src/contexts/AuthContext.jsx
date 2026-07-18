@@ -4,20 +4,13 @@ import { supabase } from '../lib/supabase'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [profile, setProfile] = useState(null)
-
-  useEffect(() => {
-    // Set loading to false immediately for faster initial render
-    setLoading(false)
-
-    // Check for local user session
-    const localUserStr = localStorage.getItem('localUser')
-    if (localUserStr) {
-      try {
+  // Check localStorage synchronously during initial state setup
+  const getInitialUser = () => {
+    try {
+      const localUserStr = localStorage.getItem('localUser')
+      if (localUserStr) {
         const localUser = JSON.parse(localUserStr)
-        setUser({
+        return {
           id: localUser.id,
           email: localUser.email,
           user_metadata: {
@@ -25,20 +18,43 @@ export function AuthProvider({ children }) {
             is_admin: localUser.is_admin,
             admin_id: localUser.admin_id
           }
-        })
-        setProfile({
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing local user:', error)
+      localStorage.removeItem('localUser')
+    }
+    return null
+  }
+
+  const getInitialProfile = () => {
+    try {
+      const localUserStr = localStorage.getItem('localUser')
+      if (localUserStr) {
+        const localUser = JSON.parse(localUserStr)
+        return {
           id: localUser.id,
           full_name: localUser.username,
           username: localUser.username,
           is_admin: localUser.is_admin,
           admin_id: localUser.admin_id
-        })
-        // Don't set up Supabase listeners for local users
-        return () => {}
-      } catch (error) {
-        console.error('Error parsing local user:', error)
-        localStorage.removeItem('localUser')
+        }
       }
+    } catch (error) {
+      console.error('Error parsing local user:', error)
+      localStorage.removeItem('localUser')
+    }
+    return null
+  }
+
+  const [user, setUser] = useState(getInitialUser)
+  const [loading, setLoading] = useState(false)
+  const [profile, setProfile] = useState(getInitialProfile)
+
+  useEffect(() => {
+    // Skip everything if we already have a local user
+    if (user?.id?.startsWith('local_')) {
+      return () => {}
     }
 
     // Only set up Supabase if no local user
@@ -66,7 +82,7 @@ export function AuthProvider({ children }) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [user?.id])
 
   // Real-time ban status check
   useEffect(() => {
