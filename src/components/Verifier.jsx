@@ -107,6 +107,69 @@ function Verifier() {
     setShowVerificationModal(true)
   }
 
+  const handleCheckVerification = async (account) => {
+    const platform = platforms.find(p => p.id === account.platform)
+    const apiKey = import.meta.env.VITE_SOCIAL_FETCH_API_KEY
+    
+    if (!apiKey) {
+      alert('Social Fetch API key not configured. Please add VITE_SOCIAL_FETCH_API_KEY to your environment variables.')
+      return
+    }
+
+    try {
+      let endpoint = ''
+      switch (account.platform) {
+        case 'instagram':
+          endpoint = `https://api.socialfetch.dev/v1/instagram/profiles/${account.username.replace('@', '')}`
+          break
+        case 'tiktok':
+          endpoint = `https://api.socialfetch.dev/v1/tiktok/profiles/${account.username.replace('@', '')}`
+          break
+        case 'youtube':
+          endpoint = `https://api.socialfetch.dev/v1/youtube/profiles/${account.username.replace('@', '')}`
+          break
+        case 'twitter':
+          endpoint = `https://api.socialfetch.dev/v1/twitter/profiles/${account.username.replace('@', '')}`
+          break
+        case 'facebook':
+          endpoint = `https://api.socialfetch.dev/v1/facebook/profiles/${account.username.replace('@', '')}`
+          break
+        case 'threads':
+          endpoint = `https://api.socialfetch.dev/v1/threads/profiles/${account.username.replace('@', '')}`
+          break
+        default:
+          alert('Platform not supported for automatic verification')
+          return
+      }
+
+      const response = await fetch(endpoint, {
+        headers: { 'x-api-key': apiKey }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile data')
+      }
+
+      const data = await response.json()
+      
+      // Check if verification code exists in bio or description
+      const bio = data.bio || data.description || ''
+      const codeFound = bio.includes(account.verificationCode)
+
+      if (codeFound) {
+        setAccounts(accounts.map(acc => 
+          acc.id === account.id ? { ...acc, verified: true } : acc
+        ))
+        alert('Account verified successfully!')
+      } else {
+        alert(`Verification code not found in profile. Please make sure you've posted "${account.verificationCode}" in your bio.`)
+      }
+    } catch (error) {
+      console.error('Verification check failed:', error)
+      alert('Failed to check verification. Please try again later.')
+    }
+  }
+
   const handleDeleteAccount = (id) => {
     setAccounts(accounts.filter(acc => acc.id !== id))
   }
@@ -177,6 +240,15 @@ function Verifier() {
                               <>
                                 <span className="text-yellow-400 text-xs">Pending verification</span>
                                 <span className="bg-zinc-700 text-gray-300 text-xs px-2 py-0.5 rounded">Code: {account.verificationCode}</span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleCheckVerification(account)
+                                  }}
+                                  className="text-blue-400 text-xs hover:underline"
+                                >
+                                  Check Verification
+                                </button>
                               </>
                             )}
                             <span className="text-gray-500 text-xs">• {account.views?.toLocaleString() || 0} views</span>
