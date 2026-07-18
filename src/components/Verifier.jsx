@@ -284,6 +284,43 @@ function Verifier() {
       console.log('Full API Response:', JSON.stringify(data, null, 2))
       console.log('Available fields:', Object.keys(data))
       
+      // For YouTube, if no results found, try search fallback
+      if (account.platform === 'youtube' && data.pageInfo && data.pageInfo.totalResults === 0) {
+        console.log('YouTube channel not found by username, trying search...')
+        let youtubeApiKey = localStorage.getItem('YOUTUBE_API_KEY') || import.meta.env.VITE_YOUTUBE_API_KEY
+        
+        // Hardcoded fallback
+        if (!youtubeApiKey) {
+          youtubeApiKey = 'AIzaSyA7NWd90TxdR1PPDSKZWSPdZiRfb8OzAEQ'
+        }
+        
+        // Try searching by channel name
+        const searchEndpoint = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${account.username.replace('@', '')}&type=channel&key=${youtubeApiKey}`
+        const searchResponse = await fetch(searchEndpoint, {
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store'
+        })
+        
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json()
+          console.log('YouTube search API Response data:', searchData)
+          if (searchData.items && searchData.items.length > 0) {
+            const channelId = searchData.items[0].id.channelId
+            const channelEndpoint = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${youtubeApiKey}`
+            const channelResponse = await fetch(channelEndpoint, {
+              headers: { 'Content-Type': 'application/json' },
+              cache: 'no-store'
+            })
+            
+            if (channelResponse.ok) {
+              const channelData = await channelResponse.json()
+              console.log('YouTube channel API Response data:', channelData)
+              return processVerificationData(channelData, account, apiKey)
+            }
+          }
+        }
+      }
+      
       return processVerificationData(data, account, apiKey)
     } catch (error) {
       console.error('Verification check failed:', error)
