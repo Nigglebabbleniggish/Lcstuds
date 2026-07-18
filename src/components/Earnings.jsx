@@ -10,6 +10,12 @@ function Earnings() {
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
+    // Skip Supabase fetch for local users
+    if (profile?.id?.startsWith('local_')) {
+      setLoading(false)
+      return
+    }
+
     if (profile?.id) {
       fetchEarnings()
     } else {

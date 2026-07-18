@@ -1,10 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 function Verifier() {
+  const { profile } = useAuth()
   const [accounts, setAccounts] = useState([])
   const [showAddModal, setShowAddModal] = useState(false)
   const [newAccount, setNewAccount] = useState({ platform: '', username: '', link: '' })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Skip Supabase fetch for local users
+    if (profile?.id?.startsWith('local_')) {
+      setLoading(false)
+      return
+    }
+
+    setLoading(false)
+  }, [profile?.id])
 
   const platforms = [
     {
@@ -78,6 +91,10 @@ function Verifier() {
 
   const handleDeleteAccount = (id) => {
     setAccounts(accounts.filter(acc => acc.id !== id))
+  }
+
+  if (loading) {
+    return <div className="p-6 text-gray-400">Loading...</div>
   }
 
   return (

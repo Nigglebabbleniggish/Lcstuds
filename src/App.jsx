@@ -413,7 +413,14 @@ function App() {
               <CheckCircle size={20} />
             </button>
             <button
-              onClick={signOut}
+              onClick={async () => {
+                try {
+                  await signOut()
+                  window.location.reload()
+                } catch (error) {
+                  console.error('Logout error:', error)
+                }
+              }}
               className="p-2 rounded-lg transition-colors hover:bg-zinc-800 text-gray-400 hover:text-red-400"
               title="Sign out"
             >
@@ -429,13 +436,21 @@ function App() {
                   <label className="block text-sm font-medium mb-2 text-gray-400">Theme</label>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setTheme('dark')}
+                      onClick={() => {
+                        setTheme('dark')
+                        document.documentElement.classList.remove('light')
+                        document.documentElement.classList.add('dark')
+                      }}
                       className="flex-1 py-2 px-3 rounded-lg border-2 transition-colors border-white bg-white/10 text-white"
                     >
                       Dark
                     </button>
                     <button
-                      onClick={() => setTheme('light')}
+                      onClick={() => {
+                        setTheme('light')
+                        document.documentElement.classList.remove('dark')
+                        document.documentElement.classList.add('light')
+                      }}
                       className="flex-1 py-2 px-3 rounded-lg border-2 transition-colors border-zinc-600 text-gray-400 hover:border-zinc-500"
                     >
                       Light
