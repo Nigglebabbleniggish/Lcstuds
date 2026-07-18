@@ -107,24 +107,6 @@ function Verifier() {
     setShowVerificationModal(true)
   }
 
-  const handleVerifyAccount = async (account) => {
-    // This would integrate with PostSyncer OAuth Delegation API
-    // For now, we'll simulate the verification process
-    const platform = platforms.find(p => p.id === account.platform)
-    const verificationUrl = `https://postsyncer.com/oauth/delegate/${account.platform}?callback=${encodeURIComponent(window.location.origin + '/verify-callback')}`
-    
-    // In production, this would redirect to PostSyncer's OAuth flow
-    // For demo purposes, we'll show instructions
-    alert(`To verify your ${platform.name} account:\n\n1. We'll redirect you to ${platform.name}'s authorization page\n2. Authorize LC Studio to access your account\n3. We'll automatically verify your ownership\n\nNote: This requires PostSyncer API integration for production use.`)
-    
-    // Simulate verification after user confirms
-    setTimeout(() => {
-      setAccounts(accounts.map(acc => 
-        acc.id === account.id ? { ...acc, verified: true } : acc
-      ))
-    }, 2000)
-  }
-
   const handleDeleteAccount = (id) => {
     setAccounts(accounts.filter(acc => acc.id !== id))
   }
@@ -195,15 +177,6 @@ function Verifier() {
                               <>
                                 <span className="text-yellow-400 text-xs">Pending verification</span>
                                 <span className="bg-zinc-700 text-gray-300 text-xs px-2 py-0.5 rounded">Code: {account.verificationCode}</span>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleVerifyAccount(account)
-                                  }}
-                                  className="text-blue-400 text-xs hover:underline"
-                                >
-                                  Verify with OAuth
-                                </button>
                               </>
                             )}
                             <span className="text-gray-500 text-xs">• {account.views?.toLocaleString() || 0} views</span>
