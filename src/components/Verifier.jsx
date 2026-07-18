@@ -149,7 +149,7 @@ function Verifier() {
           endpoint = `https://api.socialfetch.dev/v1/tiktok/profiles/${account.username.replace('@', '')}`
           break
         case 'youtube':
-          // Try both with and without @ prefix
+          // YouTube might need different formats
           endpoint = `https://api.socialfetch.dev/v1/youtube/profiles/${account.username.replace('@', '')}`
           break
         case 'twitter':
@@ -187,29 +187,38 @@ function Verifier() {
         const errorText = await response.text()
         console.error('API Error:', errorText)
         
-        // For YouTube, try with @ prefix if first attempt fails
-        if (response.status === 404 && account.platform === 'youtube' && !endpoint.includes('@')) {
-          console.log('Retrying with @ prefix for YouTube...')
-          const endpointWithAt = `https://api.socialfetch.dev/v1/youtube/profiles/@${account.username.replace('@', '')}`
-          const proxyEndpointWithAt = `https://corsproxy.io/?${encodeURIComponent(endpointWithAt + '?t=' + Date.now())}`
+        // For YouTube, try multiple formats if first attempt fails
+        if (response.status === 404 && account.platform === 'youtube') {
+          console.log('YouTube 404, trying alternative formats...')
           
-          const retryResponse = await fetch(proxyEndpointWithAt, {
-            headers: { 
-              'x-api-key': apiKey,
-              'Content-Type': 'application/json',
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache'
-            },
-            cache: 'no-store'
-          })
+          const youtubeEndpoints = [
+            `https://api.socialfetch.dev/v1/youtube/profiles/@${account.username.replace('@', '')}`,
+            `https://api.socialfetch.dev/v1/youtube/profiles/UC${account.username.replace('@', '')}`,
+            `https://api.socialfetch.dev/v1/youtube/channels/${account.username.replace('@', '')}`,
+            `https://api.socialfetch.dev/v1/youtube/channels/@${account.username.replace('@', '')}`
+          ]
           
-          console.log('Retry response status:', retryResponse.status)
-          
-          if (retryResponse.ok) {
-            const data = await retryResponse.json()
-            console.log('Retry API Response data:', data)
-            // Continue with the retry data
-            return processVerificationData(data, account, apiKey)
+          for (const altEndpoint of youtubeEndpoints) {
+            console.log('Trying alternative endpoint:', altEndpoint)
+            const proxyEndpoint = `https://corsproxy.io/?${encodeURIComponent(altEndpoint + '?t=' + Date.now())}`
+            
+            const retryResponse = await fetch(proxyEndpoint, {
+              headers: { 
+                'x-api-key': apiKey,
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+              },
+              cache: 'no-store'
+            })
+            
+            console.log('Alternative endpoint response status:', retryResponse.status)
+            
+            if (retryResponse.ok) {
+              const data = await retryResponse.json()
+              console.log('Alternative endpoint API Response data:', data)
+              return processVerificationData(data, account, apiKey)
+            }
           }
         }
         
