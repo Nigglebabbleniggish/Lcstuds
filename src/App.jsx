@@ -407,9 +407,7 @@ function App() {
       >
         <div className="p-6">
           <button
-            onClick={() => {
-              window.location.href = '/'
-            }}
+            onClick={() => setActiveTab('dashboard')}
             className="text-2xl font-bold mb-8 text-white hover:text-gray-300 transition-colors"
           >
             LC Studio

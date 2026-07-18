@@ -459,10 +459,10 @@ function Affiliates() {
             <div 
               key={reward.id} 
               onClick={() => { setSelectedReward(reward); setIsCampaignView(true) }}
-              className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden hover:border-zinc-700 transition-colors cursor-pointer h-80 flex flex-col"
+              className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden hover:border-zinc-700 transition-colors cursor-pointer h-72 flex flex-col"
             >
               {reward.cover_image && (
-                <img src={reward.cover_image} alt={reward.title} className="w-full h-32 object-cover flex-shrink-0" />
+                <img src={reward.cover_image} alt={reward.title} className="w-full h-28 object-cover flex-shrink-0" />
               )}
               <div className="p-4 flex-1 flex flex-col">
                 <div className="flex items-start justify-between mb-2">
