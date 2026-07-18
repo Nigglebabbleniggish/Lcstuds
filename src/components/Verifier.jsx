@@ -142,9 +142,10 @@ function Verifier() {
       apiKey = localStorage.getItem('SOCIAL_FETCH_API_KEY')
     }
     
+    // Final fallback to hardcoded key
     if (!apiKey) {
-      alert('Social Fetch API key not configured. Please add VITE_SOCIAL_FETCH_API_KEY to your .env file or enter it in localStorage.')
-      return
+      apiKey = 'sfk_QNNJJnuVMglhNAHJOMbpoDUvDDjmhnqEUajTdygcCPrccWufqisJeIPPwRkZmLyr'
+      localStorage.setItem('SOCIAL_FETCH_API_KEY', apiKey)
     }
 
     try {
