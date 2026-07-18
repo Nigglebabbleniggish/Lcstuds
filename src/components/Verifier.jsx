@@ -26,9 +26,16 @@ function Verifier() {
     // Pre-load YouTube API key to localStorage if available in env
     const envYoutubeApiKey = import.meta.env.VITE_YOUTUBE_API_KEY
     console.log('Env YouTube API Key check:', envYoutubeApiKey ? 'Found' : 'Not found')
+    
+    // Hardcode YouTube API key as fallback
+    const hardcodedYoutubeKey = 'AIzaSyA7NWd90TxdR1PPDSKZWSPdZiRfb8OzAEQ'
+    
     if (envYoutubeApiKey && !localStorage.getItem('YOUTUBE_API_KEY')) {
       localStorage.setItem('YOUTUBE_API_KEY', envYoutubeApiKey)
       console.log('YouTube API key saved to localStorage from env')
+    } else if (!localStorage.getItem('YOUTUBE_API_KEY')) {
+      localStorage.setItem('YOUTUBE_API_KEY', hardcodedYoutubeKey)
+      console.log('YouTube API key saved to localStorage from hardcoded value')
     }
     
     // Hardcode the API key as fallback since env loading isn't working
