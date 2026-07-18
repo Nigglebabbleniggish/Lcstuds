@@ -323,14 +323,14 @@ function Affiliates() {
                 </div>
                 {reward.views_required && (
                   <div>
-                    <p className="text-xs text-gray-500">Views Required</p>
-                    <p className="text-sm font-bold text-blue-400">{reward.views_required?.toLocaleString() || '0'}</p>
+                    <p className="text-xs text-gray-500">RPM</p>
+                    <p className="text-sm font-bold text-blue-400">${reward.views_required?.toFixed(2)} / 1k views</p>
                   </div>
                 )}
                 {reward.views_required && reward.budget && (
                   <div>
-                    <p className="text-xs text-gray-500">RPM</p>
-                    <p className="text-sm font-bold text-purple-400">${((reward.budget / reward.views_required) * 1000).toFixed(2)}</p>
+                    <p className="text-xs text-gray-500">Views Needed</p>
+                    <p className="text-sm font-bold text-purple-400">{Math.ceil(reward.budget / reward.views_required * 1000).toLocaleString()}</p>
                   </div>
                 )}
                 <div className="w-full mt-2">
@@ -419,15 +419,15 @@ function Affiliates() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Views Required</label>
+                <label className="block text-sm font-medium text-gray-400 mb-2">RPM ($ per 1000 views)</label>
                 <input
                   type="number"
                   min="0"
-                  step="1"
+                  step="0.01"
                   value={newReward.viewsRequired}
                   onChange={(e) => setNewReward({ ...newReward, viewsRequired: e.target.value })}
                   className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
-                  placeholder="1000"
+                  placeholder="0.95"
                 />
               </div>
               
@@ -657,14 +657,14 @@ function Affiliates() {
                       </div>
                       {selectedReward.views_required && (
                         <div>
-                          <p className="text-gray-400 text-sm mb-1">Views Required</p>
-                          <p className="text-xl font-bold text-blue-400">{selectedReward.views_required?.toLocaleString() || '0'}</p>
+                          <p className="text-gray-400 text-sm mb-1">RPM</p>
+                          <p className="text-xl font-bold text-blue-400">${selectedReward.views_required?.toFixed(2)} / 1k views</p>
                         </div>
                       )}
                       {selectedReward.views_required && selectedReward.budget && (
                         <div>
-                          <p className="text-gray-400 text-sm mb-1">RPM</p>
-                          <p className="text-xl font-bold text-purple-400">${((selectedReward.budget / selectedReward.views_required) * 1000).toFixed(2)}</p>
+                          <p className="text-gray-400 text-sm mb-1">Views Needed</p>
+                          <p className="text-xl font-bold text-purple-400">{Math.ceil(selectedReward.budget / selectedReward.views_required * 1000).toLocaleString()}</p>
                         </div>
                       )}
                     </div>
