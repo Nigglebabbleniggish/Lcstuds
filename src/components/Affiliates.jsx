@@ -327,6 +327,12 @@ function Affiliates() {
                     <p className="text-sm font-bold text-blue-400">{reward.views_required?.toLocaleString() || '0'}</p>
                   </div>
                 )}
+                {reward.views_required && reward.budget && (
+                  <div>
+                    <p className="text-xs text-gray-500">RPM</p>
+                    <p className="text-sm font-bold text-purple-400">${((reward.budget / reward.views_required) * 1000).toFixed(2)}</p>
+                  </div>
+                )}
                 <div className="w-full mt-2">
                   <div className="flex justify-between text-xs text-gray-500 mb-1">
                     <span>Progress</span>
@@ -655,6 +661,12 @@ function Affiliates() {
                           <p className="text-xl font-bold text-blue-400">{selectedReward.views_required?.toLocaleString() || '0'}</p>
                         </div>
                       )}
+                      {selectedReward.views_required && selectedReward.budget && (
+                        <div>
+                          <p className="text-gray-400 text-sm mb-1">RPM</p>
+                          <p className="text-xl font-bold text-purple-400">${((selectedReward.budget / selectedReward.views_required) * 1000).toFixed(2)}</p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="mt-4">
@@ -751,7 +763,7 @@ function Affiliates() {
                         <div className="text-center py-4">
                           <p className="text-gray-400 text-sm mb-4">No application questions required</p>
                           <button
-                            onClick={() => alert('You have joined this campaign!')}
+                            onClick={() => handleSubmission(selectedReward.id, {})}
                             className="w-full px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
                           >
                             Join Campaign

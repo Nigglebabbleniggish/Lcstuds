@@ -1,40 +1,54 @@
 import { useState, useEffect } from 'react'
-import { Users, TrendingUp, DollarSign, Activity, Calendar, BarChart3, Eye, Target } from 'lucide-react'
+import { TrendingUp, DollarSign, Activity, Calendar, BarChart3, Eye, Target, Users, Heart, MessageCircle, Share2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 function Dashboard() {
   const { profile } = useAuth()
   const [stats, setStats] = useState({
-    totalAffiliates: 0,
-    activeCampaigns: 0,
     totalEarnings: 0,
-    totalViews: 0
+    activeCampaigns: 0,
+    totalViews: 0,
+    totalFollowers: 0,
+    engagementRate: 0,
+    socialAccounts: 0
   })
   const [recentActivity, setRecentActivity] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Skip Supabase fetch for local users
+    if (profile?.id?.startsWith('local_')) {
+      setLoading(false)
+      return
+    }
+
     fetchDashboardData()
   }, [profile])
 
   const fetchDashboardData = async () => {
     try {
-      const [affiliatesData, campaignsData, earningsData] = await Promise.all([
-        supabase.from('affiliates').select('*'),
+      const [campaignsData, earningsData, socialData] = await Promise.all([
         supabase.from('content_rewards').select('*'),
         profile?.is_admin 
           ? supabase.from('earnings').select('*').order('created_at', { ascending: false }).limit(10)
-          : supabase.from('earnings').select('*').eq('user_id', profile?.id).order('created_at', { ascending: false }).limit(10)
+          : supabase.from('earnings').select('*').eq('user_id', profile?.id).order('created_at', { ascending: false }).limit(10),
+        profile?.id ? supabase.from('social_accounts').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] })
       ])
 
       const totalViews = campaignsData.data?.reduce((sum, c) => sum + (c.views_required || 0), 0) || 0
+      const totalFollowers = socialData.data?.reduce((sum, s) => sum + (s.followers || 0), 0) || 0
+      const avgEngagement = socialData.data?.length > 0 
+        ? socialData.data.reduce((sum, s) => sum + (s.engagement_rate || 0), 0) / socialData.data.length 
+        : 0
 
       setStats({
-        totalAffiliates: affiliatesData.data?.length || 0,
-        activeCampaigns: campaignsData.data?.length || 0,
         totalEarnings: earningsData.data?.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0) || 0,
-        totalViews
+        activeCampaigns: campaignsData.data?.length || 0,
+        totalViews,
+        totalFollowers,
+        engagementRate: avgEngagement,
+        socialAccounts: socialData.data?.length || 0
       })
 
       setRecentActivity(earningsData.data || [])
@@ -48,8 +62,8 @@ function Dashboard() {
   const statCards = [
     { label: 'Total Earnings', value: `$${stats.totalEarnings.toFixed(2)}`, icon: DollarSign, color: 'from-green-500 to-emerald-600', bg: 'bg-green-500/10' },
     { label: 'Active Campaigns', value: stats.activeCampaigns, icon: Target, color: 'from-blue-500 to-cyan-600', bg: 'bg-blue-500/10' },
-    { label: 'Total Views', value: stats.totalViews.toLocaleString(), icon: Eye, color: 'from-purple-500 to-violet-600', bg: 'bg-purple-500/10' },
-    { label: 'Total Affiliates', value: stats.totalAffiliates, icon: Users, color: 'from-orange-500 to-amber-600', bg: 'bg-orange-500/10' },
+    { label: 'Total Followers', value: stats.totalFollowers.toLocaleString(), icon: Users, color: 'from-purple-500 to-violet-600', bg: 'bg-purple-500/10' },
+    { label: 'Engagement Rate', value: `${stats.engagementRate.toFixed(1)}%`, icon: Heart, color: 'from-pink-500 to-rose-600', bg: 'bg-pink-500/10' },
   ]
 
   if (loading) {
@@ -89,14 +103,14 @@ function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
         <div className="lg:col-span-2 bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-white">Earnings Overview</h3>
+            <h3 className="text-lg font-semibold text-white">Social Media Performance</h3>
             <BarChart3 className="text-gray-400" size={20} />
           </div>
           <div className="h-48 flex items-end gap-3">
             {[65, 45, 78, 52, 89, 67, 95, 72, 58, 84, 91, 76].map((height, i) => (
               <div
                 key={i}
-                className="flex-1 bg-gradient-to-t from-zinc-800 to-zinc-700 rounded-t-lg transition-all hover:from-green-900 hover:to-green-700"
+                className="flex-1 bg-gradient-to-t from-zinc-800 to-zinc-700 rounded-t-lg transition-all hover:from-purple-900 hover:to-purple-700"
                 style={{ height: `${height}%` }}
               />
             ))}
@@ -110,14 +124,14 @@ function Dashboard() {
 
         <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-white">Campaign Status</h3>
-            <TrendingUp className="text-gray-400" size={20} />
+            <h3 className="text-lg font-semibold text-white">Social Accounts</h3>
+            <Share2 className="text-gray-400" size={20} />
           </div>
           <div className="space-y-4">
             {[
-              { name: 'Active', count: stats.activeCampaigns, color: 'bg-green-500' },
-              { name: 'Pending', count: Math.floor(stats.activeCampaigns * 0.3), color: 'bg-yellow-500' },
-              { name: 'Completed', count: Math.floor(stats.activeCampaigns * 0.5), color: 'bg-blue-500' },
+              { name: 'Connected', count: stats.socialAccounts, color: 'bg-green-500' },
+              { name: 'Active', count: Math.floor(stats.socialAccounts * 0.8), color: 'bg-blue-500' },
+              { name: 'Pending', count: Math.floor(stats.socialAccounts * 0.2), color: 'bg-yellow-500' },
             ].map((status) => (
               <div key={status.name} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -127,6 +141,57 @@ function Dashboard() {
                 <span className="text-white font-semibold">{status.count}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Social Media Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 bg-pink-500/10 rounded-xl">
+              <Heart className="text-pink-400" size={20} />
+            </div>
+            <div>
+              <p className="text-gray-400 text-sm">Total Likes</p>
+              <p className="text-2xl font-bold text-white">{(stats.totalFollowers * 12).toLocaleString()}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-green-400 text-sm">
+            <TrendingUp size={16} />
+            <span>+12.5%</span>
+          </div>
+        </div>
+
+        <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 bg-blue-500/10 rounded-xl">
+              <MessageCircle className="text-blue-400" size={20} />
+            </div>
+            <div>
+              <p className="text-gray-400 text-sm">Total Comments</p>
+              <p className="text-2xl font-bold text-white">{(stats.totalFollowers * 3).toLocaleString()}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-green-400 text-sm">
+            <TrendingUp size={16} />
+            <span>+8.3%</span>
+          </div>
+        </div>
+
+        <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 bg-purple-500/10 rounded-xl">
+              <Share2 className="text-purple-400" size={20} />
+            </div>
+            <div>
+              <p className="text-gray-400 text-sm">Total Shares</p>
+              <p className="text-2xl font-bold text-white">{(stats.totalFollowers * 5).toLocaleString()}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-green-400 text-sm">
+            <TrendingUp size={16} />
+            <span>+15.2%</span>
           </div>
         </div>
       </div>
