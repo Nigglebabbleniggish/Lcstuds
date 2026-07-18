@@ -9,7 +9,10 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null)
 
   useEffect(() => {
-    // Check for local user session first
+    // Set loading to false immediately for faster initial render
+    setLoading(false)
+
+    // Check for local user session
     const localUserStr = localStorage.getItem('localUser')
     if (localUserStr) {
       try {
@@ -30,7 +33,6 @@ export function AuthProvider({ children }) {
           is_admin: localUser.is_admin,
           admin_id: localUser.admin_id
         })
-        setLoading(false)
         // Don't set up Supabase listeners for local users
         return () => {}
       } catch (error) {
@@ -39,16 +41,14 @@ export function AuthProvider({ children }) {
       }
     }
 
-    // Get initial session from Supabase
+    // Only set up Supabase if no local user
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       if (session?.user) {
         fetchProfile(session.user.id)
       }
-      setLoading(false)
     }).catch((error) => {
       console.error('Error getting session:', error)
-      setLoading(false)
     })
 
     // Listen for auth changes
@@ -61,7 +61,6 @@ export function AuthProvider({ children }) {
       } else {
         setProfile(null)
       }
-      setLoading(false)
     })
 
     return () => {
