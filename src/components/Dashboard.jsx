@@ -62,16 +62,7 @@ function Dashboard() {
       // Use local accounts if available, otherwise use database accounts
       const savedAccounts = localStorage.getItem('social_accounts')
       if (savedAccounts) {
-        const accounts = JSON.parse(savedAccounts)
-        // Deduplicate by platform (keep only one per platform)
-        const uniqueAccounts = accounts.reduce((acc, account) => {
-          const platform = account.platform.toLowerCase()
-          if (!acc[platform]) {
-            acc[platform] = account
-          }
-          return acc
-        }, {})
-        setSocialAccounts(Object.values(uniqueAccounts))
+        setSocialAccounts(JSON.parse(savedAccounts))
       } else {
         setSocialAccounts(socialData.data || [])
       }
