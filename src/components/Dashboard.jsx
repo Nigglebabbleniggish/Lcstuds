@@ -159,13 +159,13 @@ function Dashboard() {
               return (
                 <div 
                   key={account.id} 
-                  className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in min-h-[120px] max-h-[120px] flex flex-col justify-center"
+                  className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in aspect-square flex flex-col justify-center items-center"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className={`p-3 rounded-lg bg-gradient-to-br ${color} w-fit mb-3`}>
                     <Icon size={24} className="text-white" />
                   </div>
-                  <div>
+                  <div className="text-center">
                     <p className="text-white font-semibold capitalize text-sm">{account.platform}</p>
                     <p className="text-gray-400 text-xs">@{account.username}</p>
                   </div>
