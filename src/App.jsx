@@ -12,12 +12,21 @@ import {
   Zap,
   ArrowRight,
   CheckCircle,
-  Settings
+  Settings,
+  MessageCircle,
+  Shield,
+  Briefcase,
+  FileText
 } from 'lucide-react'
 import Affiliates from './components/Affiliates'
 import Verifier from './components/Verifier'
 import SocialMedia from './components/SocialMedia'
 import Dashboard from './components/Dashboard'
+import SecurityManagement from './components/SecurityManagement'
+import Support from './components/Support'
+import SupportManagement from './components/SupportManagement'
+import SubmissionsManagement from './components/SubmissionsManagement'
+import Earnings from './components/Earnings'
 import Auth from './components/Auth'
 import { useAuth } from './contexts/AuthContext'
 
@@ -28,14 +37,36 @@ function App() {
   const [showAuth, setShowAuth] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [showSettings, setShowSettings] = useState(false)
+  const [showRules, setShowRules] = useState(false)
   const [theme, setTheme] = useState('dark')
+  const [isBanned, setIsBanned] = useState(new URLSearchParams(window.location.search).get('banned') === 'true')
+
+  if (isBanned) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex items-center justify-center">
+        <div className="bg-gray-900/80 backdrop-blur-xl border border-red-500/30 rounded-2xl p-8 max-w-md text-center">
+          <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <X className="text-red-500" size={32} />
+          </div>
+          <h1 className="text-2xl font-bold text-red-400 mb-2">Account Suspended</h1>
+          <p className="text-gray-300 mb-6">Your account has been suspended by an administrator. If you believe this is an error, please contact support.</p>
+          <button
+            onClick={() => window.location.href = '/'}
+            className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            Return to Home
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading...</p>
         </div>
       </div>
     )
@@ -48,19 +79,19 @@ function App() {
     }
 
     return (
-      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950' : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100'}`}>
+      <div className="min-h-screen bg-black">
         {/* Navigation */}
-        <nav className={`${theme === 'dark' ? 'bg-gray-900/80 backdrop-blur-xl border-gray-800' : 'bg-white/80 backdrop-blur-xl border-gray-200'} border-b sticky top-0 z-50`}>
+        <nav className="bg-zinc-900/80 backdrop-blur-xl border-zinc-800 border-b sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center gap-2">
-                <TrendingUp className={theme === 'dark' ? 'text-primary-400' : 'text-primary-600'} size={32} />
-                <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Lc Studio</span>
+                <TrendingUp className="text-white" size={32} />
+                <span className="text-2xl font-bold text-white">LC Studio</span>
               </div>
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setShowSettings(!showSettings)}
-                  className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'}`}
+                  className="p-2 rounded-lg transition-colors hover:bg-zinc-800 text-gray-400"
                   title="Settings"
                 >
                   <Settings size={20} />
@@ -70,7 +101,7 @@ function App() {
                     setAuthMode('login')
                     setShowAuth(true)
                   }}
-                  className={`px-4 py-2 font-medium transition-colors ${theme === 'dark' ? 'text-gray-300 hover:text-primary-400' : 'text-gray-700 hover:text-primary-600'}`}
+                  className="px-4 py-2 font-medium transition-colors text-gray-400 hover:text-white"
                 >
                   Dashboard
                 </button>
@@ -79,7 +110,7 @@ function App() {
                     setAuthMode('login')
                     setShowAuth(true)
                   }}
-                  className={`px-4 py-2 font-medium transition-colors ${theme === 'dark' ? 'text-gray-300 hover:text-primary-400' : 'text-gray-700 hover:text-primary-600'}`}
+                  className="px-4 py-2 font-medium transition-colors text-gray-400 hover:text-white"
                 >
                   Sign In
                 </button>
@@ -88,36 +119,28 @@ function App() {
                     setAuthMode('signup')
                     setShowAuth(true)
                   }}
-                  className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
+                  className="px-6 py-2 bg-white text-black rounded-lg font-medium hover:bg-gray-200 transition-colors"
                 >
                   Sign Up
                 </button>
               </div>
 
               {showSettings && (
-                <div className={`absolute top-16 right-4 ${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} border rounded-lg shadow-xl p-4 z-50 w-64`}>
-                  <h3 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Settings</h3>
+                <div className="absolute top-16 right-4 bg-zinc-900 border-zinc-800 border rounded-lg shadow-xl p-4 z-50 w-64">
+                  <h3 className="font-semibold mb-3 text-white">Settings</h3>
                   <div className="space-y-3">
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Theme</label>
+                      <label className="block text-sm font-medium mb-2 text-gray-400">Theme</label>
                       <div className="flex gap-2">
                         <button
                           onClick={() => setTheme('dark')}
-                          className={`flex-1 py-2 px-3 rounded-lg border-2 transition-colors ${
-                            theme === 'dark'
-                              ? 'border-primary-500 bg-primary-900/30 text-primary-400'
-                              : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                          }`}
+                          className="flex-1 py-2 px-3 rounded-lg border-2 transition-colors border-white bg-white/10 text-white"
                         >
                           Dark
                         </button>
                         <button
                           onClick={() => setTheme('light')}
-                          className={`flex-1 py-2 px-3 rounded-lg border-2 transition-colors ${
-                            theme === 'light'
-                              ? 'border-primary-600 bg-primary-50 text-primary-700'
-                              : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                          }`}
+                          className="flex-1 py-2 px-3 rounded-lg border-2 transition-colors border-zinc-600 text-gray-400 hover:border-zinc-500"
                         >
                           Light
                         </button>
@@ -133,42 +156,84 @@ function App() {
         {/* Hero Section */}
         <section className="py-32 px-4">
           <div className="max-w-7xl mx-auto text-center">
-            <h1 className={`text-6xl md:text-8xl font-bold mb-6 slide-in ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-              Latest Trending
+            <h1 className="text-5xl md:text-7xl font-bold mb-4 text-white">
+              LC Studio
             </h1>
-            <h1 className={`text-6xl md:text-8xl font-bold mb-8 slide-in-delay-1 text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-purple-500`}>
-              Streamer Clips
-            </h1>
-            <p className={`text-2xl mb-12 max-w-3xl mx-auto slide-in-delay-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-              Discover and share the best moments from your favorite streamers
+            <h2 className="text-2xl md:text-3xl font-semibold mb-8 text-gray-400">
+              Creator Management Platform
+            </h2>
+            <p className="text-xl mb-12 max-w-2xl mx-auto text-gray-500">
+              Manage campaigns, track earnings, and grow your creator business all in one place.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center slide-in-delay-2">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => setShowAuth(true)}
-                className="px-10 py-4 bg-primary-600 text-white rounded-xl font-semibold text-lg hover:bg-primary-700 transition-all hover:scale-105 flex items-center justify-center gap-2"
+                onClick={() => {
+                  setAuthMode('signup')
+                  setShowAuth(true)
+                }}
+                className="px-8 py-4 bg-white text-black rounded-xl font-semibold text-lg hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
               >
-                Start Clipping
+                Get Started
                 <ArrowRight size={20} />
+              </button>
+              <button
+                onClick={() => {
+                  setAuthMode('login')
+                  setShowAuth(true)
+                }}
+                className="px-8 py-4 bg-zinc-900 text-white rounded-xl font-semibold text-lg border border-zinc-800 hover:bg-zinc-800 transition-all"
+              >
+                Sign In
               </button>
             </div>
           </div>
         </section>
 
+        {/* Features Section */}
+        <section className="py-20 px-4 bg-zinc-900/50">
+          <div className="max-w-7xl mx-auto">
+            <h3 className="text-3xl font-bold text-white text-center mb-12">Everything You Need</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
+                <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-4">
+                  <DollarSign className="text-green-400" size={24} />
+                </div>
+                <h4 className="text-xl font-semibold text-white mb-2">Earn Crypto</h4>
+                <p className="text-gray-400">Get paid in USDT/USDC for completing campaigns and growing your audience.</p>
+              </div>
+              <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
+                <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
+                  <Target className="text-blue-400" size={24} />
+                </div>
+                <h4 className="text-xl font-semibold text-white mb-2">Campaign Management</h4>
+                <p className="text-gray-400">Apply to campaigns, track progress, and manage your content all in one dashboard.</p>
+              </div>
+              <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
+                <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
+                  <TrendingUp className="text-purple-400" size={24} />
+                </div>
+                <h4 className="text-xl font-semibold text-white mb-2">Analytics</h4>
+                <p className="text-gray-400">Track your earnings, views, and campaign performance with detailed analytics.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Stats Section */}
-        <section className={`py-16 px-4 ${theme === 'dark' ? 'bg-gray-800/30' : 'bg-white'}`}>
+        <section className="py-16 px-4 bg-zinc-900/50">
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center p-8">
-                <div className={`text-5xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>$600K+</div>
-                <p className={`text-xl ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Paid to Clippers</p>
+                <div className="text-5xl font-bold mb-2 text-white">$600K+</div>
+                <p className="text-xl text-gray-400">Paid to Creators</p>
               </div>
               <div className="text-center p-8">
-                <div className={`text-5xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>10K+</div>
-                <p className={`text-xl ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Active Clippers</p>
+                <div className="text-5xl font-bold mb-2 text-white">5K+</div>
+                <p className="text-xl text-gray-400">Campaigns Completed</p>
               </div>
               <div className="text-center p-8">
-                <div className={`text-5xl font-bold mb-2 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>1M+</div>
-                <p className={`text-xl ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Clips Created</p>
+                <div className="text-5xl font-bold mb-2 text-white">1M+</div>
+                <p className="text-xl text-gray-400">Total Views</p>
               </div>
             </div>
           </div>
@@ -177,15 +242,15 @@ function App() {
         {/* CTA Section */}
         <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className={`text-4xl font-bold mb-6 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+            <h2 className="text-4xl font-bold mb-6 text-white">
               Start Earning Today
             </h2>
-            <p className={`text-xl mb-8 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-              Join thousands of clippers earning money from streamer content
+            <p className="text-xl mb-8 text-gray-400">
+              Join thousands of creators earning crypto through campaigns
             </p>
             <button
               onClick={() => setShowAuth(true)}
-              className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors"
+              className="px-8 py-4 bg-white text-black rounded-lg font-semibold text-lg hover:bg-gray-200 transition-colors"
             >
               Create Your Free Account
             </button>
@@ -193,10 +258,10 @@ function App() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-gray-950 text-white py-8 px-4">
+        <footer className="bg-zinc-950 text-white py-8 px-4">
           <div className="max-w-7xl mx-auto text-center">
-            <p className="text-gray-400">
-              © 2024 Lc Studio. All rights reserved.
+            <p className="text-gray-500">
+              © 2024 LC Studio. All rights reserved.
             </p>
           </div>
         </footer>
@@ -206,9 +271,17 @@ function App() {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'affiliates', label: 'Affiliates', icon: Users },
-    { id: 'verifier', label: 'Verifier', icon: ShieldCheck },
-    { id: 'social', label: 'Social Media', icon: Share2 },
+    { id: 'affiliates', label: 'Campaign', icon: Users },
+    { id: 'verifier', label: 'Accounts', icon: ShieldCheck },
+    { id: 'earnings', label: 'Earnings', icon: DollarSign },
+    { id: 'support', label: 'Support', icon: MessageCircle },
+  ]
+
+  // Admin-only tabs
+  const adminTabs = [
+    { id: 'admin-security', label: 'Security Admin Layer', icon: Shield },
+    { id: 'admin-support', label: 'Support Management', icon: MessageCircle },
+    { id: 'admin-submissions', label: 'Submissions', icon: FileText },
   ]
 
   const renderContent = () => {
@@ -219,25 +292,43 @@ function App() {
         return <Affiliates />
       case 'verifier':
         return <Verifier />
-      case 'social':
-        return <SocialMedia />
+      case 'earnings':
+        return <Earnings />
+      case 'support':
+        return <Support />
+      case 'admin-security':
+        if (profile?.is_admin) {
+          return <SecurityManagement />
+        }
+        return <Dashboard />
+      case 'admin-support':
+        if (profile?.is_admin) {
+          return <SupportManagement />
+        }
+        return <Dashboard />
+      case 'admin-submissions':
+        if (profile?.is_admin) {
+          return <SubmissionsManagement />
+        }
+        return <Dashboard />
       default:
         return <Dashboard />
     }
   }
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex`}>
+    <div className="min-h-screen bg-black flex">
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-full ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r z-50 transition-all duration-300 ${
-          sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'
-        }`}
+        className="fixed left-0 top-0 h-full bg-zinc-900/90 backdrop-blur border-zinc-800 border-r z-50 transition-all duration-300 w-64"
       >
         <div className="p-6">
-          <h1 className={`text-2xl font-bold mb-8 ${theme === 'dark' ? 'text-primary-400' : 'text-primary-600'}`}>
-            Lc Studio
-          </h1>
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className="text-2xl font-bold mb-8 text-white hover:text-gray-300 transition-colors"
+          >
+            LC Studio
+          </button>
           <nav className="space-y-2">
             {tabs.map((tab) => {
               const Icon = tab.icon
@@ -247,8 +338,8 @@ function App() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                     activeTab === tab.id
-                      ? theme === 'dark' ? 'bg-primary-900/30 text-primary-400' : 'bg-primary-50 text-primary-700'
-                      : theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
+                      ? 'bg-white/10 text-white'
+                      : 'text-gray-400 hover:bg-zinc-800'
                   }`}
                 >
                   <Icon size={20} />
@@ -256,42 +347,73 @@ function App() {
                 </button>
               )
             })}
+            {/* Admin-only tabs */}
+            {profile?.is_admin && (
+              <>
+                <div className="border-t border-zinc-800 my-4"></div>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-gray-500">Admin</p>
+                {adminTabs.map((tab) => {
+                  const Icon = tab.icon
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                        activeTab === tab.id
+                          ? 'bg-red-500/10 text-red-400'
+                          : 'text-gray-400 hover:bg-zinc-800'
+                      }`}
+                    >
+                      <Icon size={20} />
+                      {tab.label}
+                    </button>
+                  )
+                })}
+              </>
+            )}
+            {/* Debug: Show profile status */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-4 p-2 bg-zinc-800 rounded text-xs">
+                <p className="text-gray-400">Profile: {profile ? 'loaded' : 'not loaded'}</p>
+                <p className="text-gray-400">Is Admin: {profile?.is_admin ? 'yes' : 'no'}</p>
+                <p className="text-gray-400">User ID: {user?.id?.slice(0, 8)}...</p>
+              </div>
+            )}
           </nav>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className={`flex-1 transition-all duration-300 ${
-        sidebarOpen ? 'ml-64' : 'ml-0'
-      }`}>
+      <main className="flex-1 ml-64">
         {/* Header */}
-        <header className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40`}>
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'}`}
-          >
-            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+        <header className="bg-zinc-900/90 backdrop-blur border-zinc-800 border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'}`}
+              className="p-2 rounded-lg transition-colors hover:bg-zinc-800 text-gray-400"
               title="Settings"
             >
               <Settings size={20} />
             </button>
             <div className="text-right">
-              <p className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{profile?.full_name || user?.email}</p>
-              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{profile?.email || user?.email}</p>
+              <p className="font-medium text-white">{profile?.full_name || user?.email}</p>
+              <p className="text-sm text-gray-400">{profile?.email || user?.email}</p>
             </div>
-            <div className={`w-10 h-10 ${theme === 'dark' ? 'bg-primary-900/30' : 'bg-primary-100'} rounded-full flex items-center justify-center`}>
-              <span className={`${theme === 'dark' ? 'text-primary-400' : 'text-primary-700'} font-semibold`}>
+            <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+              <span className="text-white font-semibold">
                 {(profile?.full_name || user?.email)?.charAt(0).toUpperCase()}
               </span>
             </div>
             <button
+              onClick={() => setShowRules(true)}
+              className="p-2 rounded-lg transition-colors hover:bg-zinc-800 text-gray-400"
+              title="Rules / TOS"
+            >
+              <CheckCircle size={20} />
+            </button>
+            <button
               onClick={signOut}
-              className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-300 hover:text-red-400' : 'hover:bg-gray-100 text-gray-500 hover:text-red-600'}`}
+              className="p-2 rounded-lg transition-colors hover:bg-zinc-800 text-gray-400 hover:text-red-400"
               title="Sign out"
             >
               <LogOut size={20} />
@@ -299,33 +421,61 @@ function App() {
           </div>
 
           {showSettings && (
-            <div className={`absolute top-16 right-6 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-lg shadow-lg p-4 z-50 w-64`}>
-              <h3 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Settings</h3>
+            <div className="absolute top-16 right-6 bg-zinc-900 border-zinc-800 border rounded-lg shadow-lg p-4 z-50 w-64">
+              <h3 className="font-semibold mb-3 text-white">Settings</h3>
               <div className="space-y-3">
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Theme</label>
+                  <label className="block text-sm font-medium mb-2 text-gray-400">Theme</label>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setTheme('dark')}
-                      className={`flex-1 py-2 px-3 rounded-lg border-2 transition-colors ${
-                        theme === 'dark'
-                          ? 'border-primary-500 bg-primary-900/30 text-primary-400'
-                          : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                      }`}
+                      className="flex-1 py-2 px-3 rounded-lg border-2 transition-colors border-white bg-white/10 text-white"
                     >
                       Dark
                     </button>
                     <button
                       onClick={() => setTheme('light')}
-                      className={`flex-1 py-2 px-3 rounded-lg border-2 transition-colors ${
-                        theme === 'light'
-                          ? 'border-primary-600 bg-primary-50 text-primary-700'
-                          : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                      }`}
+                      className="flex-1 py-2 px-3 rounded-lg border-2 transition-colors border-zinc-600 text-gray-400 hover:border-zinc-500"
                     >
                       Light
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showRules && (
+            <div className="absolute top-16 right-6 bg-zinc-900 border-zinc-800 border rounded-lg shadow-lg p-6 z-50 w-96 max-h-[80vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-white">Rules / Terms of Service</h3>
+                <button
+                  onClick={() => setShowRules(false)}
+                  className="p-1 rounded hover:bg-zinc-800 text-gray-400"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="space-y-4 text-sm text-gray-400">
+                <div>
+                  <h4 className="font-medium text-white mb-2">1. Account Usage</h4>
+                  <p>Users must be at least 13 years old. Each user is allowed one account only.</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-white mb-2">2. Content Guidelines</h4>
+                  <p>All submitted content must comply with community standards. No hate speech, harassment, or illegal content.</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-white mb-2">3. Payment Terms</h4>
+                  <p>Payments are processed within 30 days of campaign completion. Minimum payout is $10.</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-white mb-2">4. Prohibited Activities</h4>
+                  <p>Bot usage, fake engagement, and fraudulent activities are strictly prohibited and will result in immediate banning.</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-white mb-2">5. Privacy</h4>
+                  <p>Your data is protected according to our privacy policy. We do not sell your personal information.</p>
                 </div>
               </div>
             </div>
