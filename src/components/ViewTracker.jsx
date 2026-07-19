@@ -76,7 +76,8 @@ function ViewTracker() {
   }
 
   const extractYouTubeId = (url) => {
-    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+    // Handle regular YouTube URLs, short URLs, and live URLs
+    const regex = /(?:youtube\.com\/(?:live\/|[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
     const match = url.match(regex)
     return match ? match[1] : null
   }
@@ -107,23 +108,42 @@ function ViewTracker() {
 
   const scrapeInstagramViews = async (url) => {
     try {
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
-      const response = await fetch(proxyUrl)
-      const data = await response.json()
+      // Try multiple CORS proxies
+      const proxies = [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+      ]
       
-      if (!data.contents) throw new Error('Failed to fetch page')
-      
-      const html = data.contents
-      // Try to extract view count from Instagram HTML
-      const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) ||
-                       html.match(/"video_view_count":(\d+)/) ||
-                       html.match(/"viewCount":(\d+)/)
-      
-      if (viewMatch) {
-        return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+      for (const proxyUrl of proxies) {
+        try {
+          const response = await fetch(proxyUrl)
+          const data = await response.json()
+          
+          let html = ''
+          if (data.contents) {
+            html = data.contents
+          } else if (typeof data === 'string') {
+            html = data
+          } else {
+            continue
+          }
+          
+          // Try to extract view count from Instagram HTML
+          const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) ||
+                           html.match(/"video_view_count":(\d+)/) ||
+                           html.match(/"viewCount":(\d+)/)
+          
+          if (viewMatch) {
+            return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+          }
+        } catch (e) {
+          console.log('Proxy failed, trying next...', e)
+          continue
+        }
       }
       
-      throw new Error('Could not extract view count from Instagram page')
+      throw new Error('Could not extract view count from Instagram page - all proxies failed')
     } catch (err) {
       throw new Error(`Instagram scraping failed: ${err.message}`)
     }
