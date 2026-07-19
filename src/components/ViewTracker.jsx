@@ -8,6 +8,7 @@ function ViewTracker() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
+  const [socialKitKey, setSocialKitKey] = useState(localStorage.getItem('SOCIALKIT_API_KEY') || 'dmGn2xI9O07xVa')
 
   const detectPlatform = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
@@ -109,7 +110,6 @@ function ViewTracker() {
   const scrapeInstagramViews = async (url) => {
     try {
       // Try SocialKit API (free tier, requires API key)
-      const socialKitKey = localStorage.getItem('SOCIALKIT_API_KEY') || ''
       if (socialKitKey) {
         try {
           const socialKitUrl = `https://api.socialkit.dev/instagram/stats?access_key=${socialKitKey}&url=${encodeURIComponent(url)}`
