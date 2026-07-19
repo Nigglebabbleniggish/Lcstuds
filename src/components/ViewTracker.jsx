@@ -5,9 +5,11 @@ import { useAuth } from '../contexts/AuthContext'
 function ViewTracker() {
   const { profile } = useAuth()
   const [url, setUrl] = useState('')
+  const [manualViewCount, setManualViewCount] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
+  const [showManualInput, setShowManualInput] = useState(false)
 
   const detectPlatform = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
@@ -53,13 +55,38 @@ function ViewTracker() {
         viewCount = await scrapeTwitterViews(url)
       } else if (platform === 'instagram') {
         // Scrape Instagram page HTML via CORS proxy with fallbacks
-        viewCount = await scrapeInstagramViews(url)
+        try {
+          viewCount = await scrapeInstagramViews(url)
+        } catch (err) {
+          // If scraping fails, show manual input option
+          if (!manualViewCount) {
+            setShowManualInput(true)
+            throw new Error('Instagram scraping failed. Please manually enter the view count below.')
+          }
+          viewCount = parseInt(manualViewCount) || 0
+        }
       } else if (platform === 'threads') {
         // Scrape Threads page HTML via CORS proxy with fallbacks
-        viewCount = await scrapeThreadsViews(url)
+        try {
+          viewCount = await scrapeThreadsViews(url)
+        } catch (err) {
+          if (!manualViewCount) {
+            setShowManualInput(true)
+            throw new Error('Threads scraping failed. Please manually enter the view count below.')
+          }
+          viewCount = parseInt(manualViewCount) || 0
+        }
       } else if (platform === 'tiktok') {
         // Scrape TikTok page HTML via CORS proxy with fallbacks
-        viewCount = await scrapeTikTokViews(url)
+        try {
+          viewCount = await scrapeTikTokViews(url)
+        } catch (err) {
+          if (!manualViewCount) {
+            setShowManualInput(true)
+            throw new Error('TikTok scraping failed. Please manually enter the view count below.')
+          }
+          viewCount = parseInt(manualViewCount) || 0
+        }
       }
 
       setResult({
@@ -108,12 +135,31 @@ function ViewTracker() {
 
   const scrapeInstagramViews = async (url) => {
     try {
+      // Try Instagram oEmbed API first (free, no auth for public posts)
+      try {
+        const oembedUrl = `https://www.instagram.com/oembed?url=${encodeURIComponent(url)}`
+        const response = await fetch(oembedUrl)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.html) {
+            // Extract view count from oEmbed HTML if available
+            const viewMatch = data.html.match(/(\d+(?:,\d+)*)\s*views?/i)
+            if (viewMatch) {
+              return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+            }
+          }
+        }
+      } catch (e) {
+        console.log('oEmbed failed, trying proxies...')
+      }
+
       // Try multiple CORS proxies
       const proxies = [
         `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
         `https://corsproxy.io/?${encodeURIComponent(url)}`,
         `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-        `https://cors-anywhere.herokuapp.com/${url}`
+        `https://corsproxy.htmldriven.com/?url=${encodeURIComponent(url)}`,
+        `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(url)}`
       ]
       
       for (const proxyUrl of proxies) {
@@ -138,18 +184,18 @@ function ViewTracker() {
           
           // Try to extract view count from Instagram HTML with better patterns
           const patterns = [
-            /"video_view_count":\s*(\d+)/,
-            /edge_media_to_viewed_count":\s*{\s*"count":\s*(\d+)/,
-            /video_view_count":\s*(\d+)/,
-            /data-video-views="(\d+)"/,
-            /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:views|view)/i,
-            /"viewCount":\s*(\d+)/,
-            /play_count":\s*(\d+)/,
-            /"play_count":\s*"(\d+)"/
+            /"video_view_count":\s*(\d+)/g,
+            /edge_media_to_viewed_count":\s*{\s*"count":\s*(\d+)/g,
+            /video_view_count":\s*(\d+)/g,
+            /data-video-views="(\d+)"/g,
+            /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:views|view)/gi,
+            /"viewCount":\s*(\d+)/g,
+            /play_count":\s*(\d+)/g,
+            /"play_count":\s*"(\d+)"/g
           ]
           
           for (const pattern of patterns) {
-            const matches = html.matchAll(new RegExp(pattern.source, pattern.flags))
+            const matches = html.matchAll(pattern)
             for (const match of matches) {
               const countStr = match[1].replace(/,/g, '').replace(/\./g, '')
               const count = parseInt(countStr)
@@ -170,7 +216,7 @@ function ViewTracker() {
         }
       }
       
-      throw new Error('Could not extract view count from Instagram page')
+      throw new Error('Instagram has strong CORS protection. All proxies failed. Please manually check the view count.')
     } catch (err) {
       throw new Error(`Instagram scraping failed: ${err.message}`)
     }
@@ -282,7 +328,11 @@ function ViewTracker() {
             <input
               type="text"
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              onChange={(e) => {
+                setUrl(e.target.value)
+                setShowManualInput(false)
+                setManualViewCount('')
+              }}
               placeholder="https://youtube.com/watch?v=... or https://threads.net/..."
               className="flex-1 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
             />
@@ -305,6 +355,19 @@ function ViewTracker() {
             </button>
           </div>
         </div>
+
+        {showManualInput && (
+          <div className="p-4 bg-yellow-500/10 border border-yellow-500/50 rounded-xl">
+            <p className="text-yellow-400 text-sm mb-2">Automatic scraping failed. Please enter the view count manually:</p>
+            <input
+              type="number"
+              value={manualViewCount}
+              onChange={(e) => setManualViewCount(e.target.value)}
+              placeholder="Enter view count manually"
+              className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+            />
+          </div>
+        )}
 
         {error && (
           <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-xl">
