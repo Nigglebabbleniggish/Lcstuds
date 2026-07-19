@@ -85,20 +85,66 @@ function ViewTracker() {
 
   const scrapeTwitterViews = async (url) => {
     try {
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
-      const response = await fetch(proxyUrl)
-      const data = await response.json()
+      // Extract tweet ID from URL
+      const tweetIdMatch = url.match(/status\/(\d+)/) || url.match(/\/(\d+)/)
+      if (!tweetIdMatch) {
+        throw new Error('Could not extract tweet ID from URL')
+      }
+      const tweetId = tweetIdMatch[1]
+
+      // Try multiple CORS proxies with better handling
+      const proxies = [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        `https://corsproxy.htmldriven.com/?url=${encodeURIComponent(url)}`,
+        `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(url)}`,
+        `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`
+      ]
       
-      if (!data.contents) throw new Error('Failed to fetch page')
-      
-      const html = data.contents
-      // Try to extract view count from Twitter HTML
-      const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) || 
-                       html.match(/"viewCount":(\d+)/) ||
-                       html.match(/data-testid="views">(\d+)/)
-      
-      if (viewMatch) {
-        return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+      for (const proxyUrl of proxies) {
+        try {
+          const response = await fetch(proxyUrl)
+          let html = ''
+          
+          if (proxyUrl.includes('allorigins')) {
+            const data = await response.json()
+            html = data.contents || ''
+          } else if (proxyUrl.includes('codetabs')) {
+            const data = await response.json()
+            html = data || ''
+          } else if (proxyUrl.includes('rss2json')) {
+            const data = await response.json()
+            html = data?.contents || ''
+          } else {
+            html = await response.text()
+          }
+          
+          if (!html) continue
+          
+          // Try to extract view count from Twitter/X HTML
+          const patterns = [
+            /(\d+(?:,\d+)*)\s*views?/i,
+            /"viewCount":\s*(\d+)/,
+            /data-testid="views">(\d+(?:,\d+)*)/,
+            /impression_count":\s*(\d+)/,
+            /public_metrics":\s*{\s*"view_count":\s*(\d+)/,
+            /views">\s*(\d+(?:,\d+)*)/
+          ]
+          
+          for (const pattern of patterns) {
+            const match = html.match(pattern)
+            if (match) {
+              const count = parseInt(match[1].replace(/,/g, '')) || 0
+              if (count > 0) {
+                return count
+              }
+            }
+          }
+        } catch (e) {
+          console.log('Proxy failed, trying next...', e)
+          continue
+        }
       }
       
       throw new Error('Could not extract view count from Twitter page')
