@@ -17,14 +17,15 @@ function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Skip Supabase fetch for local users
+    // For local users, load from localStorage
     if (profile?.id?.startsWith('local_')) {
+      loadLocalSocialAccounts()
       setLoading(false)
       return
     }
 
+    // For authenticated users, fetch from database
     fetchDashboardData()
-    loadLocalSocialAccounts()
   }, [profile])
 
   const loadLocalSocialAccounts = () => {
