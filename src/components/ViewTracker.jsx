@@ -133,14 +133,31 @@ function ViewTracker() {
           
           if (!html) continue
           
-          // Try to extract view count from Instagram HTML
-          const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) ||
-                           html.match(/"video_view_count":(\d+)/) ||
-                           html.match(/"viewCount":(\d+)/) ||
-                           html.match(/play_count":(\d+)/)
+          // Try to extract view count from Instagram HTML with better patterns
+          // Instagram stores view counts in various formats
+          const patterns = [
+            /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:views|view)/i,
+            /"video_view_count":\s*(\d+)/,
+            /"viewCount":\s*(\d+)/,
+            /play_count":\s*(\d+)/,
+            /"play_count":\s*"(\d+)"/,
+            /edge_media_to_viewed_count":\s*{\s*"count":\s*(\d+)/,
+            /edge_media_preview_comment_count":\s*{\s*"count":\s*(\d+)/,
+            /edge_media_preview_like_count":\s*{\s*"count":\s*(\d+)/,
+            /video_view_count":\s*(\d+)/,
+            /data-video-views="(\d+)"/,
+            /views">\s*(\d+(?:,\d+)*)/
+          ]
           
-          if (viewMatch) {
-            return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+          for (const pattern of patterns) {
+            const match = html.match(pattern)
+            if (match) {
+              const countStr = match[1].replace(/,/g, '').replace(/\./g, '')
+              const count = parseInt(countStr)
+              if (count > 0) {
+                return count
+              }
+            }
           }
         } catch (e) {
           console.log('Proxy failed, trying next...', e)
