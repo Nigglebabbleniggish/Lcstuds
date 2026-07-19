@@ -85,7 +85,21 @@ function Verifier() {
       }
       
       console.log('Loaded accounts from database for this user:', data)
-      setAccounts(data || [])
+      
+      // Map database fields to component state format
+      const mappedAccounts = (data || []).map(dbAccount => ({
+        id: dbAccount.id,
+        platform: dbAccount.platform,
+        username: dbAccount.username,
+        link: dbAccount.link,
+        verificationCode: dbAccount.verification_code,
+        verified: dbAccount.verified || false,
+        views: dbAccount.views || 0,
+        performance: dbAccount.performance || 0,
+        followers: dbAccount.followers || 0
+      }))
+      
+      setAccounts(mappedAccounts)
     } catch (error) {
       console.error('Error loading social accounts:', error)
       // Fallback to localStorage on error
@@ -199,7 +213,8 @@ function Verifier() {
         console.log('Saving account to Supabase:', {
           user_id: profile.id,
           platform: newAccount.platform,
-          username: newAccount.username
+          username: newAccount.username,
+          verification_code: code
         })
         
         const { data, error } = await supabase
@@ -209,7 +224,9 @@ function Verifier() {
             platform: newAccount.platform,
             username: newAccount.username,
             followers: 0,
-            engagement_rate: 0
+            engagement_rate: 0,
+            verification_code: code,
+            verified: false
           })
           .select()
         
