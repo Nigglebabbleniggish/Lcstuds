@@ -14,13 +14,14 @@ function ViewTracker() {
     if (url.includes('threads.net')) return 'threads'
     if (url.includes('instagram.com/reel') || url.includes('instagram.com/reels')) return 'instagram'
     if (url.includes('twitter.com') || url.includes('x.com')) return 'twitter'
+    if (url.includes('tiktok.com')) return 'tiktok'
     return null
   }
 
   const fetchViewCount = async () => {
     const platform = detectPlatform(url)
     if (!platform) {
-      setError('Could not detect platform. Please enter a valid YouTube, Threads, Instagram Reel, or Twitter URL.')
+      setError('Could not detect platform. Please enter a valid YouTube, Threads, Instagram Reel, Twitter, or TikTok URL.')
       return
     }
 
@@ -56,6 +57,9 @@ function ViewTracker() {
       } else if (platform === 'threads') {
         // Scrape Threads page HTML via CORS proxy
         viewCount = await scrapeThreadsViews(url)
+      } else if (platform === 'tiktok') {
+        // Scrape TikTok page HTML via CORS proxy
+        viewCount = await scrapeTikTokViews(url)
       }
 
       setResult({
@@ -148,6 +152,30 @@ function ViewTracker() {
     }
   }
 
+  const scrapeTikTokViews = async (url) => {
+    try {
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
+      const response = await fetch(proxyUrl)
+      const data = await response.json()
+      
+      if (!data.contents) throw new Error('Failed to fetch page')
+      
+      const html = data.contents
+      // Try to extract view count from TikTok HTML
+      const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) ||
+                       html.match(/"viewCount":(\d+)/) ||
+                       html.match(/data-e2e="video-views">(\d+)/)
+      
+      if (viewMatch) {
+        return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+      }
+      
+      throw new Error('Could not extract view count from TikTok page')
+    } catch (err) {
+      throw new Error(`TikTok scraping failed: ${err.message}`)
+    }
+  }
+
   if (!profile?.is_admin) {
     return null
   }
@@ -227,6 +255,7 @@ function ViewTracker() {
             <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">Threads (Auto)</span>
             <span className="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-xs">Instagram Reels (Auto)</span>
             <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">Twitter (Auto)</span>
+            <span className="px-3 py-1 bg-black/20 text-white rounded-full text-xs">TikTok (Auto)</span>
           </div>
           <p className="text-gray-500 text-xs mt-2">
             All platforms fetch view counts automatically via web scraping.
