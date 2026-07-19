@@ -133,31 +133,36 @@ function ViewTracker() {
           
           if (!html) continue
           
+          // Collect all potential view counts and pick the largest reasonable one
+          const allCounts = []
+          
           // Try to extract view count from Instagram HTML with better patterns
-          // Instagram stores view counts in various formats
           const patterns = [
-            /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:views|view)/i,
             /"video_view_count":\s*(\d+)/,
-            /"viewCount":\s*(\d+)/,
-            /play_count":\s*(\d+)/,
-            /"play_count":\s*"(\d+)"/,
             /edge_media_to_viewed_count":\s*{\s*"count":\s*(\d+)/,
-            /edge_media_preview_comment_count":\s*{\s*"count":\s*(\d+)/,
-            /edge_media_preview_like_count":\s*{\s*"count":\s*(\d+)/,
             /video_view_count":\s*(\d+)/,
             /data-video-views="(\d+)"/,
-            /views">\s*(\d+(?:,\d+)*)/
+            /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:views|view)/i,
+            /"viewCount":\s*(\d+)/,
+            /play_count":\s*(\d+)/,
+            /"play_count":\s*"(\d+)"/
           ]
           
           for (const pattern of patterns) {
-            const match = html.match(pattern)
-            if (match) {
+            const matches = html.matchAll(new RegExp(pattern.source, pattern.flags))
+            for (const match of matches) {
               const countStr = match[1].replace(/,/g, '').replace(/\./g, '')
               const count = parseInt(countStr)
-              if (count > 0) {
-                return count
+              // Only include counts that are reasonable (not too small for a viral video)
+              if (count > 10) {
+                allCounts.push(count)
               }
             }
+          }
+          
+          // Return the largest count found (most likely to be the actual view count)
+          if (allCounts.length > 0) {
+            return Math.max(...allCounts)
           }
         } catch (e) {
           console.log('Proxy failed, trying next...', e)
