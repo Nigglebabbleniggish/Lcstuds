@@ -54,15 +54,44 @@ function App() {
 
   const fetchNotifications = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch campaign applications (affiliate submissions)
+      const { data: submissionsData, error: submissionsError } = await supabase
+        .from('affiliates')
+        .select('*, content_rewards(*)')
+        .eq('user_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(10)
+      
+      // Fetch video submissions
+      const { data: videoData, error: videoError } = await supabase
         .from('video_submissions')
-        .select('*')
+        .select('*, content_rewards(*)')
         .eq('user_id', profile.id)
         .order('submitted_at', { ascending: false })
         .limit(10)
       
-      if (error) throw error
-      setNotifications(data || [])
+      if (submissionsError) throw submissionsError
+      if (videoError) throw videoError
+      
+      // Combine both types of notifications
+      const allNotifications = [
+        ...(submissionsData || []).map(s => ({
+          ...s,
+          type: 'campaign_application',
+          title: s.content_rewards?.title || 'Campaign Application',
+          status: s.status,
+          created_at: s.created_at
+        })),
+        ...(videoData || []).map(v => ({
+          ...v,
+          type: 'video_submission',
+          title: `Video - ${v.platform}`,
+          status: v.status,
+          created_at: v.submitted_at
+        }))
+      ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      
+      setNotifications(allNotifications)
     } catch (error) {
       console.error('Error fetching notifications:', error)
     }

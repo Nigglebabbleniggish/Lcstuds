@@ -561,6 +561,7 @@ function Verifier() {
                                 </button>
                               </>
                             )}
+                            <span className="text-gray-500 text-xs">• {account.followers?.toLocaleString() || 0} followers</span>
                             <span className="text-gray-500 text-xs">• {account.views?.toLocaleString() || 0} views</span>
                           </div>
                         </div>

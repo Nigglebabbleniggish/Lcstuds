@@ -435,7 +435,7 @@ function Affiliates() {
                       href={submission.video_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-blue-400 text-sm hover:underline block truncate"
+                      className="text-blue-400 text-sm hover:underline break-all"
                     >
                       {submission.video_url}
                     </a>
