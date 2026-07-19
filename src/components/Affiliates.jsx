@@ -153,6 +153,24 @@ function Affiliates() {
     }
   }
 
+  const handleDeleteVideoSubmission = async (submissionId) => {
+    if (!confirm('Are you sure you want to delete this video submission?')) return
+    
+    try {
+      const { error } = await supabase
+        .from('video_submissions')
+        .delete()
+        .eq('id', submissionId)
+
+      if (error) throw error
+      fetchData()
+      alert('Video submission deleted successfully')
+    } catch (error) {
+      console.error('Error deleting video submission:', error.message)
+      alert('Failed to delete video submission')
+    }
+  }
+
   const handleViewCountUpdate = async (submissionId, viewCount) => {
     try {
       const { error } = await supabase
@@ -479,6 +497,12 @@ function Affiliates() {
                           className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
                         >
                           Reject
+                        </button>
+                        <button
+                          onClick={() => handleDeleteVideoSubmission(submission.id)}
+                          className="px-3 py-1 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                        >
+                          Delete
                         </button>
                       </div>
                     )}
