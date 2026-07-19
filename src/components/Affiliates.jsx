@@ -153,6 +153,24 @@ function Affiliates() {
     }
   }
 
+  const handleViewCountUpdate = async (submissionId, viewCount) => {
+    try {
+      const { error } = await supabase
+        .from('video_submissions')
+        .update({ 
+          view_count: viewCount,
+          last_view_update: new Date().toISOString()
+        })
+        .eq('id', submissionId)
+
+      if (error) throw error
+      fetchData()
+    } catch (error) {
+      console.error('Error updating view count:', error.message)
+      alert('Failed to update view count')
+    }
+  }
+
   const handleEditReward = async (e) => {
     e.preventDefault()
     try {
@@ -409,6 +427,9 @@ function Affiliates() {
                       }`}>
                         {submission.status}
                       </span>
+                      <span className="text-xs text-gray-400">
+                        Views: {submission.view_count || 0}
+                      </span>
                     </div>
                     <a 
                       href={submission.video_url} 
@@ -428,22 +449,40 @@ function Affiliates() {
                       })()} • Submitted: {new Date(submission.submitted_at).toLocaleDateString()}
                     </p>
                   </div>
-                  {submission.status === 'pending' && (
-                    <div className="flex gap-2 ml-4">
+                  <div className="flex flex-col gap-2 ml-4">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min="0"
+                        value={submission.view_count || 0}
+                        onChange={(e) => handleViewCountUpdate(submission.id, parseInt(e.target.value))}
+                        className="w-24 px-2 py-1 bg-zinc-800 border border-zinc-700 rounded text-white text-sm focus:outline-none focus:border-white"
+                        placeholder="Views"
+                      />
                       <button
-                        onClick={() => handleVideoStatusChange(submission.id, 'approved')}
-                        className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                        onClick={() => handleViewCountUpdate(submission.id, submission.view_count || 0)}
+                        className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs"
                       >
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleVideoStatusChange(submission.id, 'rejected')}
-                        className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                      >
-                        Reject
+                        Update
                       </button>
                     </div>
-                  )}
+                    {submission.status === 'pending' && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleVideoStatusChange(submission.id, 'approved')}
+                          className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleVideoStatusChange(submission.id, 'rejected')}
+                          className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -1262,7 +1301,7 @@ function Affiliates() {
                   value={newVideoSubmission.video_url}
                   onChange={(e) => setNewVideoSubmission({ ...newVideoSubmission, video_url: e.target.value })}
                   className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white"
-                  placeholder="https://youtube.com/watch?v=..."
+                  placeholder="https://www.youtube.com/live/... or any social media link"
                 />
               </div>
 

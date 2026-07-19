@@ -59,12 +59,12 @@ function Dashboard() {
         socialAccounts: socialData.data?.length || 0
       })
 
-      // Use local accounts if available, otherwise use database accounts
-      const savedAccounts = localStorage.getItem('social_accounts')
-      if (savedAccounts) {
-        setSocialAccounts(JSON.parse(savedAccounts))
-      } else {
+      // For authenticated users, use Supabase data directly
+      if (profile?.id && !profile.id.startsWith('local_')) {
         setSocialAccounts(socialData.data || [])
+      } else {
+        // For local users, use localStorage
+        loadLocalSocialAccounts()
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error.message)

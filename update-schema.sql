@@ -96,6 +96,8 @@ CREATE TABLE video_submissions (
   video_url TEXT NOT NULL,
   platform TEXT NOT NULL, -- 'youtube', 'instagram', 'twitter', 'tiktok', 'threads'
   status TEXT DEFAULT 'pending', -- 'pending', 'approved', 'rejected'
+  view_count INTEGER DEFAULT 0,
+  last_view_update TIMESTAMP WITH TIME ZONE,
   submitted_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   reviewed_at TIMESTAMP WITH TIME ZONE,
   reviewer_notes TEXT

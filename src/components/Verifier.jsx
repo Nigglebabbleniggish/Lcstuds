@@ -15,15 +15,17 @@ function Verifier() {
   const [videoSubmissions, setVideoSubmissions] = useState([])
 
   useEffect(() => {
-    // Load accounts from localStorage
-    const savedAccounts = localStorage.getItem('social_accounts')
-    if (savedAccounts) {
-      setAccounts(JSON.parse(savedAccounts))
-    }
-
     // Load video submissions from Supabase
     if (profile?.id && !profile.id.startsWith('local_')) {
       loadVideoSubmissions()
+      loadSocialAccounts()
+    } else {
+      // Load accounts from localStorage for local users
+      const savedAccounts = localStorage.getItem('social_accounts')
+      if (savedAccounts) {
+        setAccounts(JSON.parse(savedAccounts))
+      }
+      setLoading(false)
     }
 
     // Pre-load API key to localStorage if available in env
@@ -56,14 +58,23 @@ function Verifier() {
       console.log('API key saved to localStorage from hardcoded value')
     }
 
-    // Skip Supabase fetch for local users
-    if (profile?.id?.startsWith('local_')) {
-      setLoading(false)
-      return
-    }
-
     setLoading(false)
   }, [profile?.id])
+
+  const loadSocialAccounts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('social_accounts')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('connected_at', { ascending: false })
+      
+      if (error) throw error
+      setAccounts(data || [])
+    } catch (error) {
+      console.error('Error loading social accounts:', error)
+    }
+  }
 
   const loadVideoSubmissions = async () => {
     try {
@@ -80,10 +91,15 @@ function Verifier() {
     }
   }
 
-  // Save accounts to localStorage whenever they change
+  // Save accounts to Supabase whenever they change (for authenticated users)
   useEffect(() => {
+    if (profile?.id && !profile.id.startsWith('local_')) {
+      // Accounts are loaded from Supabase, no need to save to localStorage
+      return
+    }
+    // For local users, still save to localStorage
     localStorage.setItem('social_accounts', JSON.stringify(accounts))
-  }, [accounts])
+  }, [accounts, profile?.id])
 
   const platforms = [
     {
@@ -144,7 +160,7 @@ function Verifier() {
     return code
   }
 
-  const handleAddAccount = (e) => {
+  const handleAddAccount = async (e) => {
     e.preventDefault()
     const code = generateVerificationCode()
     const accountWithCode = { 
@@ -155,7 +171,34 @@ function Verifier() {
       views: 0,
       performance: 0
     }
-    setAccounts([...accounts, accountWithCode])
+
+    // Save to Supabase for authenticated users
+    if (profile?.id && !profile.id.startsWith('local_')) {
+      try {
+        const { error } = await supabase
+          .from('social_accounts')
+          .insert({
+            user_id: profile.id,
+            platform: newAccount.platform,
+            username: newAccount.username,
+            followers: 0,
+            engagement_rate: 0
+          })
+        
+        if (error) throw error
+        
+        // Reload accounts from Supabase
+        await loadSocialAccounts()
+      } catch (error) {
+        console.error('Error saving account to Supabase:', error)
+        alert('Failed to save account. Please try again.')
+        return
+      }
+    } else {
+      // For local users, save to localStorage
+      setAccounts([...accounts, accountWithCode])
+    }
+    
     setNewAccount({ platform: '', username: '', link: '' })
     setShowAddModal(false)
     setShowVerificationModal(true)
