@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext'
 function ViewTracker() {
   const { profile } = useAuth()
   const [url, setUrl] = useState('')
-  const [manualViewCount, setManualViewCount] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
@@ -53,16 +52,13 @@ function ViewTracker() {
         // Scrape Twitter/X page HTML via CORS proxy
         viewCount = await scrapeTwitterViews(url)
       } else if (platform === 'instagram') {
-        // Instagram has strong CORS protection, use manual input
-        if (!manualViewCount) {
-          throw new Error('Instagram has strong CORS protection. Please manually enter the view count.')
-        }
-        viewCount = parseInt(manualViewCount) || 0
+        // Scrape Instagram page HTML via CORS proxy with fallbacks
+        viewCount = await scrapeInstagramViews(url)
       } else if (platform === 'threads') {
-        // Scrape Threads page HTML via CORS proxy
+        // Scrape Threads page HTML via CORS proxy with fallbacks
         viewCount = await scrapeThreadsViews(url)
       } else if (platform === 'tiktok') {
-        // Scrape TikTok page HTML via CORS proxy
+        // Scrape TikTok page HTML via CORS proxy with fallbacks
         viewCount = await scrapeTikTokViews(url)
       }
 
@@ -110,21 +106,89 @@ function ViewTracker() {
     }
   }
 
+  const scrapeInstagramViews = async (url) => {
+    try {
+      // Try multiple CORS proxies
+      const proxies = [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        `https://cors-anywhere.herokuapp.com/${url}`
+      ]
+      
+      for (const proxyUrl of proxies) {
+        try {
+          const response = await fetch(proxyUrl)
+          let html = ''
+          
+          if (proxyUrl.includes('allorigins')) {
+            const data = await response.json()
+            html = data.contents || ''
+          } else if (proxyUrl.includes('codetabs')) {
+            const data = await response.json()
+            html = data || ''
+          } else {
+            html = await response.text()
+          }
+          
+          if (!html) continue
+          
+          // Try to extract view count from Instagram HTML
+          const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) ||
+                           html.match(/"video_view_count":(\d+)/) ||
+                           html.match(/"viewCount":(\d+)/) ||
+                           html.match(/play_count":(\d+)/)
+          
+          if (viewMatch) {
+            return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+          }
+        } catch (e) {
+          console.log('Proxy failed, trying next...', e)
+          continue
+        }
+      }
+      
+      throw new Error('Could not extract view count from Instagram page')
+    } catch (err) {
+      throw new Error(`Instagram scraping failed: ${err.message}`)
+    }
+  }
+
   const scrapeThreadsViews = async (url) => {
     try {
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
-      const response = await fetch(proxyUrl)
-      const data = await response.json()
+      const proxies = [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+      ]
       
-      if (!data.contents) throw new Error('Failed to fetch page')
-      
-      const html = data.contents
-      // Try to extract view count from Threads HTML
-      const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) ||
-                       html.match(/"viewCount":(\d+)/)
-      
-      if (viewMatch) {
-        return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+      for (const proxyUrl of proxies) {
+        try {
+          const response = await fetch(proxyUrl)
+          let html = ''
+          
+          if (proxyUrl.includes('allorigins')) {
+            const data = await response.json()
+            html = data.contents || ''
+          } else if (proxyUrl.includes('codetabs')) {
+            const data = await response.json()
+            html = data || ''
+          } else {
+            html = await response.text()
+          }
+          
+          if (!html) continue
+          
+          const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) ||
+                           html.match(/"viewCount":(\d+)/)
+          
+          if (viewMatch) {
+            return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+          }
+        } catch (e) {
+          console.log('Proxy failed, trying next...', e)
+          continue
+        }
       }
       
       throw new Error('Could not extract view count from Threads page')
@@ -135,20 +199,41 @@ function ViewTracker() {
 
   const scrapeTikTokViews = async (url) => {
     try {
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
-      const response = await fetch(proxyUrl)
-      const data = await response.json()
+      const proxies = [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+      ]
       
-      if (!data.contents) throw new Error('Failed to fetch page')
-      
-      const html = data.contents
-      // Try to extract view count from TikTok HTML
-      const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) ||
-                       html.match(/"viewCount":(\d+)/) ||
-                       html.match(/data-e2e="video-views">(\d+)/)
-      
-      if (viewMatch) {
-        return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+      for (const proxyUrl of proxies) {
+        try {
+          const response = await fetch(proxyUrl)
+          let html = ''
+          
+          if (proxyUrl.includes('allorigins')) {
+            const data = await response.json()
+            html = data.contents || ''
+          } else if (proxyUrl.includes('codetabs')) {
+            const data = await response.json()
+            html = data || ''
+          } else {
+            html = await response.text()
+          }
+          
+          if (!html) continue
+          
+          const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) ||
+                           html.match(/"viewCount":(\d+)/) ||
+                           html.match(/data-e2e="video-views">(\d+)/) ||
+                           html.match(/play_count":(\d+)/)
+          
+          if (viewMatch) {
+            return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+          }
+        } catch (e) {
+          console.log('Proxy failed, trying next...', e)
+          continue
+        }
       }
       
       throw new Error('Could not extract view count from TikTok page')
@@ -179,41 +264,25 @@ function ViewTracker() {
               placeholder="https://youtube.com/watch?v=... or https://threads.net/..."
               className="flex-1 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
             />
+            <button
+              onClick={fetchViewCount}
+              disabled={loading || !url}
+              className="px-6 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Eye size={20} />
+                  Check Views
+                </>
+              )}
+            </button>
           </div>
         </div>
-
-        {url && detectPlatform(url) && (detectPlatform(url) === 'instagram' || detectPlatform(url) === 'threads' || detectPlatform(url) === 'tiktok') && (
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">
-              Manual View Count (for {detectPlatform(url)})
-            </label>
-            <input
-              type="number"
-              value={manualViewCount}
-              onChange={(e) => setManualViewCount(e.target.value)}
-              placeholder="Enter view count manually"
-              className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
-            />
-          </div>
-        )}
-
-        <button
-          onClick={fetchViewCount}
-          disabled={loading || !url}
-          className="w-full px-6 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="animate-spin" size={20} />
-              Loading...
-            </>
-          ) : (
-            <>
-              <Eye size={20} />
-              Check Views
-            </>
-          )}
-        </button>
 
         {error && (
           <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-xl">
@@ -250,12 +319,12 @@ function ViewTracker() {
           <div className="flex flex-wrap gap-2">
             <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs">YouTube (Auto)</span>
             <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">Twitter (Auto)</span>
-            <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">Threads (Manual)</span>
-            <span className="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-xs">Instagram Reels (Manual)</span>
-            <span className="px-3 py-1 bg-black/20 text-white rounded-full text-xs">TikTok (Manual)</span>
+            <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">Threads (Auto)</span>
+            <span className="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-xs">Instagram Reels (Auto)</span>
+            <span className="px-3 py-1 bg-black/20 text-white rounded-full text-xs">TikTok (Auto)</span>
           </div>
           <p className="text-gray-500 text-xs mt-2">
-            YouTube and Twitter fetch automatically. Instagram, Threads, and TikTok require manual input due to CORS protection.
+            All platforms fetch view counts automatically via web scraping with multiple proxy fallbacks.
           </p>
         </div>
       </div>
