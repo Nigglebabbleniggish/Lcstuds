@@ -10,6 +10,7 @@ function ViewTracker() {
   const [error, setError] = useState('')
   const [socialKitKey, setSocialKitKey] = useState(localStorage.getItem('SOCIALKIT_API_KEY') || 'dmGn2xI9O07xVa')
   const [twitterApiKey, setTwitterApiKey] = useState(localStorage.getItem('TWITTER_API_KEY') || 'new1_4932481c056c446cabbafbadb00f41a8')
+  const [captapiKey, setCaptapiKey] = useState(localStorage.getItem('CAPTAPI_KEY') || '')
 
   const detectPlatform = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
@@ -340,10 +341,28 @@ function ViewTracker() {
 
   const scrapeThreadsViews = async (url) => {
     try {
+      // Try Captapi for Threads (100 free credits, no OAuth)
+      if (captapiKey) {
+        try {
+          const captapiUrl = `https://api.captapi.com/v1/threads/post-details?url=${encodeURIComponent(url)}&api_key=${captapiKey}`
+          const response = await fetch(captapiUrl)
+          if (response.ok) {
+            const data = await response.json()
+            if (data?.views) {
+              return data.views
+            }
+          }
+        } catch (e) {
+          console.log('Captapi failed, trying proxies...')
+        }
+      }
+
       const proxies = [
         `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
         `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        `https://corsproxy.htmldriven.com/?url=${encodeURIComponent(url)}`,
+        `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(url)}`
       ]
       
       for (const proxyUrl of proxies) {
@@ -363,11 +382,22 @@ function ViewTracker() {
           
           if (!html) continue
           
-          const viewMatch = html.match(/(\d+(?:,\d+)*)\s*views?/i) ||
-                           html.match(/"viewCount":(\d+)/)
+          // Try to extract view count from Threads HTML
+          const patterns = [
+            /(\d+(?:,\d+)*)\s*views?/i,
+            /"viewCount":\s*(\d+)/,
+            /data-testid="views">(\d+(?:,\d+)*)/,
+            /views">\s*(\d+(?:,\d+)*)/
+          ]
           
-          if (viewMatch) {
-            return parseInt(viewMatch[1].replace(/,/g, '')) || 0
+          for (const pattern of patterns) {
+            const match = html.match(pattern)
+            if (match) {
+              const count = parseInt(match[1].replace(/,/g, '')) || 0
+              if (count > 0) {
+                return count
+              }
+            }
           }
         } catch (e) {
           console.log('Proxy failed, trying next...', e)
