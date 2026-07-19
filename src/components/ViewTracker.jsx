@@ -5,11 +5,9 @@ import { useAuth } from '../contexts/AuthContext'
 function ViewTracker() {
   const { profile } = useAuth()
   const [url, setUrl] = useState('')
-  const [manualViewCount, setManualViewCount] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
-  const [showManualInput, setShowManualInput] = useState(false)
 
   const detectPlatform = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
@@ -55,38 +53,13 @@ function ViewTracker() {
         viewCount = await scrapeTwitterViews(url)
       } else if (platform === 'instagram') {
         // Scrape Instagram page HTML via CORS proxy with fallbacks
-        try {
-          viewCount = await scrapeInstagramViews(url)
-        } catch (err) {
-          // If scraping fails, show manual input option
-          if (!manualViewCount) {
-            setShowManualInput(true)
-            throw new Error('Instagram scraping failed. Please manually enter the view count below.')
-          }
-          viewCount = parseInt(manualViewCount) || 0
-        }
+        viewCount = await scrapeInstagramViews(url)
       } else if (platform === 'threads') {
         // Scrape Threads page HTML via CORS proxy with fallbacks
-        try {
-          viewCount = await scrapeThreadsViews(url)
-        } catch (err) {
-          if (!manualViewCount) {
-            setShowManualInput(true)
-            throw new Error('Threads scraping failed. Please manually enter the view count below.')
-          }
-          viewCount = parseInt(manualViewCount) || 0
-        }
+        viewCount = await scrapeThreadsViews(url)
       } else if (platform === 'tiktok') {
         // Scrape TikTok page HTML via CORS proxy with fallbacks
-        try {
-          viewCount = await scrapeTikTokViews(url)
-        } catch (err) {
-          if (!manualViewCount) {
-            setShowManualInput(true)
-            throw new Error('TikTok scraping failed. Please manually enter the view count below.')
-          }
-          viewCount = parseInt(manualViewCount) || 0
-        }
+        viewCount = await scrapeTikTokViews(url)
       }
 
       setResult({
@@ -328,11 +301,7 @@ function ViewTracker() {
             <input
               type="text"
               value={url}
-              onChange={(e) => {
-                setUrl(e.target.value)
-                setShowManualInput(false)
-                setManualViewCount('')
-              }}
+              onChange={(e) => setUrl(e.target.value)}
               placeholder="https://youtube.com/watch?v=... or https://threads.net/..."
               className="flex-1 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
             />
@@ -355,19 +324,6 @@ function ViewTracker() {
             </button>
           </div>
         </div>
-
-        {showManualInput && (
-          <div className="p-4 bg-yellow-500/10 border border-yellow-500/50 rounded-xl">
-            <p className="text-yellow-400 text-sm mb-2">Automatic scraping failed. Please enter the view count manually:</p>
-            <input
-              type="number"
-              value={manualViewCount}
-              onChange={(e) => setManualViewCount(e.target.value)}
-              placeholder="Enter view count manually"
-              className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
-            />
-          </div>
-        )}
 
         {error && (
           <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-xl">
