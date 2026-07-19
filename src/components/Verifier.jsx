@@ -175,7 +175,13 @@ function Verifier() {
     // Save to Supabase for authenticated users
     if (profile?.id && !profile.id.startsWith('local_')) {
       try {
-        const { error } = await supabase
+        console.log('Saving account to Supabase:', {
+          user_id: profile.id,
+          platform: newAccount.platform,
+          username: newAccount.username
+        })
+        
+        const { data, error } = await supabase
           .from('social_accounts')
           .insert({
             user_id: profile.id,
@@ -184,15 +190,22 @@ function Verifier() {
             followers: 0,
             engagement_rate: 0
           })
+          .select()
         
-        if (error) throw error
+        if (error) {
+          console.error('Supabase error:', error)
+          throw error
+        }
+        
+        console.log('Account saved successfully:', data)
         
         // Reload accounts from Supabase
         await loadSocialAccounts()
       } catch (error) {
         console.error('Error saving account to Supabase:', error)
-        alert('Failed to save account. Please try again.')
-        return
+        alert(`Failed to save account: ${error.message}. Falling back to local storage.`)
+        // Fallback to localStorage on error
+        setAccounts([...accounts, accountWithCode])
       }
     } else {
       // For local users, save to localStorage

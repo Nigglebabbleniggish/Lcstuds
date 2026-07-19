@@ -35,13 +35,19 @@ function Dashboard() {
   }
 
   const fetchDashboardData = async () => {
+    // Guard: don't fetch if profile id is not available
+    if (!profile?.id) {
+      setLoading(false)
+      return
+    }
+
     try {
       const [campaignsData, earningsData, socialData] = await Promise.all([
         supabase.from('content_rewards').select('*'),
         profile?.is_admin 
           ? supabase.from('earnings').select('*').order('created_at', { ascending: false }).limit(10)
-          : supabase.from('earnings').select('*').eq('user_id', profile?.id).order('created_at', { ascending: false }).limit(10),
-        profile?.id ? supabase.from('social_accounts').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] })
+          : supabase.from('earnings').select('*').eq('user_id', profile.id).order('created_at', { ascending: false }).limit(10),
+        supabase.from('social_accounts').select('*').eq('user_id', profile.id)
       ])
 
       const totalViews = socialData.data?.reduce((sum, s) => sum + (s.views || 0), 0) || 0
