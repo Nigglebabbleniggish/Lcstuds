@@ -38,6 +38,7 @@ ALTER TABLE social_accounts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users can view own social accounts" ON social_accounts;
 DROP POLICY IF EXISTS "Users can insert own social accounts" ON social_accounts;
 DROP POLICY IF EXISTS "Users can update own social accounts" ON social_accounts;
+DROP POLICY IF EXISTS "Users can delete own social accounts" ON social_accounts;
 
 -- Create RLS policies
 CREATE POLICY "Users can view own social accounts" ON social_accounts
@@ -48,6 +49,9 @@ CREATE POLICY "Users can insert own social accounts" ON social_accounts
 
 CREATE POLICY "Users can update own social accounts" ON social_accounts
   FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own social accounts" ON social_accounts
+  FOR DELETE USING (auth.uid() = user_id);
 
 -- Create updated_at trigger function if it doesn't exist
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -64,3 +68,4 @@ DROP TRIGGER IF EXISTS update_social_accounts_updated_at ON social_accounts;
 -- Add updated_at trigger
 CREATE TRIGGER update_social_accounts_updated_at BEFORE UPDATE ON social_accounts
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+ 

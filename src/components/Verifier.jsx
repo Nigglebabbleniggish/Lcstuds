@@ -65,14 +65,7 @@ function Verifier() {
     try {
       console.log('Loading social accounts for user:', profile.id)
       
-      // First, check if ANY accounts exist in the database (for debugging)
-      const { data: allAccounts, error: allError } = await supabase
-        .from('social_accounts')
-        .select('*')
-      
-      console.log('ALL accounts in database:', allAccounts)
-      
-      // Then load accounts for this specific user
+      // Load accounts for this specific user
       const { data, error } = await supabase
         .from('social_accounts')
         .select('*')
@@ -205,6 +198,16 @@ function Verifier() {
       verified: false,
       views: 0,
       performance: 0
+    }
+
+    // Check if account with same platform and username already exists
+    const existingAccount = accounts.find(
+      a => a.platform === newAccount.platform && a.username === newAccount.username
+    )
+    
+    if (existingAccount) {
+      alert('An account with this platform and username already exists.')
+      return
     }
 
     // Save to Supabase for authenticated users
