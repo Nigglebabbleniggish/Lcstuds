@@ -63,16 +63,28 @@ function Verifier() {
 
   const loadSocialAccounts = async () => {
     try {
+      console.log('Loading social accounts for user:', profile.id)
       const { data, error } = await supabase
         .from('social_accounts')
         .select('*')
         .eq('user_id', profile.id)
         .order('connected_at', { ascending: false })
       
-      if (error) throw error
+      if (error) {
+        console.error('Error loading social accounts:', error)
+        throw error
+      }
+      
+      console.log('Loaded accounts from database:', data)
       setAccounts(data || [])
     } catch (error) {
       console.error('Error loading social accounts:', error)
+      // Fallback to localStorage on error
+      const savedAccounts = localStorage.getItem('social_accounts')
+      if (savedAccounts) {
+        console.log('Falling back to localStorage accounts')
+        setAccounts(JSON.parse(savedAccounts))
+      }
     }
   }
 
