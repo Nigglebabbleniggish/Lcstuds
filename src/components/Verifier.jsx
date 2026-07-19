@@ -200,19 +200,24 @@ function Verifier() {
       performance: 0
     }
 
-    // Check if account with same platform and username already exists
-    const existingAccount = accounts.find(
-      a => a.platform === newAccount.platform && a.username === newAccount.username
-    )
-    
-    if (existingAccount) {
-      alert('An account with this platform and username already exists.')
-      return
-    }
-
     // Save to Supabase for authenticated users
     if (profile?.id && !profile.id.startsWith('local_')) {
       try {
+        // Check if account already exists in database
+        const { data: existingAccounts, error: checkError } = await supabase
+          .from('social_accounts')
+          .select('*')
+          .eq('user_id', profile.id)
+          .eq('platform', newAccount.platform)
+          .eq('username', newAccount.username)
+        
+        if (checkError) throw checkError
+        
+        if (existingAccounts && existingAccounts.length > 0) {
+          alert('An account with this platform and username already exists.')
+          return
+        }
+
         console.log('Saving account to Supabase:', {
           user_id: profile.id,
           platform: newAccount.platform,
