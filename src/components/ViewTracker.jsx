@@ -108,14 +108,48 @@ function ViewTracker() {
 
   const scrapeInstagramViews = async (url) => {
     try {
-      // Try Instagram oEmbed API first (free, no auth for public posts)
+      // Extract shortcode from Instagram URL
+      const shortcodeMatch = url.match(/instagram\.com\/reel\/([^\/\?]+)/) || url.match(/instagram\.com\/p\/([^\/\?]+)/)
+      if (!shortcodeMatch) {
+        throw new Error('Could not extract Instagram shortcode from URL')
+      }
+      const shortcode = shortcodeMatch[1]
+
+      // Try Instagram GraphQL API (reverse-engineered, no auth required)
+      try {
+        const graphqlUrl = 'https://www.instagram.com/graphql/query'
+        const queryHash = 'd4d882acee38a175e3a6d1c6c0b8b8f0' // This is a known query hash for media info
+        const variables = JSON.stringify({
+          shortcode: shortcode,
+          first: 10
+        })
+        
+        const response = await fetch(`${graphqlUrl}?query_hash=${queryHash}&variables=${encodeURIComponent(variables)}`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://www.instagram.com/'
+          }
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data?.data?.shortcode_media?.video_view_count) {
+            return data.data.shortcode_media.video_view_count
+          }
+        }
+      } catch (e) {
+        console.log('GraphQL API failed, trying proxies...')
+      }
+
+      // Try Instagram oEmbed API
       try {
         const oembedUrl = `https://www.instagram.com/oembed?url=${encodeURIComponent(url)}`
         const response = await fetch(oembedUrl)
         if (response.ok) {
           const data = await response.json()
           if (data.html) {
-            // Extract view count from oEmbed HTML if available
             const viewMatch = data.html.match(/(\d+(?:,\d+)*)\s*views?/i)
             if (viewMatch) {
               return parseInt(viewMatch[1].replace(/,/g, '')) || 0
@@ -193,7 +227,7 @@ function ViewTracker() {
         }
       }
       
-      throw new Error('Instagram has strong CORS protection. All proxies failed.')
+      throw new Error('Instagram has strong CORS protection. All methods failed.')
     } catch (err) {
       throw new Error(`Instagram scraping failed: ${err.message}`)
     }
