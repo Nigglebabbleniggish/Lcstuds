@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 function ViewTracker() {
   const { profile } = useAuth()
   const [url, setUrl] = useState('')
+  const [manualViewCount, setManualViewCount] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
@@ -47,15 +48,12 @@ function ViewTracker() {
         } else {
           throw new Error('Video not found')
         }
-      } else if (platform === 'threads') {
-        // Threads API requires authentication, using a placeholder
-        throw new Error('Threads API requires authentication. Please manually check the post.')
-      } else if (platform === 'instagram') {
-        // Instagram API requires authentication, using a placeholder
-        throw new Error('Instagram API requires authentication. Please manually check the reel.')
-      } else if (platform === 'twitter') {
-        // Twitter API requires authentication, using a placeholder
-        throw new Error('Twitter API requires authentication. Please manually check the tweet.')
+      } else {
+        // For other platforms, use manual input
+        if (!manualViewCount) {
+          throw new Error(`Please manually enter the view count for ${platform} (free APIs not available)`)
+        }
+        viewCount = parseInt(manualViewCount) || 0
       }
 
       setResult({
@@ -99,25 +97,41 @@ function ViewTracker() {
               placeholder="https://youtube.com/watch?v=... or https://threads.net/..."
               className="flex-1 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
             />
-            <button
-              onClick={fetchViewCount}
-              disabled={loading || !url}
-              className="px-6 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin" size={20} />
-                  Loading...
-                </>
-              ) : (
-                <>
-                  <Eye size={20} />
-                  Check Views
-                </>
-              )}
-            </button>
           </div>
         </div>
+
+        {url && detectPlatform(url) && detectPlatform(url) !== 'youtube' && (
+          <div>
+            <label className="block text-sm text-gray-400 mb-2">
+              Manual View Count (for {detectPlatform(url)})
+            </label>
+            <input
+              type="number"
+              value={manualViewCount}
+              onChange={(e) => setManualViewCount(e.target.value)}
+              placeholder="Enter view count manually"
+              className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+            />
+          </div>
+        )}
+
+        <button
+          onClick={fetchViewCount}
+          disabled={loading || !url}
+          className="w-full px-6 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="animate-spin" size={20} />
+              Loading...
+            </>
+          ) : (
+            <>
+              <Eye size={20} />
+              Check Views
+            </>
+          )}
+        </button>
 
         {error && (
           <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-xl">
@@ -152,13 +166,13 @@ function ViewTracker() {
         <div className="p-4 bg-zinc-800/50 rounded-xl border border-zinc-700">
           <p className="text-gray-400 text-sm mb-2">Supported Platforms:</p>
           <div className="flex flex-wrap gap-2">
-            <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs">YouTube</span>
-            <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">Threads</span>
-            <span className="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-xs">Instagram Reels</span>
-            <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">Twitter</span>
+            <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs">YouTube (Auto)</span>
+            <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">Threads (Manual)</span>
+            <span className="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-xs">Instagram Reels (Manual)</span>
+            <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">Twitter (Manual)</span>
           </div>
           <p className="text-gray-500 text-xs mt-2">
-            Note: Threads, Instagram, and Twitter require API authentication. Only YouTube works automatically.
+            YouTube fetches view counts automatically. For other platforms, manually enter the view count after checking the post.
           </p>
         </div>
       </div>
