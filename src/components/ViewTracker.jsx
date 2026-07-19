@@ -10,7 +10,7 @@ function ViewTracker() {
   const [error, setError] = useState('')
   const [socialKitKey, setSocialKitKey] = useState(localStorage.getItem('SOCIALKIT_API_KEY') || 'dmGn2xI9O07xVa')
   const [twitterApiKey, setTwitterApiKey] = useState(localStorage.getItem('TWITTER_API_KEY') || 'new1_4932481c056c446cabbafbadb00f41a8')
-  const [captapiKey, setCaptapiKey] = useState(localStorage.getItem('CAPTAPI_KEY') || '')
+  const [captapiKey, setCaptapiKey] = useState(localStorage.getItem('CAPTAPI_KEY') || 'capt_live_lrf37WU99MrOEESq91vbmCRKBvhHUF')
 
   const detectPlatform = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
