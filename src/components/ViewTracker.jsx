@@ -15,7 +15,6 @@ function ViewTracker() {
 
   const detectPlatform = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
-    if (url.includes('threads.net') || url.includes('threads.com')) return 'threads'
     if (url.includes('instagram.com/reel') || url.includes('instagram.com/reels')) return 'instagram'
     if (url.includes('twitter.com') || url.includes('x.com')) return 'twitter'
     if (url.includes('tiktok.com')) return 'tiktok'
@@ -25,7 +24,7 @@ function ViewTracker() {
   const fetchViewCount = async () => {
     const platform = detectPlatform(url)
     if (!platform) {
-      setError('Could not detect platform. Please enter a valid YouTube, Threads, Instagram Reel, Twitter, or TikTok URL.')
+      setError('Could not detect platform. Please enter a valid YouTube, Instagram Reel, Twitter, or TikTok URL.')
       return
     }
 
@@ -58,9 +57,6 @@ function ViewTracker() {
       } else if (platform === 'instagram') {
         // Scrape Instagram page HTML via CORS proxy with fallbacks
         viewCount = await scrapeInstagramViews(url)
-      } else if (platform === 'threads') {
-        // Scrape Threads page HTML via CORS proxy with fallbacks
-        viewCount = await scrapeThreadsViews(url)
       } else if (platform === 'tiktok') {
         // Scrape TikTok page HTML via CORS proxy with fallbacks
         viewCount = await scrapeTikTokViews(url)
@@ -594,7 +590,6 @@ function ViewTracker() {
           <div className="flex flex-wrap gap-2">
             <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs">YouTube (Auto)</span>
             <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">Twitter (Auto)</span>
-            <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">Threads (Auto)</span>
             <span className="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-xs">Instagram Reels (Auto)</span>
             <span className="px-3 py-1 bg-black/20 text-white rounded-full text-xs">TikTok (Auto)</span>
           </div>
