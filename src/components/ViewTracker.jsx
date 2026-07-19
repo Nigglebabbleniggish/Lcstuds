@@ -9,6 +9,7 @@ function ViewTracker() {
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [socialKitKey, setSocialKitKey] = useState(localStorage.getItem('SOCIALKIT_API_KEY') || 'dmGn2xI9O07xVa')
+  const [twitterApiKey, setTwitterApiKey] = useState(localStorage.getItem('TWITTER_API_KEY') || 'new1_4932481c056c446cabbafbadb00f41a8')
 
   const detectPlatform = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
@@ -91,6 +92,31 @@ function ViewTracker() {
         throw new Error('Could not extract tweet ID from URL')
       }
       const tweetId = tweetIdMatch[1]
+
+      // Try TwitterAPI.io first (requires API key)
+      if (twitterApiKey) {
+        try {
+          const twitterApiUrl = `https://api.twitterapi.io/twitter/tweets/${tweetId}`
+          const response = await fetch(twitterApiUrl, {
+            headers: {
+              'X-API-Key': twitterApiKey
+            }
+          })
+          if (response.ok) {
+            const data = await response.json()
+            // TwitterAPI.io returns public_metrics with view_count
+            if (data?.public_metrics?.view_count) {
+              return data.public_metrics.view_count
+            }
+            // Also check for impression_count as fallback
+            if (data?.public_metrics?.impression_count) {
+              return data.public_metrics.impression_count
+            }
+          }
+        } catch (e) {
+          console.log('TwitterAPI.io failed, trying proxies...')
+        }
+      }
 
       // Try multiple CORS proxies with better handling
       const proxies = [
