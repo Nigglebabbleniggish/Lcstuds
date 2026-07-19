@@ -11,6 +11,7 @@ function ViewTracker() {
   const [socialKitKey, setSocialKitKey] = useState(localStorage.getItem('SOCIALKIT_API_KEY') || 'dmGn2xI9O07xVa')
   const [twitterApiKey, setTwitterApiKey] = useState(localStorage.getItem('TWITTER_API_KEY') || 'new1_4932481c056c446cabbafbadb00f41a8')
   const [captapiKey, setCaptapiKey] = useState(localStorage.getItem('CAPTAPI_KEY') || 'capt_live_lrf37WU99MrOEESq91vbmCRKBvhHUF')
+  const [socialFetchKey, setSocialFetchKey] = useState(localStorage.getItem('SOCIALFETCH_API_KEY') || '')
 
   const detectPlatform = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
@@ -341,6 +342,26 @@ function ViewTracker() {
 
   const scrapeThreadsViews = async (url) => {
     try {
+      // Try Social Fetch for Threads (supports Threads posts)
+      if (socialFetchKey) {
+        try {
+          const socialFetchUrl = `https://api.socialfetch.dev/v1/threads/posts?url=${encodeURIComponent(url)}`
+          const response = await fetch(socialFetchUrl, {
+            headers: {
+              'x-api-key': socialFetchKey
+            }
+          })
+          if (response.ok) {
+            const data = await response.json()
+            if (data?.data?.views) {
+              return data.data.views
+            }
+          }
+        } catch (e) {
+          console.log('Social Fetch failed, trying Captapi...')
+        }
+      }
+
       // Try Captapi for Threads (100 free credits, no OAuth) - try with x-api-key header
       if (captapiKey) {
         try {
