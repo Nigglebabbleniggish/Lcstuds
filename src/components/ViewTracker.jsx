@@ -13,7 +13,7 @@ function ViewTracker() {
 
   const detectPlatform = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
-    if (url.includes('threads.net')) return 'threads'
+    if (url.includes('threads.net') || url.includes('threads.com')) return 'threads'
     if (url.includes('instagram.com/reel') || url.includes('instagram.com/reels')) return 'instagram'
     if (url.includes('twitter.com') || url.includes('x.com')) return 'twitter'
     if (url.includes('tiktok.com')) return 'tiktok'
