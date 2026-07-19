@@ -108,6 +108,23 @@ function ViewTracker() {
 
   const scrapeInstagramViews = async (url) => {
     try {
+      // Try SocialKit API (free tier, requires API key)
+      const socialKitKey = localStorage.getItem('SOCIALKIT_API_KEY') || ''
+      if (socialKitKey) {
+        try {
+          const socialKitUrl = `https://api.socialkit.dev/instagram/stats?access_key=${socialKitKey}&url=${encodeURIComponent(url)}`
+          const response = await fetch(socialKitUrl)
+          if (response.ok) {
+            const data = await response.json()
+            if (data?.data?.views) {
+              return data.data.views
+            }
+          }
+        } catch (e) {
+          console.log('SocialKit failed, trying other methods...')
+        }
+      }
+
       // Extract shortcode from Instagram URL
       const shortcodeMatch = url.match(/instagram\.com\/reel\/([^\/\?]+)/) || url.match(/instagram\.com\/p\/([^\/\?]+)/)
       if (!shortcodeMatch) {
@@ -118,7 +135,7 @@ function ViewTracker() {
       // Try Instagram GraphQL API (reverse-engineered, no auth required)
       try {
         const graphqlUrl = 'https://www.instagram.com/graphql/query'
-        const queryHash = 'd4d882acee38a175e3a6d1c6c0b8b8f0' // This is a known query hash for media info
+        const queryHash = 'd4d882acee38a175e3a6d1c6c0b8b8f0'
         const variables = JSON.stringify({
           shortcode: shortcode,
           first: 10
@@ -227,7 +244,7 @@ function ViewTracker() {
         }
       }
       
-      throw new Error('Instagram has strong CORS protection. All methods failed.')
+      throw new Error('Instagram requires API key for reliable view counts. Get free key at socialkit.dev')
     } catch (err) {
       throw new Error(`Instagram scraping failed: ${err.message}`)
     }
