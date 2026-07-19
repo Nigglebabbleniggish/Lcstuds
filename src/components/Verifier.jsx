@@ -64,6 +64,15 @@ function Verifier() {
   const loadSocialAccounts = async () => {
     try {
       console.log('Loading social accounts for user:', profile.id)
+      
+      // First, check if ANY accounts exist in the database (for debugging)
+      const { data: allAccounts, error: allError } = await supabase
+        .from('social_accounts')
+        .select('*')
+      
+      console.log('ALL accounts in database:', allAccounts)
+      
+      // Then load accounts for this specific user
       const { data, error } = await supabase
         .from('social_accounts')
         .select('*')
@@ -75,7 +84,7 @@ function Verifier() {
         throw error
       }
       
-      console.log('Loaded accounts from database:', data)
+      console.log('Loaded accounts from database for this user:', data)
       setAccounts(data || [])
     } catch (error) {
       console.error('Error loading social accounts:', error)
