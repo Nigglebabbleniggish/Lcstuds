@@ -93,6 +93,23 @@ function ViewTracker() {
       }
       const tweetId = tweetIdMatch[1]
 
+      // Try SocialKit API for Twitter/X (same key as Instagram)
+      if (socialKitKey) {
+        try {
+          const socialKitUrl = `https://api.socialkit.dev/twitter/tweet?access_key=${socialKitKey}&url=${encodeURIComponent(url)}`
+          const response = await fetch(socialKitUrl)
+          if (response.ok) {
+            const data = await response.json()
+            // SocialKit returns tweet object with views
+            if (data?.data?.tweet?.views) {
+              return data.data.tweet.views
+            }
+          }
+        } catch (e) {
+          console.log('SocialKit failed, trying TwitterAPI.io...')
+        }
+      }
+
       // Try TwitterAPI.io first (requires API key) - use API key as query param
       if (twitterApiKey) {
         try {
