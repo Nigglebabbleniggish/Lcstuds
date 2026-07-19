@@ -538,8 +538,27 @@ function Verifier() {
       }
   }
 
-  const handleDeleteAccount = (id) => {
-    setAccounts(accounts.filter(acc => acc.id !== id))
+  const handleDeleteAccount = async (id) => {
+    // For authenticated users, delete from database
+    if (profile?.id && !profile.id.startsWith('local_')) {
+      try {
+        const { error } = await supabase
+          .from('social_accounts')
+          .delete()
+          .eq('id', id)
+        
+        if (error) throw error
+        
+        // Reload accounts from database
+        await loadSocialAccounts()
+      } catch (error) {
+        console.error('Error deleting account from database:', error)
+        alert('Failed to delete account')
+      }
+    } else {
+      // For local users, remove from state only
+      setAccounts(accounts.filter(acc => acc.id !== id))
+    }
   }
 
   if (loading) {
