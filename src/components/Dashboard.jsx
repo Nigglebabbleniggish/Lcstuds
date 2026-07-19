@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { TrendingUp, DollarSign, Activity, Calendar, BarChart3, Eye, Target, Users, Heart, MessageCircle, Share2, Instagram, Youtube, Twitter, Facebook, Linkedin } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import ViewTracker from './ViewTracker'
 
 function Dashboard() {
   const { profile } = useAuth()
@@ -195,11 +196,11 @@ function Dashboard() {
               return (
                 <div 
                   key={account.id} 
-                  className="bg-zinc-800/50 rounded-xl p-1.5 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in aspect-square flex flex-col justify-center items-center relative"
+                  className="bg-zinc-800/50 rounded-xl p-3 border border-zinc-700 hover:border-zinc-600 transition-all animate-fade-in aspect-square flex flex-col justify-center items-center relative"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className={`p-1.5 rounded-xl bg-gradient-to-br ${color} w-fit mb-1`}>
-                    <div className="w-10 h-10">
+                  <div className={`p-2 rounded-xl bg-gradient-to-br ${color} w-fit mb-2`}>
+                    <div className="w-12 h-12">
                       <IconComponent />
                     </div>
                   </div>
@@ -213,6 +214,9 @@ function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* View Tracker - Admin Only */}
+      {profile?.is_admin && <ViewTracker />}
     </div>
   )
 }

@@ -1,0 +1,169 @@
+import { useState } from 'react'
+import { Eye, ExternalLink, Loader2 } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
+
+function ViewTracker() {
+  const { profile } = useAuth()
+  const [url, setUrl] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState('')
+
+  const detectPlatform = (url) => {
+    if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
+    if (url.includes('threads.net')) return 'threads'
+    if (url.includes('instagram.com/reel') || url.includes('instagram.com/reels')) return 'instagram'
+    if (url.includes('twitter.com') || url.includes('x.com')) return 'twitter'
+    return null
+  }
+
+  const fetchViewCount = async () => {
+    const platform = detectPlatform(url)
+    if (!platform) {
+      setError('Could not detect platform. Please enter a valid YouTube, Threads, Instagram Reel, or Twitter URL.')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+    setResult(null)
+
+    try {
+      let viewCount = 0
+
+      if (platform === 'youtube') {
+        // Extract video ID from URL
+        const videoId = extractYouTubeId(url)
+        if (!videoId) throw new Error('Invalid YouTube URL')
+
+        const apiKey = localStorage.getItem('YOUTUBE_API_KEY') || 'AIzaSyA7NWd90TxdR1PPDSKZWSPdZiRfb8OzAEQ'
+        const response = await fetch(
+          `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${apiKey}`
+        )
+        const data = await response.json()
+        
+        if (data.items && data.items.length > 0) {
+          viewCount = parseInt(data.items[0].statistics.viewCount) || 0
+        } else {
+          throw new Error('Video not found')
+        }
+      } else if (platform === 'threads') {
+        // Threads API requires authentication, using a placeholder
+        throw new Error('Threads API requires authentication. Please manually check the post.')
+      } else if (platform === 'instagram') {
+        // Instagram API requires authentication, using a placeholder
+        throw new Error('Instagram API requires authentication. Please manually check the reel.')
+      } else if (platform === 'twitter') {
+        // Twitter API requires authentication, using a placeholder
+        throw new Error('Twitter API requires authentication. Please manually check the tweet.')
+      }
+
+      setResult({
+        platform,
+        url,
+        viewCount,
+        timestamp: new Date().toISOString()
+      })
+    } catch (err) {
+      setError(err.message || 'Failed to fetch view count')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const extractYouTubeId = (url) => {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+    const match = url.match(regex)
+    return match ? match[1] : null
+  }
+
+  if (!profile?.is_admin) {
+    return null
+  }
+
+  return (
+    <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <Eye className="text-white" size={24} />
+        <h2 className="text-2xl font-bold text-white">View Tracker</h2>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm text-gray-400 mb-2">Enter Social Media URL</label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://youtube.com/watch?v=... or https://threads.net/..."
+              className="flex-1 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+            />
+            <button
+              onClick={fetchViewCount}
+              disabled={loading || !url}
+              className="px-6 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Eye size={20} />
+                  Check Views
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-xl">
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+        )}
+
+        {result && (
+          <div className="p-6 bg-zinc-800 rounded-xl border border-zinc-700">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-gray-400 text-sm capitalize">Platform</p>
+                <p className="text-white font-semibold">{result.platform}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-gray-400 text-sm">View Count</p>
+                <p className="text-3xl font-bold text-white">{result.viewCount.toLocaleString()}</p>
+              </div>
+            </div>
+            <a
+              href={result.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-blue-400 text-sm hover:underline"
+            >
+              <ExternalLink size={16} />
+              Open in new tab
+            </a>
+          </div>
+        )}
+
+        <div className="p-4 bg-zinc-800/50 rounded-xl border border-zinc-700">
+          <p className="text-gray-400 text-sm mb-2">Supported Platforms:</p>
+          <div className="flex flex-wrap gap-2">
+            <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs">YouTube</span>
+            <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">Threads</span>
+            <span className="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-xs">Instagram Reels</span>
+            <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">Twitter</span>
+          </div>
+          <p className="text-gray-500 text-xs mt-2">
+            Note: Threads, Instagram, and Twitter require API authentication. Only YouTube works automatically.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ViewTracker
