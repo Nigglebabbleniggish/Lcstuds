@@ -96,7 +96,7 @@ function ViewTracker() {
       // Try TwitterAPI.io first (requires API key)
       if (twitterApiKey) {
         try {
-          const twitterApiUrl = `https://api.twitterapi.io/twitter/tweets/${tweetId}`
+          const twitterApiUrl = `https://api.twitterapi.io/twitter/tweets?tweet_ids=${tweetId}`
           const response = await fetch(twitterApiUrl, {
             headers: {
               'X-API-Key': twitterApiKey
@@ -104,13 +104,16 @@ function ViewTracker() {
           })
           if (response.ok) {
             const data = await response.json()
-            // TwitterAPI.io returns public_metrics with view_count
-            if (data?.public_metrics?.view_count) {
-              return data.public_metrics.view_count
-            }
-            // Also check for impression_count as fallback
-            if (data?.public_metrics?.impression_count) {
-              return data.public_metrics.impression_count
+            // TwitterAPI.io returns tweets array with public_metrics
+            if (data?.tweets && data.tweets.length > 0) {
+              const tweet = data.tweets[0]
+              if (tweet?.public_metrics?.view_count) {
+                return tweet.public_metrics.view_count
+              }
+              // Also check for impression_count as fallback
+              if (tweet?.public_metrics?.impression_count) {
+                return tweet.public_metrics.impression_count
+              }
             }
           }
         } catch (e) {
