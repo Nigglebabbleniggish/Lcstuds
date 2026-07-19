@@ -126,13 +126,15 @@ function ViewTracker() {
         console.log('oEmbed failed, trying proxies...')
       }
 
-      // Try multiple CORS proxies
+      // Try multiple CORS proxies - best working ones first
       const proxies = [
-        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
         `https://corsproxy.io/?${encodeURIComponent(url)}`,
         `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
         `https://corsproxy.htmldriven.com/?url=${encodeURIComponent(url)}`,
-        `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(url)}`
+        `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(url)}`,
+        `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`,
+        `https://json2jsonp.com/?url=${encodeURIComponent(url)}&callback=cb`
       ]
       
       for (const proxyUrl of proxies) {
@@ -141,11 +143,13 @@ function ViewTracker() {
           let html = ''
           
           if (proxyUrl.includes('allorigins')) {
-            const data = await response.json()
-            html = data.contents || ''
+            html = await response.text()
           } else if (proxyUrl.includes('codetabs')) {
             const data = await response.json()
             html = data || ''
+          } else if (proxyUrl.includes('rss2json')) {
+            const data = await response.json()
+            html = data?.contents || ''
           } else {
             html = await response.text()
           }
@@ -189,7 +193,7 @@ function ViewTracker() {
         }
       }
       
-      throw new Error('Instagram has strong CORS protection. All proxies failed. Please manually check the view count.')
+      throw new Error('Instagram has strong CORS protection. All proxies failed.')
     } catch (err) {
       throw new Error(`Instagram scraping failed: ${err.message}`)
     }
