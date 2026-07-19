@@ -341,7 +341,47 @@ function ViewTracker() {
 
   const scrapeThreadsViews = async (url) => {
     try {
-      // Try Captapi for Threads (100 free credits, no OAuth)
+      // Try Captapi for Threads (100 free credits, no OAuth) - try with x-api-key header
+      if (captapiKey) {
+        try {
+          const captapiUrl = `https://api.captapi.com/v1/threads/post-details?url=${encodeURIComponent(url)}`
+          const response = await fetch(captapiUrl, {
+            headers: {
+              'x-api-key': captapiKey
+            }
+          })
+          if (response.ok) {
+            const data = await response.json()
+            if (data?.views) {
+              return data.views
+            }
+          }
+        } catch (e) {
+          console.log('Captapi x-api-key failed, trying Bearer auth...')
+        }
+      }
+
+      // Try Captapi with Bearer auth
+      if (captapiKey) {
+        try {
+          const captapiUrl = `https://api.captapi.com/v1/threads/post-details?url=${encodeURIComponent(url)}`
+          const response = await fetch(captapiUrl, {
+            headers: {
+              'Authorization': `Bearer ${captapiKey}`
+            }
+          })
+          if (response.ok) {
+            const data = await response.json()
+            if (data?.views) {
+              return data.views
+            }
+          }
+        } catch (e) {
+          console.log('Captapi Bearer auth failed, trying query param...')
+        }
+      }
+
+      // Try Captapi with query parameter
       if (captapiKey) {
         try {
           const captapiUrl = `https://api.captapi.com/v1/threads/post-details?url=${encodeURIComponent(url)}&api_key=${captapiKey}`
@@ -353,7 +393,7 @@ function ViewTracker() {
             }
           }
         } catch (e) {
-          console.log('Captapi failed, trying proxies...')
+          console.log('Captapi query param failed, trying proxies...')
         }
       }
 
