@@ -93,15 +93,11 @@ function ViewTracker() {
       }
       const tweetId = tweetIdMatch[1]
 
-      // Try TwitterAPI.io first (requires API key)
+      // Try TwitterAPI.io first (requires API key) - use API key as query param
       if (twitterApiKey) {
         try {
-          const twitterApiUrl = `https://api.twitterapi.io/twitter/tweets?tweet_ids=${tweetId}`
-          const response = await fetch(twitterApiUrl, {
-            headers: {
-              'X-API-Key': twitterApiKey
-            }
-          })
+          const twitterApiUrl = `https://api.twitterapi.io/twitter/tweets?tweet_ids=${tweetId}&api_key=${twitterApiKey}`
+          const response = await fetch(twitterApiUrl)
           if (response.ok) {
             const data = await response.json()
             // TwitterAPI.io returns tweets array with public_metrics
