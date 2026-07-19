@@ -65,22 +65,19 @@ function Dashboard() {
         socialAccounts: socialData.data?.length || 0
       })
 
-      // For authenticated users, use Supabase data directly
+      // For authenticated users, use Supabase data directly (no localStorage fallback)
       if (profile?.id && !profile.id.startsWith('local_')) {
-        if (socialData.data && socialData.data.length > 0) {
-          setSocialAccounts(socialData.data)
-        } else {
-          // Fallback to localStorage if database is empty or failed
-          loadLocalSocialAccounts()
-        }
+        setSocialAccounts(socialData.data || [])
       } else {
-        // For local users, use localStorage
+        // For local users only, use localStorage
         loadLocalSocialAccounts()
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error.message)
-      // Fallback to localStorage on error
-      loadLocalSocialAccounts()
+      // Only fallback to localStorage for local users
+      if (profile?.id?.startsWith('local_')) {
+        loadLocalSocialAccounts()
+      }
     } finally {
       setLoading(false)
     }
