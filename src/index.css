@@ -38,42 +38,42 @@
 
 @keyframes fall-left {
   0% {
-    transform: translateY(-100px) translateX(0) rotate(0deg);
+    transform: translateY(-50px);
     opacity: 0;
   }
-  10% {
-    opacity: 0.5;
+  5% {
+    opacity: 0.4;
   }
-  90% {
-    opacity: 0.5;
+  95% {
+    opacity: 0.4;
   }
   100% {
-    transform: translateY(100vh) translateX(-150px) rotate(360deg);
+    transform: translateY(110vh);
     opacity: 0;
   }
 }
 
 .animate-fall-left {
-  animation: fall-left 20s linear infinite;
+  animation: fall-left 15s linear infinite;
 }
 
 @keyframes fall-right {
   0% {
-    transform: translateY(-100px) translateX(0) rotate(0deg);
+    transform: translateY(-50px);
     opacity: 0;
   }
-  10% {
-    opacity: 0.5;
+  5% {
+    opacity: 0.4;
   }
-  90% {
-    opacity: 0.5;
+  95% {
+    opacity: 0.4;
   }
   100% {
-    transform: translateY(100vh) translateX(150px) rotate(-360deg);
+    transform: translateY(110vh);
     opacity: 0;
   }
 }
 
 .animate-fall-right {
-  animation: fall-right 22s linear infinite;
+  animation: fall-right 17s linear infinite;
 }
