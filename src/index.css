@@ -38,30 +38,30 @@
 
 @keyframes fall-left {
   0% {
-    top: -50px;
+    transform: translateY(0);
     opacity: 0.3;
   }
   100% {
-    top: 110%;
+    transform: translateY(120vh);
     opacity: 0.3;
   }
 }
 
 .animate-fall-left {
-  animation: fall-left 12s linear infinite;
+  animation: fall-left 10s linear infinite;
 }
 
 @keyframes fall-right {
   0% {
-    top: -50px;
+    transform: translateY(0);
     opacity: 0.3;
   }
   100% {
-    top: 110%;
+    transform: translateY(120vh);
     opacity: 0.3;
   }
 }
 
 .animate-fall-right {
-  animation: fall-right 14s linear infinite;
+  animation: fall-right 12s linear infinite;
 }
