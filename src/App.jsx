@@ -29,6 +29,7 @@ import Support from './components/Support'
 import SupportManagement from './components/SupportManagement'
 import SubmissionsManagement from './components/SubmissionsManagement'
 import Earnings from './components/Earnings'
+import YourClips from './components/YourClips'
 import Auth from './components/Auth'
 import { useAuth } from './contexts/AuthContext'
 import { supabase } from './lib/supabase'
@@ -383,6 +384,7 @@ function App() {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'your-clips', label: 'Your Clips', icon: Video },
     { id: 'affiliates', label: 'Campaign', icon: Users },
     { id: 'verifier', label: 'Accounts', icon: ShieldCheck },
     { id: 'earnings', label: 'Earnings', icon: DollarSign },
@@ -400,6 +402,8 @@ function App() {
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard />
+      case 'your-clips':
+        return <YourClips />
       case 'affiliates':
         return <Affiliates />
       case 'verifier':
