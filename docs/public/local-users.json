@@ -1,0 +1,18 @@
+{
+  "567": {
+    "password": "hf5p5zy6lv6q6ljubj1s",
+    "username": "567",
+    "isAdmin": true,
+    "loginCount": [
+      1
+    ],
+    "adminId": 130648
+  },
+  "Tela": {
+    "password": ".4hhltj1s4c6dkdltxls",
+    "fullName": "Tela",
+    "isAdmin": true,
+    "loginCount": 1,
+    "adminId": 251550
+  }
+}
