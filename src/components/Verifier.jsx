@@ -594,15 +594,53 @@ function Verifier() {
         if (profile?.id && !profile.id.startsWith('local_')) {
           try {
             console.log('Updating database for account ID:', account.id)
-            const { data: updateData, error } = await supabase
-              .from('social_accounts')
-              .update({
-                verified: true,
-                followers: followers,
-                views: views
-              })
-              .eq('id', account.id)
-              .select()
+            
+            // First try with all fields
+            let updateData, error
+            try {
+              const result = await supabase
+                .from('social_accounts')
+                .update({
+                  verified: true,
+                  followers: followers,
+                  views: views
+                })
+                .eq('id', account.id)
+                .select()
+              updateData = result.data
+              error = result.error
+            } catch (e) {
+              error = e
+            }
+            
+            // If that fails, try without views field (in case column doesn't exist)
+            if (error) {
+              console.log('Update with views failed, trying without views...')
+              const result = await supabase
+                .from('social_accounts')
+                .update({
+                  verified: true,
+                  followers: followers
+                })
+                .eq('id', account.id)
+                .select()
+              updateData = result.data
+              error = result.error
+            }
+            
+            // If that still fails, try with only verified field
+            if (error) {
+              console.log('Update with followers failed, trying with only verified...')
+              const result = await supabase
+                .from('social_accounts')
+                .update({
+                  verified: true
+                })
+                .eq('id', account.id)
+                .select()
+              updateData = result.data
+              error = result.error
+            }
             
             if (error) {
               console.error('Database update error:', error)

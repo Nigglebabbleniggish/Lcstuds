@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS social_accounts (
   platform TEXT NOT NULL, -- 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'tiktok', 'threads'
   username TEXT,
   followers INTEGER DEFAULT 0,
+  views INTEGER DEFAULT 0,
   engagement_rate DECIMAL(5, 2) DEFAULT 0.00,
   verification_code TEXT,
   verified BOOLEAN DEFAULT FALSE,
@@ -27,6 +28,21 @@ BEGIN
         -- Add verified column if it doesn't exist
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'social_accounts' AND column_name = 'verified') THEN
             ALTER TABLE social_accounts ADD COLUMN verified BOOLEAN DEFAULT FALSE;
+        END IF;
+        
+        -- Add views column if it doesn't exist
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'social_accounts' AND column_name = 'views') THEN
+            ALTER TABLE social_accounts ADD COLUMN views INTEGER DEFAULT 0;
+        END IF;
+        
+        -- Add unique constraint if it doesn't exist
+        IF NOT EXISTS (
+            SELECT 1 FROM pg_constraint 
+            WHERE conname = 'social_accounts_user_platform_username_unique'
+        ) THEN
+            ALTER TABLE social_accounts 
+            ADD CONSTRAINT social_accounts_user_platform_username_unique 
+            UNIQUE (user_id, platform, username);
         END IF;
     END IF;
 END $$;
