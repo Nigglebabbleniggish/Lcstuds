@@ -23,7 +23,6 @@ function YourClips() {
         .from('video_submissions')
         .select('*, content_rewards(*)')
         .eq('user_id', profile.id)
-        .eq('status', 'approved')
         .order('submitted_at', { ascending: false })
 
       if (error) throw error
@@ -88,7 +87,16 @@ function YourClips() {
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-white mb-1 truncate">{clip.content_rewards?.title || 'Campaign Submission'}</h4>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-semibold text-white truncate">{clip.content_rewards?.title || 'Campaign Submission'}</h4>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                      clip.status === 'approved' ? 'bg-green-500/20 text-green-400' :
+                      clip.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
+                      'bg-yellow-500/20 text-yellow-400'
+                    }`}>
+                      {clip.status}
+                    </span>
+                  </div>
                   <p className="text-sm text-gray-400 capitalize">{clip.platform}</p>
                 </div>
                 

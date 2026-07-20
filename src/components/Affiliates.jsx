@@ -117,6 +117,27 @@ function Affiliates() {
 
   const handleVideoSubmit = async (e) => {
     e.preventDefault()
+    
+    // Check if user has a verified social account for the selected platform
+    try {
+      const { data: socialAccounts, error: socialError } = await supabase
+        .from('social_accounts')
+        .select('*')
+        .eq('user_id', profile.id)
+        .eq('platform', newVideoSubmission.platform)
+        .eq('verified', true)
+        .single()
+
+      if (socialError || !socialAccounts) {
+        alert(`You must have a verified ${newVideoSubmission.platform} account connected to submit videos for this platform. Please verify your account in the Accounts section.`)
+        return
+      }
+    } catch (error) {
+      // If no verified account found, block submission
+      alert(`You must have a verified ${newVideoSubmission.platform} account connected to submit videos for this platform. Please verify your account in the Accounts section.`)
+      return
+    }
+
     try {
       const { error } = await supabase.from('video_submissions').insert({
         user_id: profile.id,

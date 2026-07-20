@@ -146,12 +146,8 @@ function App() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    if (user) {
-                      setActiveTab('dashboard')
-                    } else {
-                      setAuthMode('login')
-                      setShowAuth(true)
-                    }
+                    // Always go to landing page, logged in state will be shown there
+                    setActiveTab('landing')
                   }}
                   className="flex items-center gap-2"
                 >
@@ -442,6 +438,8 @@ function App() {
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'landing':
+        return renderLandingPage()
       case 'dashboard':
         return <Dashboard />
       case 'affiliates':
