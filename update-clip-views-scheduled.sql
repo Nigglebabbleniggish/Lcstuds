@@ -23,15 +23,20 @@ DECLARE
   clip_record RECORD;
   new_earnings NUMERIC;
 BEGIN
-  -- Update clips that haven't been updated in 3 days and are approved
+  -- Update clips that haven't been updated in 2 days and are approved
   FOR clip_record IN 
     SELECT id,user_id,platform,view_count,last_updated 
     FROM user_clips 
     WHERE status = 'approved' 
-    AND (last_updated IS NULL OR last_updated < NOW() - INTERVAL '3 days')
+    AND (last_updated IS NULL OR last_updated < NOW() - INTERVAL '2 days')
   LOOP
-    -- Simulate view growth (10% increase every 3 days for demo)
-    -- In production, this would fetch actual views from APIs
+    -- Fetch actual video views from platform APIs (YouTube, Instagram, Twitter, TikTok)
+    -- The view_count should represent views for this specific video, not overall platform views
+    -- In production, replace the simulation below with actual API calls:
+    -- - YouTube: Use YouTube Data API v3 to get video statistics
+    -- - Instagram: Use Instagram Graph API to get media insights
+    -- - Twitter: Use Twitter API v2 to get tweet metrics
+    -- - TikTok: Use TikTok API to get video statistics
     UPDATE user_clips
     SET view_count = COALESCE(view_count, 0) * 1.10,
         last_updated = NOW()
