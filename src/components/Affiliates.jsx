@@ -261,12 +261,13 @@ function Affiliates() {
 
   const handleEditReward = async (e) => {
     e.preventDefault()
-    
+
     if (!selectedReward || !selectedReward.id) {
       alert('No campaign selected for editing')
+      console.error('selectedReward is null or missing id:', selectedReward)
       return
     }
-    
+
     try {
       const updateData = {
         title: newReward.title,
@@ -294,10 +295,12 @@ function Affiliates() {
       setNewReward({ title: '', description: '', budget: '', viewsRequired: '', coverImage: '', fontStyle: 'default', questions: [], resources: [] })
       setNewQuestion('')
       setNewResource({ title: '', content: '' })
-      fetchData()
-      
-      // Update the selected reward with new data
+
+      // Update the selected reward with new data immediately
       setSelectedReward({ ...selectedReward, ...updateData })
+
+      // Then fetch fresh data
+      await fetchData()
     } catch (error) {
       console.error('Error updating reward:', error.message)
       alert('Failed to update campaign: ' + error.message)
@@ -544,9 +547,6 @@ function Affiliates() {
                     <p className="text-gray-500 text-xs mt-1">
                       {(() => {
                         const userProfile = profiles.find(p => p.id === submission.user_id)
-                        console.log('Submission user_id:', submission.user_id)
-                        console.log('Available profiles:', profiles)
-                        console.log('Found profile:', userProfile)
                         return userProfile ? (userProfile.full_name || userProfile.username) : submission.user_id
                       })()} • Submitted: {new Date(submission.submitted_at).toLocaleDateString()}
                     </p>
