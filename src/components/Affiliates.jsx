@@ -118,6 +118,25 @@ function Affiliates() {
   const handleVideoSubmit = async (e) => {
     e.preventDefault()
     
+    // Check if user has been accepted to the campaign
+    try {
+      const { data: campaignSubmission, error: campaignError } = await supabase
+        .from('campaign_submissions')
+        .select('*')
+        .eq('user_id', profile.id)
+        .eq('campaign_id', selectedReward.id)
+        .eq('status', 'approved')
+        .single()
+
+      if (campaignError || !campaignSubmission) {
+        alert('You must be accepted to this campaign before submitting videos.')
+        return
+      }
+    } catch (error) {
+      alert('You must be accepted to this campaign before submitting videos.')
+      return
+    }
+    
     // Check if user has pending submissions
     try {
       const { data: pendingSubmissions, error: pendingError } = await supabase
@@ -1212,8 +1231,8 @@ function Affiliates() {
                     </div>
                   </div>
 
-                  {/* Campaign Templates Section */}
-                  {userSubmissions.some(sub => sub.campaign_id === selectedReward.id) && (
+                  {/* Campaign Templates Section - Only for approved users */}
+                  {userSubmissions.some(sub => sub.campaign_id === selectedReward.id && sub.status === 'approved') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-xl font-semibold text-white mb-4">Campaign Resources</h3>
                       {selectedReward.resources && selectedReward.resources.length > 0 ? (
@@ -1309,7 +1328,15 @@ function Affiliates() {
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Submit Video</h3>
                       <button
-                        onClick={() => setShowVideoSubmitModal(true)}
+                        onClick={() => {
+                          // Double-check campaign approval before opening modal
+                          const isApproved = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved')
+                          if (isApproved) {
+                            setShowVideoSubmitModal(true)
+                          } else {
+                            alert('You must be accepted to this campaign before submitting videos.')
+                          }
+                        }}
                         className="w-full px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
                       >
                         Submit New Video
