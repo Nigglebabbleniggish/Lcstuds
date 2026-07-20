@@ -125,14 +125,13 @@ function Affiliates() {
         .select('*')
         .eq('user_id', profile.id)
         .eq('status', 'pending')
-        .single()
 
-      if (!pendingError && pendingSubmissions) {
+      if (pendingSubmissions && pendingSubmissions.length > 0) {
         alert('You already have a pending submission. Please wait for it to be reviewed before submitting another video.')
         return
       }
     } catch (error) {
-      // No pending submissions found, continue
+      console.error('Error checking pending submissions:', error)
     }
     
     // Check if user has a verified social account for the selected platform
