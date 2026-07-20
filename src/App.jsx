@@ -30,6 +30,7 @@ import SupportManagement from './components/SupportManagement'
 import SubmissionsManagement from './components/SubmissionsManagement'
 import Earnings from './components/Earnings'
 import YourClips from './components/YourClips'
+import ClipsManagement from './components/ClipsManagement'
 import Auth from './components/Auth'
 import { useAuth } from './contexts/AuthContext'
 import { supabase } from './lib/supabase'
@@ -393,6 +394,7 @@ function App() {
 
   // Admin-only tabs
   const adminTabs = [
+    { id: 'admin-clips', label: 'Clips Management', icon: Video },
     { id: 'admin-security', label: 'Security Admin Layer', icon: Shield },
     { id: 'admin-support', label: 'Support Management', icon: MessageCircle },
     { id: 'admin-submissions', label: 'Submissions', icon: FileText },
@@ -412,6 +414,11 @@ function App() {
         return <Earnings />
       case 'support':
         return <Support />
+      case 'admin-clips':
+        if (profile?.is_admin) {
+          return <ClipsManagement />
+        }
+        return <Dashboard />
       case 'admin-security':
         if (profile?.is_admin) {
           return <SecurityManagement />
