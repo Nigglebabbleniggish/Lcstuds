@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CheckCircle, X, Eye, Calendar, Video, Youtube, Instagram, Twitter, Loader2 } from 'lucide-react'
+import { CheckCircle, X, Eye, Calendar, Film, Youtube, Instagram, Twitter, Loader2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -107,7 +107,7 @@ function ClipsManagement() {
       case 'twitter':
         return Twitter
       default:
-        return Video
+        return Film
     }
   }
 
@@ -138,7 +138,7 @@ function ClipsManagement() {
 
       {clips.length === 0 ? (
         <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-12 text-center text-gray-500">
-          <Video size={48} className="mx-auto mb-4 opacity-50" />
+          <Film size={48} className="mx-auto mb-4 opacity-50" />
           <p>No clips submitted yet</p>
         </div>
       ) : (
