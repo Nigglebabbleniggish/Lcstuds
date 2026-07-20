@@ -589,7 +589,7 @@ function Verifier() {
         if (profile?.id && !profile.id.startsWith('local_')) {
           try {
             console.log('Updating database for account ID:', account.id)
-            const { error } = await supabase
+            const { data: updateData, error } = await supabase
               .from('social_accounts')
               .update({
                 verified: true,
@@ -597,16 +597,19 @@ function Verifier() {
                 views: views
               })
               .eq('id', account.id)
+              .select()
             
             if (error) {
               console.error('Database update error:', error)
               throw error
             }
             
-            console.log('Database update successful, reloading accounts...')
-            // Reload accounts from database
+            console.log('Database update successful. Updated data:', updateData)
+            
+            // Force reload accounts from database
+            console.log('Reloading accounts...')
             await loadSocialAccounts()
-            console.log('Accounts reloaded')
+            console.log('Accounts reloaded successfully')
           } catch (error) {
             console.error('Error updating account in database:', error)
             // Fallback to local state update
