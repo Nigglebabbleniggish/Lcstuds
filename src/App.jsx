@@ -300,8 +300,8 @@ function App() {
         </nav>
 
         {/* Hero Section */}
-        <section className="py-32 px-4">
-          <div className="max-w-7xl mx-auto text-center">
+        <section className="py-32 px-4 relative overflow-hidden">
+          <div className="max-w-7xl mx-auto text-center relative z-10">
             <h1 className="text-5xl md:text-7xl font-bold mb-4 text-white">
               LC Studio
             </h1>
@@ -344,6 +344,24 @@ function App() {
               </div>
             )}
           </div>
+          
+          {/* Moving Text Marquee */}
+          <div className="absolute top-0 left-0 w-full overflow-hidden bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-blue-500/10 py-3">
+            <div className="flex whitespace-nowrap animate-marquee">
+              <span className="text-white/80 text-lg font-medium mx-8">#1 Clipping Service</span>
+              <span className="text-white/80 text-lg font-medium mx-8">30+ More Features</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Gen Z Focused</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Creator Management</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Campaign Tracking</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Analytics Dashboard</span>
+              <span className="text-white/80 text-lg font-medium mx-8">#1 Clipping Service</span>
+              <span className="text-white/80 text-lg font-medium mx-8">30+ More Features</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Gen Z Focused</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Creator Management</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Campaign Tracking</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Analytics Dashboard</span>
+            </div>
+          </div>
         </section>
 
         {/* Features Section */}
@@ -352,23 +370,14 @@ function App() {
             <h3 className="text-3xl font-bold text-white text-center mb-12">Everything You Need</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
-                <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-4">
-                  <DollarSign className="text-green-400" size={24} />
-                </div>
                 <h4 className="text-xl font-semibold text-white mb-2">Earn Crypto</h4>
                 <p className="text-gray-400">Get paid in USDT/USDC for completing campaigns and growing your audience.</p>
               </div>
               <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
-                <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
-                  <Target className="text-blue-400" size={24} />
-                </div>
                 <h4 className="text-xl font-semibold text-white mb-2">Campaign Management</h4>
                 <p className="text-gray-400">Apply to campaigns, track progress, and manage your content all in one dashboard.</p>
               </div>
               <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
-                <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
-                  <TrendingUp className="text-purple-400" size={24} />
-                </div>
                 <h4 className="text-xl font-semibold text-white mb-2">Analytics</h4>
                 <p className="text-gray-400">Track your earnings, views, and campaign performance with detailed analytics.</p>
               </div>
@@ -380,15 +389,15 @@ function App() {
         <section className="py-16 px-4 bg-zinc-900/50">
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center p-8">
+              <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-2xl p-8 border border-green-500/20 text-center">
                 <div className="text-5xl font-bold mb-2 text-white">$600K+</div>
                 <p className="text-xl text-gray-400">Paid to Creators</p>
               </div>
-              <div className="text-center p-8">
+              <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-2xl p-8 border border-blue-500/20 text-center">
                 <div className="text-5xl font-bold mb-2 text-white">5K+</div>
                 <p className="text-xl text-gray-400">Campaigns Completed</p>
               </div>
-              <div className="text-center p-8">
+              <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 rounded-2xl p-8 border border-purple-500/20 text-center">
                 <div className="text-5xl font-bold mb-2 text-white">1M+</div>
                 <p className="text-xl text-gray-400">Total Views</p>
               </div>
