@@ -1328,16 +1328,17 @@ function Affiliates() {
 
                   {/* Video Submission Section - Only for users who have been accepted to the campaign and no pending clips */}
                   {!profile?.is_admin && 
-                   userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
                    !userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
-                   !videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending') && (
+                   userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
+                   !videoSubmissions.some(v => (v.campaign_id === selectedReward.id || !v.campaign_id) && v.status === 'pending') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Submit Video</h3>
                       <button
                         onClick={() => {
                           // Double-check campaign approval before opening modal
                           const isApproved = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved')
-                          if (isApproved) {
+                          const isPending = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending')
+                          if (isApproved && !isPending) {
                             setShowVideoSubmitModal(true)
                           } else {
                             alert('You must be accepted to this campaign before submitting videos.')
@@ -1354,7 +1355,7 @@ function Affiliates() {
                   {!profile?.is_admin && 
                    !userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
                    userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
-                   videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending') && (
+                   videoSubmissions.some(v => (v.campaign_id === selectedReward.id || !v.campaign_id) && v.status === 'pending') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Video Submission</h3>
                       <div className="text-center py-4">
