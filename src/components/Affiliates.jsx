@@ -47,8 +47,8 @@ function Affiliates() {
         supabase.from('content_rewards').select('*').order('created_at', { ascending: false }),
         supabase.from('affiliates').select('*').order('created_at', { ascending: false }),
         profile ? supabase.from('campaign_submissions').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] }),
-        profile ? supabase.from('video_submissions').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] }),
-        profile?.is_admin ? supabase.from('video_submissions').select('*').order('submitted_at', { ascending: false }) : Promise.resolve({ data: [] }),
+        profile ? supabase.from('user_clips').select('*').eq('user_id', profile.id) : Promise.resolve({ data: [] }),
+        profile?.is_admin ? supabase.from('user_clips').select('*').order('submitted_at', { ascending: false }) : Promise.resolve({ data: [] }),
         profile?.is_admin ? supabase.from('profiles').select('id, username, full_name') : Promise.resolve({ data: [] })
       ])
       
@@ -139,11 +139,11 @@ function Affiliates() {
     }
 
     try {
-      const { error } = await supabase.from('video_submissions').insert({
+      const { error } = await supabase.from('user_clips').insert({
         user_id: profile.id,
-        campaign_id: selectedReward.id,
-        video_url: newVideoSubmission.video_url,
         platform: newVideoSubmission.platform,
+        video_url: newVideoSubmission.video_url,
+        title: selectedReward.title || 'Campaign Submission',
         status: 'pending'
       })
 
@@ -162,8 +162,12 @@ function Affiliates() {
   const handleVideoStatusChange = async (submissionId, newStatus) => {
     try {
       const { error } = await supabase
-        .from('video_submissions')
-        .update({ status: newStatus, reviewed_at: new Date().toISOString() })
+        .from('user_clips')
+        .update({ 
+          status: newStatus, 
+          approved_at: newStatus === 'approved' ? new Date().toISOString() : null,
+          last_updated: new Date().toISOString() 
+        })
         .eq('id', submissionId)
 
       if (error) throw error
@@ -179,7 +183,7 @@ function Affiliates() {
     
     try {
       const { error } = await supabase
-        .from('video_submissions')
+        .from('user_clips')
         .delete()
         .eq('id', submissionId)
 
@@ -195,10 +199,10 @@ function Affiliates() {
   const handleViewCountUpdate = async (submissionId, viewCount) => {
     try {
       const { error } = await supabase
-        .from('video_submissions')
+        .from('user_clips')
         .update({ 
           view_count: viewCount,
-          last_view_update: new Date().toISOString()
+          last_updated: new Date().toISOString()
         })
         .eq('id', submissionId)
 

@@ -108,7 +108,7 @@ function Verifier() {
   const loadVideoSubmissions = async () => {
     try {
       const { data, error } = await supabase
-        .from('video_submissions')
+        .from('user_clips')
         .select('*')
         .eq('user_id', profile.id)
         .order('submitted_at', { ascending: false })
