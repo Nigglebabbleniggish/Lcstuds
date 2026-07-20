@@ -118,6 +118,23 @@ function Affiliates() {
   const handleVideoSubmit = async (e) => {
     e.preventDefault()
     
+    // Check if user has pending submissions
+    try {
+      const { data: pendingSubmissions, error: pendingError } = await supabase
+        .from('user_clips')
+        .select('*')
+        .eq('user_id', profile.id)
+        .eq('status', 'pending')
+        .single()
+
+      if (!pendingError && pendingSubmissions) {
+        alert('You already have a pending submission. Please wait for it to be reviewed before submitting another video.')
+        return
+      }
+    } catch (error) {
+      // No pending submissions found, continue
+    }
+    
     // Check if user has a verified social account for the selected platform
     try {
       const { data: socialAccounts, error: socialError } = await supabase
