@@ -492,10 +492,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black flex">
-      {/* Sidebar */}
-      <aside
-        className="fixed left-0 top-0 h-full bg-zinc-900/90 backdrop-blur border-zinc-800 border-r z-50 transition-all duration-300 w-64"
-      >
+      {/* Sidebar - only show when not on landing page */}
+      {activeTab !== 'landing' && (
+        <aside
+          className="fixed left-0 top-0 h-full bg-zinc-900/90 backdrop-blur border-zinc-800 border-r z-50 transition-all duration-300 w-64"
+        >
         <div className="p-6">
           <button
             onClick={() => setActiveTab('landing')}
@@ -556,11 +557,13 @@ function App() {
           </nav>
         </div>
       </aside>
+      )}
 
       {/* Main Content */}
-      <main className="flex-1 ml-64">
-        {/* Header */}
-        <header className="bg-zinc-900/90 backdrop-blur border-zinc-800 border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40">
+      <main className={`flex-1 ${activeTab !== 'landing' ? 'ml-64' : ''}`}>
+        {/* Header - only show when not on landing page */}
+        {activeTab !== 'landing' && (
+          <header className="bg-zinc-900/90 backdrop-blur border-zinc-800 border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40">
           <div className="flex items-center gap-4">
             <a
               href="https://discord.gg/XNYAM5CsMk"
@@ -750,6 +753,7 @@ function App() {
             </div>
           )}
         </header>
+        )}
 
         {/* Page Content */}
         <div className="p-6">
