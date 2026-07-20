@@ -1324,7 +1324,10 @@ function Affiliates() {
                   )}
 
                   {/* Video Submission Section - Only for users who have been accepted to the campaign and no pending clips */}
-                  {!profile?.is_admin && userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && !videoSubmissions.some(v => v.status === 'pending') && (
+                  {!profile?.is_admin && 
+                   userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
+                   !userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
+                   !videoSubmissions.some(v => v.status === 'pending') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Submit Video</h3>
                       <button
@@ -1344,8 +1347,11 @@ function Affiliates() {
                     </div>
                   )}
 
-                  {/* Show pending clip status - only if user has been accepted to campaign */}
-                  {!profile?.is_admin && userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && videoSubmissions.some(v => v.status === 'pending') && (
+                  {/* Show pending clip status - only if user has been accepted to campaign and campaign is not pending */}
+                  {!profile?.is_admin && 
+                   userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
+                   !userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
+                   videoSubmissions.some(v => v.status === 'pending') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Video Submission</h3>
                       <div className="text-center py-4">
@@ -1354,6 +1360,20 @@ function Affiliates() {
                         </div>
                         <p className="text-yellow-400 font-semibold text-lg mb-2">Pending Review</p>
                         <p className="text-gray-400 text-sm">Your video submission is being reviewed</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* If user has pending campaign application, show message that they need to be accepted first */}
+                  {!profile?.is_admin && userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') && (
+                    <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
+                      <h3 className="text-lg font-semibold text-white mb-4">Campaign Status</h3>
+                      <div className="text-center py-4">
+                        <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <Clock className="text-yellow-400" size={32} />
+                        </div>
+                        <p className="text-yellow-400 font-semibold text-lg mb-2">Application Pending</p>
+                        <p className="text-gray-400 text-sm">Your campaign application is being reviewed. Video submissions will be available once you are accepted.</p>
                       </div>
                     </div>
                   )}
