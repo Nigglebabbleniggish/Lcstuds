@@ -38,7 +38,7 @@
 
 @keyframes fall-left {
   0% {
-    transform: translateY(-50px) translateX(0) rotate(0deg);
+    transform: translateY(-100px);
     opacity: 0;
   }
   10% {
@@ -48,18 +48,18 @@
     opacity: 0.5;
   }
   100% {
-    transform: translateY(100vh) translateX(-100px) rotate(360deg);
+    transform: translateY(100vh);
     opacity: 0;
   }
 }
 
 .animate-fall-left {
-  animation: fall-left 20s linear infinite;
+  animation: fall-left 15s linear infinite;
 }
 
 @keyframes fall-right {
   0% {
-    transform: translateY(-50px) translateX(0) rotate(0deg);
+    transform: translateY(-100px);
     opacity: 0;
   }
   10% {
@@ -69,11 +69,11 @@
     opacity: 0.5;
   }
   100% {
-    transform: translateY(100vh) translateX(100px) rotate(-360deg);
+    transform: translateY(100vh);
     opacity: 0;
   }
 }
 
 .animate-fall-right {
-  animation: fall-right 22s linear infinite;
+  animation: fall-right 18s linear infinite;
 }
