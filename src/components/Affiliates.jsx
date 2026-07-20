@@ -1330,7 +1330,7 @@ function Affiliates() {
                   {!profile?.is_admin && 
                    !userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
                    userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
-                   !videoSubmissions.some(v => (v.campaign_id === selectedReward.id || !v.campaign_id) && v.status === 'pending') && (
+                   !videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Submit Video</h3>
                       <button
@@ -1338,6 +1338,7 @@ function Affiliates() {
                           // Double-check campaign approval before opening modal
                           const isApproved = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved')
                           const isPending = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending')
+                          console.log('Campaign check:', { isApproved, isPending, selectedRewardId: selectedReward.id, userSubmissions })
                           if (isApproved && !isPending) {
                             setShowVideoSubmitModal(true)
                           } else {
@@ -1355,7 +1356,7 @@ function Affiliates() {
                   {!profile?.is_admin && 
                    !userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
                    userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
-                   videoSubmissions.some(v => (v.campaign_id === selectedReward.id || !v.campaign_id) && v.status === 'pending') && (
+                   videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Video Submission</h3>
                       <div className="text-center py-4">
