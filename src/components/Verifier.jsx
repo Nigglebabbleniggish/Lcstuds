@@ -577,6 +577,14 @@ function Verifier() {
       
       const codeFound = bio.includes(account.verificationCode)
 
+      console.log('Verification check:', {
+        verificationCode: account.verificationCode,
+        bio: bio,
+        codeFound: codeFound,
+        followers: followers,
+        views: views
+      })
+
       if (codeFound) {
         // Update account with verification status and stats
         const updatedAccount = { 
@@ -585,6 +593,8 @@ function Verifier() {
           followers: followers,
           views: views
         }
+        
+        console.log('Updating account with:', updatedAccount)
         
         // Update in database for authenticated users
         if (profile?.id && !profile.id.startsWith('local_')) {
@@ -598,8 +608,12 @@ function Verifier() {
               })
               .eq('id', account.id)
             
-            if (error) throw error
+            if (error) {
+              console.error('Database update error:', error)
+              throw error
+            }
             
+            console.log('Database update successful, reloading accounts...')
             // Reload accounts from database
             await loadSocialAccounts()
           } catch (error) {
@@ -618,6 +632,7 @@ function Verifier() {
         
         alert('Account verified successfully!')
       } else {
+        console.log('Verification code not found')
         alert(`Verification code not found in profile. Please make sure you've posted "${account.verificationCode}" in your bio.`)
       }
   }
