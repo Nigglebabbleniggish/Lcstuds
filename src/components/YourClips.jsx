@@ -20,11 +20,11 @@ function YourClips() {
     if (!profile?.id) return
     try {
       const { data, error } = await supabase
-        .from('user_clips')
-        .select('*')
+        .from('video_submissions')
+        .select('*, content_rewards(*)')
         .eq('user_id', profile.id)
         .eq('status', 'approved')
-        .order('approved_at', { ascending: false })
+        .order('submitted_at', { ascending: false })
 
       if (error) throw error
       setApprovedClips(data || [])
@@ -88,7 +88,7 @@ function YourClips() {
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-white mb-1 truncate">{clip.title}</h4>
+                  <h4 className="font-semibold text-white mb-1 truncate">{clip.content_rewards?.title || 'Campaign Submission'}</h4>
                   <p className="text-sm text-gray-400 capitalize">{clip.platform}</p>
                 </div>
                 
@@ -100,7 +100,7 @@ function YourClips() {
                   <div className="flex items-center gap-2">
                     <Calendar size={16} className="text-gray-400" />
                     <span className="text-white">
-                      {clip.approved_at ? new Date(clip.approved_at).toLocaleDateString() : 'N/A'}
+                      {clip.submitted_at ? new Date(clip.submitted_at).toLocaleDateString() : 'N/A'}
                     </span>
                   </div>
                   <a
