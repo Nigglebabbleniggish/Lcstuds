@@ -585,6 +585,11 @@ function Verifier() {
         
         console.log('Updating account with:', updatedAccount)
         
+        // Update local state immediately for UI responsiveness
+        setAccounts(accounts.map(acc => 
+          acc.id === account.id ? updatedAccount : acc
+        ))
+        
         // Update in database for authenticated users
         if (profile?.id && !profile.id.startsWith('local_')) {
           try {
@@ -606,22 +611,14 @@ function Verifier() {
             
             console.log('Database update successful. Updated data:', updateData)
             
-            // Force reload accounts from database
-            console.log('Reloading accounts...')
+            // Force reload accounts from database to ensure sync
+            console.log('Reloading accounts from database...')
             await loadSocialAccounts()
             console.log('Accounts reloaded successfully')
           } catch (error) {
             console.error('Error updating account in database:', error)
-            // Fallback to local state update
-            setAccounts(accounts.map(acc => 
-              acc.id === account.id ? updatedAccount : acc
-            ))
+            // Local state is already updated, so UI should still show verified
           }
-        } else {
-          // For local users, update state only
-          setAccounts(accounts.map(acc => 
-            acc.id === account.id ? updatedAccount : acc
-          ))
         }
         
         alert('Account verified successfully!')
