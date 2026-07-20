@@ -158,11 +158,6 @@ function Dashboard() {
       <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-3xl border border-zinc-700 p-8 mb-8 animate-fade-in">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           <div className="text-center">
-            <p className="text-gray-400 text-sm mb-2">Total Earnings</p>
-            <p className="text-3xl font-bold text-white">${stats.totalEarnings.toFixed(2)}</p>
-          </div>
-
-          <div className="text-center">
             <p className="text-gray-400 text-sm mb-2">Active Campaigns</p>
             <p className="text-3xl font-bold text-white">{stats.activeCampaigns}</p>
           </div>
@@ -170,6 +165,11 @@ function Dashboard() {
           <div className="text-center">
             <p className="text-gray-400 text-sm mb-2">Total Views</p>
             <p className="text-3xl font-bold text-white">{stats.totalViews.toLocaleString()}</p>
+          </div>
+
+          <div className="text-center">
+            <p className="text-gray-400 text-sm mb-2">Total Followers</p>
+            <p className="text-3xl font-bold text-white">{stats.totalFollowers.toLocaleString()}</p>
           </div>
         </div>
       </div>

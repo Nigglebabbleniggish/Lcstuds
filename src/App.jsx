@@ -314,29 +314,40 @@ function App() {
               Creator Management Platform
             </h2>
             <p className="text-xl mb-12 max-w-2xl mx-auto text-gray-500">
-              Manage campaigns, track earnings, and grow your creator business all in one place.
+              Manage campaigns, track performance, and grow your creator business all in one place.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => {
-                  setAuthMode('signup')
-                  setShowAuth(true)
-                }}
-                className="px-8 py-4 bg-white text-black rounded-xl font-semibold text-lg hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
-              >
-                Get Started
-                <ArrowRight size={20} />
-              </button>
-              <button
-                onClick={() => {
-                  setAuthMode('login')
-                  setShowAuth(true)
-                }}
-                className="px-8 py-4 bg-zinc-900 text-white rounded-xl font-semibold text-lg border border-zinc-800 hover:bg-zinc-800 transition-all"
-              >
-                Sign In
-              </button>
-            </div>
+            {!user ? (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => {
+                    setAuthMode('signup')
+                    setShowAuth(true)
+                  }}
+                  className="px-8 py-4 bg-white text-black rounded-xl font-semibold text-lg hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+                >
+                  Get Started
+                  <ArrowRight size={20} />
+                </button>
+                <button
+                  onClick={() => {
+                    setAuthMode('login')
+                    setShowAuth(true)
+                  }}
+                  className="px-8 py-4 bg-zinc-900 text-white rounded-xl font-semibold text-lg border border-zinc-800 hover:bg-zinc-800 transition-all"
+                >
+                  Sign In
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => setActiveTab('dashboard')}
+                  className="px-8 py-4 bg-white text-black rounded-xl font-semibold text-lg hover:bg-gray-200 transition-all"
+                >
+                  Go to Dashboard
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
