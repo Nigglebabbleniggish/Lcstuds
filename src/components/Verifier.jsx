@@ -92,6 +92,7 @@ function Verifier() {
         followers: dbAccount.followers || 0
       }))
       
+      console.log('Mapped accounts:', mappedAccounts)
       setAccounts(mappedAccounts)
     } catch (error) {
       console.error('Error loading social accounts:', error)
