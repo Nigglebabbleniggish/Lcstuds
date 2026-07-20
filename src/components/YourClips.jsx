@@ -20,8 +20,8 @@ function YourClips() {
     if (!profile?.id) return
     try {
       const { data, error } = await supabase
-        .from('video_submissions')
-        .select('*, content_rewards(*)')
+        .from('user_clips')
+        .select('*')
         .eq('user_id', profile.id)
         .order('submitted_at', { ascending: false })
 
@@ -88,7 +88,7 @@ function YourClips() {
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-white truncate">{clip.content_rewards?.title || 'Campaign Submission'}</h4>
+                    <h4 className="font-semibold text-white truncate">{clip.title || 'Campaign Submission'}</h4>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
                       clip.status === 'approved' ? 'bg-green-500/20 text-green-400' :
                       clip.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
