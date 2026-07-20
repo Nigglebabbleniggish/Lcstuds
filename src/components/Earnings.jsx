@@ -54,10 +54,16 @@ function Earnings() {
         .eq('user_id', profile.id)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        // If table doesn't exist, just set empty array
+        console.log('Pending earnings table not found, skipping')
+        setPendingEarnings([])
+        return
+      }
       setPendingEarnings(data || [])
     } catch (error) {
       console.error('Error fetching pending earnings:', error.message)
+      setPendingEarnings([])
     }
   }
 
