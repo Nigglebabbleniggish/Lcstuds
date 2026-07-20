@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Youtube, Instagram, Twitter, Film, Calendar, Eye, CheckCircle, Clock, X } from 'lucide-react'
+import { Youtube, Instagram, Twitter, Film, Calendar, Eye, CheckCircle, Clock, X, DollarSign } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -108,6 +108,11 @@ function YourClips() {
     }
   }
 
+  const calculateEarnings = (clip) => {
+    if (clip.platform !== 'youtube' || !clip.view_count) return 0
+    return (clip.view_count / 1000) * 0.35
+  }
+
   const getPlatformIcon = (platform) => {
     switch (platform.toLowerCase()) {
       case 'youtube':
@@ -189,6 +194,12 @@ function YourClips() {
                     <Eye size={16} className="text-gray-400" />
                     <span className="text-white font-medium">{clip.view_count?.toLocaleString() || 0}</span>
                   </div>
+                  {clip.platform === 'youtube' && clip.view_count > 0 && (
+                    <div className="flex items-center gap-2">
+                      <DollarSign size={16} className="text-gray-400" />
+                      <span className="text-white font-medium">${calculateEarnings(clip).toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
                     <Calendar size={16} className="text-gray-400" />
                     <span className="text-white">

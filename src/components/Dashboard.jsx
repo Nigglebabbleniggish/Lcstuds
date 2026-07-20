@@ -56,12 +56,14 @@ function Dashboard() {
 
       const totalViews = clipsData.data?.reduce((sum, clip) => sum + (clip.view_count || 0), 0) || 0
       const totalClips = clipsData.data?.length || 0
+      const youtubeViews = clipsData.data?.filter(c => c.platform === 'youtube').reduce((sum, clip) => sum + (clip.view_count || 0), 0) || 0
+      const youtubeEarnings = (youtubeViews / 1000) * 0.35
       const avgEngagement = socialData.data?.length > 0 
         ? socialData.data.reduce((sum, s) => sum + (s.engagement_rate || 0), 0) / socialData.data.length 
         : 0
 
       setStats({
-        totalEarnings: earningsData.data?.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0) || 0,
+        totalEarnings: (earningsData.data?.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0) || 0) + youtubeEarnings,
         activeCampaigns: campaignsData.data?.length || 0,
         totalViews,
         totalFollowers: totalClips,
