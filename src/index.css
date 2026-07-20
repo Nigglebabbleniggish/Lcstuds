@@ -54,7 +54,7 @@
 }
 
 .animate-fall-left {
-  animation: fall-left 8s linear infinite;
+  animation: fall-left 20s linear infinite;
 }
 
 @keyframes fall-right {
@@ -75,5 +75,5 @@
 }
 
 .animate-fall-right {
-  animation: fall-right 10s linear infinite;
+  animation: fall-right 22s linear infinite;
 }
