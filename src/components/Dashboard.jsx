@@ -3,6 +3,7 @@ import { TrendingUp, DollarSign, Activity, Calendar, BarChart3, Eye, Target, Use
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import ViewTracker from './ViewTracker'
+import YourClips from './YourClips'
 
 function Dashboard() {
   const { profile } = useAuth()
@@ -211,6 +212,9 @@ function Dashboard() {
 
       {/* View Tracker - Admin Only */}
       {profile?.is_admin && <ViewTracker />}
+
+      {/* Your Clips Section */}
+      <YourClips />
     </div>
   )
 }
