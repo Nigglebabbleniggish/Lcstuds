@@ -42,10 +42,10 @@
     opacity: 0;
   }
   10% {
-    opacity: 0.1;
+    opacity: 0.3;
   }
   90% {
-    opacity: 0.1;
+    opacity: 0.3;
   }
   100% {
     transform: translateY(100vh) rotate(360deg);
@@ -54,7 +54,7 @@
 }
 
 .animate-fall-left {
-  animation: fall-left 15s linear infinite;
+  animation: fall-left 25s linear infinite;
 }
 
 @keyframes fall-right {
@@ -63,10 +63,10 @@
     opacity: 0;
   }
   10% {
-    opacity: 0.1;
+    opacity: 0.3;
   }
   90% {
-    opacity: 0.1;
+    opacity: 0.3;
   }
   100% {
     transform: translateY(100vh) rotate(-360deg);
@@ -75,5 +75,5 @@
 }
 
 .animate-fall-right {
-  animation: fall-right 18s linear infinite;
+  animation: fall-right 30s linear infinite;
 }
