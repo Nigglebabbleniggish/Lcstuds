@@ -303,34 +303,54 @@ function App() {
         <section className="py-32 px-4 relative overflow-hidden">
           {/* Falling Social Media Icons */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-10 left-10 text-4xl text-white/30 animate-fall-left" style={{ animationDelay: '0s' }}>
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16">
+            <div className="absolute top-10 left-10 text-4xl text-white/40 animate-fall-left" style={{ animationDelay: '0s' }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
               </svg>
             </div>
-            <div className="absolute top-20 right-20 text-4xl text-white/30 animate-fall-right" style={{ animationDelay: '2s' }}>
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16">
+            <div className="absolute top-20 right-20 text-4xl text-white/40 animate-fall-right" style={{ animationDelay: '3s' }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
               </svg>
             </div>
-            <div className="absolute top-32 left-1/4 text-4xl text-white/30 animate-fall-left" style={{ animationDelay: '4s' }}>
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16">
+            <div className="absolute top-32 left-1/4 text-4xl text-white/40 animate-fall-left" style={{ animationDelay: '6s' }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </div>
-            <div className="absolute top-40 right-1/3 text-4xl text-white/30 animate-fall-right" style={{ animationDelay: '6s' }}>
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16">
+            <div className="absolute top-40 right-1/3 text-4xl text-white/40 animate-fall-right" style={{ animationDelay: '9s' }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
               </svg>
             </div>
-            <div className="absolute top-16 left-1/2 text-4xl text-white/30 animate-fall-left" style={{ animationDelay: '8s' }}>
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16">
+            <div className="absolute top-16 left-1/2 text-4xl text-white/40 animate-fall-left" style={{ animationDelay: '12s' }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
               </svg>
             </div>
-            <div className="absolute top-48 right-10 text-4xl text-white/30 animate-fall-right" style={{ animationDelay: '10s' }}>
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16">
+            <div className="absolute top-48 right-10 text-4xl text-white/40 animate-fall-right" style={{ animationDelay: '15s' }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </div>
+            <div className="absolute top-24 left-1/3 text-4xl text-white/40 animate-fall-left" style={{ animationDelay: '18s' }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </div>
+            <div className="absolute top-36 right-1/4 text-4xl text-white/40 animate-fall-right" style={{ animationDelay: '21s' }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </div>
+            <div className="absolute top-28 left-3/4 text-4xl text-white/40 animate-fall-left" style={{ animationDelay: '24s' }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </div>
+            <div className="absolute top-44 right-1/2 text-4xl text-white/40 animate-fall-right" style={{ animationDelay: '27s' }}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
               </svg>
             </div>
           </div>
@@ -383,17 +403,17 @@ function App() {
           <div className="absolute top-0 left-0 w-full overflow-hidden bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-blue-500/10 py-3">
             <div className="flex whitespace-nowrap animate-marquee">
               <span className="text-white/80 text-lg font-medium mx-8">#1 Clipping Service</span>
-              <span className="text-white/80 text-lg font-medium mx-8">30+ More Features</span>
-              <span className="text-white/80 text-lg font-medium mx-8">Gen Z Focused</span>
               <span className="text-white/80 text-lg font-medium mx-8">Creator Management</span>
               <span className="text-white/80 text-lg font-medium mx-8">Campaign Tracking</span>
               <span className="text-white/80 text-lg font-medium mx-8">Analytics Dashboard</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Social Media Integration</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Video Performance</span>
               <span className="text-white/80 text-lg font-medium mx-8">#1 Clipping Service</span>
-              <span className="text-white/80 text-lg font-medium mx-8">30+ More Features</span>
-              <span className="text-white/80 text-lg font-medium mx-8">Gen Z Focused</span>
               <span className="text-white/80 text-lg font-medium mx-8">Creator Management</span>
               <span className="text-white/80 text-lg font-medium mx-8">Campaign Tracking</span>
               <span className="text-white/80 text-lg font-medium mx-8">Analytics Dashboard</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Social Media Integration</span>
+              <span className="text-white/80 text-lg font-medium mx-8">Video Performance</span>
             </div>
           </div>
         </section>
@@ -423,14 +443,16 @@ function App() {
           <div className="max-w-7xl mx-auto">
             <h3 className="text-3xl font-bold text-white text-center mb-12">Everything You Need</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700">
-                <div className="h-32 bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center">
-                  <svg viewBox="0 0 64 64" fill="none" className="w-20 h-20">
-                    <rect x="8" y="16" width="48" height="32" rx="4" fill="#4a4a4a"/>
-                    <rect x="12" y="20" width="40" height="24" rx="2" fill="#3a3a3a"/>
-                    <circle cx="20" cy="32" r="6" fill="#5a5a5a"/>
-                    <path d="M32 28 L40 32 L32 36 L32 28" fill="#6a6a6a"/>
-                    <rect x="44" y="28" width="8" height="8" rx="2" fill="#5a5a5a"/>
+              <div className="bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700 hover:border-zinc-600 transition-all hover:transform hover:-translate-y-1 group">
+                <div className="h-40 bg-gradient-to-br from-zinc-700 via-zinc-800 to-zinc-900 flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                  <svg viewBox="0 0 64 64" fill="none" className="w-24 h-24 relative z-10 group-hover:scale-110 transition-transform">
+                    <rect x="8" y="16" width="48" height="32" rx="4" fill="#5a5a5a"/>
+                    <rect x="12" y="20" width="40" height="24" rx="2" fill="#4a4a4a"/>
+                    <circle cx="20" cy="32" r="6" fill="#6a6a6a"/>
+                    <path d="M32 28 L40 32 L32 36 L32 28" fill="#7a7a7a"/>
+                    <rect x="44" y="28" width="8" height="8" rx="2" fill="#6a6a6a"/>
+                    <circle cx="32" cy="32" r="12" stroke="#8a8a8a" stroke-width="2" fill="none" opacity="0.5"/>
                   </svg>
                 </div>
                 <div className="p-6">
@@ -438,15 +460,17 @@ function App() {
                   <p className="text-gray-400">Get paid in USDT/USDC for completing campaigns and growing your audience.</p>
                 </div>
               </div>
-              <div className="bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700">
-                <div className="h-32 bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center">
-                  <svg viewBox="0 0 64 64" fill="none" className="w-20 h-20">
-                    <rect x="8" y="8" width="48" height="48" rx="4" fill="#4a4a4a"/>
-                    <rect x="12" y="12" width="40" height="40" rx="2" fill="#3a3a3a"/>
-                    <rect x="16" y="20" width="32" height="4" rx="2" fill="#5a5a5a"/>
-                    <rect x="16" y="28" width="24" height="4" rx="2" fill="#5a5a5a"/>
-                    <rect x="16" y="36" width="28" height="4" rx="2" fill="#5a5a5a"/>
-                    <circle cx="48" cy="44" r="6" fill="#6a6a6a"/>
+              <div className="bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700 hover:border-zinc-600 transition-all hover:transform hover:-translate-y-1 group">
+                <div className="h-40 bg-gradient-to-br from-zinc-700 via-zinc-800 to-zinc-900 flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                  <svg viewBox="0 0 64 64" fill="none" className="w-24 h-24 relative z-10 group-hover:scale-110 transition-transform">
+                    <rect x="8" y="8" width="48" height="48" rx="4" fill="#5a5a5a"/>
+                    <rect x="12" y="12" width="40" height="40" rx="2" fill="#4a4a4a"/>
+                    <rect x="16" y="20" width="32" height="4" rx="2" fill="#6a6a6a"/>
+                    <rect x="16" y="28" width="24" height="4" rx="2" fill="#6a6a6a"/>
+                    <rect x="16" y="36" width="28" height="4" rx="2" fill="#6a6a6a"/>
+                    <circle cx="48" cy="44" r="6" fill="#7a7a7a"/>
+                    <path d="M20 20 L32 28 L44 20" stroke="#8a8a8a" stroke-width="2" fill="none" opacity="0.5"/>
                   </svg>
                 </div>
                 <div className="p-6">
@@ -454,17 +478,20 @@ function App() {
                   <p className="text-gray-400">Apply to campaigns, track progress, and manage your content all in one dashboard.</p>
                 </div>
               </div>
-              <div className="bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700">
-                <div className="h-32 bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center">
-                  <svg viewBox="0 0 64 64" fill="none" className="w-20 h-20">
-                    <rect x="8" y="16" width="48" height="40" rx="4" fill="#4a4a4a"/>
-                    <rect x="12" y="20" width="40" height="32" rx="2" fill="#3a3a3a"/>
-                    <path d="M12 44 L20 36 L28 40 L36 28 L44 32 L52 24" stroke="#6a6a6a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="52" cy="24" r="4" fill="#5a5a5a"/>
-                    <circle cx="44" cy="32" r="4" fill="#5a5a5a"/>
-                    <circle cx="36" cy="28" r="4" fill="#5a5a5a"/>
-                    <circle cx="28" cy="40" r="4" fill="#5a5a5a"/>
-                    <circle cx="20" cy="36" r="4" fill="#5a5a5a"/>
+              <div className="bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700 hover:border-zinc-600 transition-all hover:transform hover:-translate-y-1 group">
+                <div className="h-40 bg-gradient-to-br from-zinc-700 via-zinc-800 to-zinc-900 flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                  <svg viewBox="0 0 64 64" fill="none" className="w-24 h-24 relative z-10 group-hover:scale-110 transition-transform">
+                    <rect x="8" y="16" width="48" height="40" rx="4" fill="#5a5a5a"/>
+                    <rect x="12" y="20" width="40" height="32" rx="2" fill="#4a4a4a"/>
+                    <path d="M12 44 L20 36 L28 40 L36 28 L44 32 L52 24" stroke="#7a7a7a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="52" cy="24" r="4" fill="#6a6a6a"/>
+                    <circle cx="44" cy="32" r="4" fill="#6a6a6a"/>
+                    <circle cx="36" cy="28" r="4" fill="#6a6a6a"/>
+                    <circle cx="28" cy="40" r="4" fill="#6a6a6a"/>
+                    <circle cx="20" cy="36" r="4" fill="#6a6a6a"/>
+                    <path d="M12 52 L52 52" stroke="#8a8a8a" stroke-width="1" opacity="0.5"/>
+                    <path d="M12 48 L52 48" stroke="#8a8a8a" stroke-width="1" opacity="0.3"/>
                   </svg>
                 </div>
                 <div className="p-6">
