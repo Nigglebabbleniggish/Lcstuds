@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Youtube, Instagram, Twitter, Video, Calendar, Eye, CheckCircle, Clock, X } from 'lucide-react'
+import { Youtube, Instagram, Twitter, Film, Calendar, Eye, CheckCircle, Clock, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -62,7 +62,7 @@ function YourClips() {
       case 'twitter':
         return Twitter
       default:
-        return Video
+        return Film
     }
   }
 
@@ -92,7 +92,7 @@ function YourClips() {
         <h3 className="text-xl font-semibold text-white mb-4">Campaign Submissions</h3>
         {campaignClips.length === 0 ? (
           <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-12 text-center text-gray-500">
-            <Video size={48} className="mx-auto mb-4 opacity-50" />
+            <Film size={48} className="mx-auto mb-4 opacity-50" />
             <p className="text-lg mb-2">No campaign submissions yet</p>
             <p className="text-sm">Submit videos to campaigns to see them here</p>
           </div>
