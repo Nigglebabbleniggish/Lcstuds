@@ -642,6 +642,27 @@ function Affiliates() {
                 {profile?.is_admin && (
                   <div className="flex gap-2">
                     <button
+                      onClick={(e) => { 
+                        e.stopPropagation()
+                        setSelectedReward(reward)
+                        setNewReward({
+                          title: reward.title,
+                          description: reward.description,
+                          budget: reward.budget,
+                          viewsRequired: reward.views_required,
+                          coverImage: reward.cover_image,
+                          fontStyle: reward.font_style || 'default',
+                          questions: reward.questions || [],
+                          resources: reward.resources || []
+                        })
+                        setShowEditModal(true)
+                      }}
+                      className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors"
+                      title="Edit"
+                    >
+                      <Plus size={18} />
+                    </button>
+                    <button
                       onClick={() => handleDeleteReward(reward.id)}
                       className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
                       title="Remove"
