@@ -1327,10 +1327,14 @@ function Affiliates() {
                   )}
 
                   {/* Video Submission Section - Only for users who have been accepted to the campaign and no pending clips */}
-                  {!profile?.is_admin && 
-                   !userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
-                   userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
-                   !videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending') && (
+                  {!profile?.is_admin && (() => {
+                    const hasPendingCampaign = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending')
+                    const hasApprovedCampaign = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved')
+                    const hasPendingClip = videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending')
+                    const shouldShow = !hasPendingCampaign && hasApprovedCampaign && !hasPendingClip
+                    console.log('Video submission check:', { hasPendingCampaign, hasApprovedCampaign, hasPendingClip, shouldShow, selectedRewardId: selectedReward.id, userSubmissions, videoSubmissions })
+                    return shouldShow
+                  })() && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Submit Video</h3>
                       <button
