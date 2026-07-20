@@ -556,18 +556,13 @@ function Verifier() {
         if (data.followers) followers = parseInt(data.followers) || 0
       }
       
-      console.log('Bio fields checked:', {
-        directBio: !!data.bio,
-        directDescription: !!data.description,
-        dataBio: !!data.data?.bio,
-        dataDescription: !!data.data?.description,
-        profileBio: !!data.profile?.bio,
-        dataProfileBio: !!data.data?.profile?.bio,
-        dataBiography: !!data.data?.biography,
-        biography: !!data.biography,
-        finalBio: bio,
-        followers,
-        views
+      console.log('Verification check:', {
+        verificationCode: account.verificationCode,
+        bio: bio,
+        bioLength: bio.length,
+        codeFound: bio.includes(account.verificationCode),
+        followers: followers,
+        views: views
       })
       
       if (!bio) {
@@ -577,15 +572,8 @@ function Verifier() {
       
       const codeFound = bio.includes(account.verificationCode)
 
-      console.log('Verification check:', {
-        verificationCode: account.verificationCode,
-        bio: bio,
-        codeFound: codeFound,
-        followers: followers,
-        views: views
-      })
-
       if (codeFound) {
+        console.log('Verification code found! Updating account...')
         // Update account with verification status and stats
         const updatedAccount = { 
           ...account, 
@@ -599,6 +587,7 @@ function Verifier() {
         // Update in database for authenticated users
         if (profile?.id && !profile.id.startsWith('local_')) {
           try {
+            console.log('Updating database for account ID:', account.id)
             const { error } = await supabase
               .from('social_accounts')
               .update({
@@ -616,6 +605,7 @@ function Verifier() {
             console.log('Database update successful, reloading accounts...')
             // Reload accounts from database
             await loadSocialAccounts()
+            console.log('Accounts reloaded')
           } catch (error) {
             console.error('Error updating account in database:', error)
             // Fallback to local state update
@@ -632,7 +622,7 @@ function Verifier() {
         
         alert('Account verified successfully!')
       } else {
-        console.log('Verification code not found')
+        console.log('Verification code not found in bio')
         alert(`Verification code not found in profile. Please make sure you've posted "${account.verificationCode}" in your bio.`)
       }
   }
