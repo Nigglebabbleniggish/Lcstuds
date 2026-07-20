@@ -111,14 +111,16 @@ function YourClips() {
                       {clip.submitted_at ? new Date(clip.submitted_at).toLocaleDateString() : 'N/A'}
                     </span>
                   </div>
-                  <a
-                    href={clip.video_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-400 hover:underline"
-                  >
-                    View
-                  </a>
+                  {clip.video_url && (
+                    <a
+                      href={clip.video_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-400 hover:underline flex items-center gap-1"
+                    >
+                      View
+                    </a>
+                  )}
                 </div>
               </div>
             )

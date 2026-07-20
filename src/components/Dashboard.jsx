@@ -55,7 +55,7 @@ function Dashboard() {
       ])
 
       const totalViews = clipsData.data?.reduce((sum, clip) => sum + (clip.view_count || 0), 0) || 0
-      const totalFollowers = socialData.data?.reduce((sum, s) => sum + (s.followers || 0), 0) || 0
+      const totalClips = clipsData.data?.length || 0
       const avgEngagement = socialData.data?.length > 0 
         ? socialData.data.reduce((sum, s) => sum + (s.engagement_rate || 0), 0) / socialData.data.length 
         : 0
@@ -64,7 +64,7 @@ function Dashboard() {
         totalEarnings: earningsData.data?.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0) || 0,
         activeCampaigns: campaignsData.data?.length || 0,
         totalViews,
-        totalFollowers,
+        totalFollowers: totalClips,
         engagementRate: avgEngagement,
         socialAccounts: socialData.data?.length || 0
       })
@@ -169,7 +169,7 @@ function Dashboard() {
           </div>
 
           <div className="text-center">
-            <p className="text-gray-400 text-sm mb-2">Total Followers</p>
+            <p className="text-gray-400 text-sm mb-2">Total Clips</p>
             <p className="text-3xl font-bold text-white">{stats.totalFollowers.toLocaleString()}</p>
           </div>
         </div>
