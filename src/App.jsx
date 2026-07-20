@@ -438,7 +438,8 @@ function App() {
           <button
             onClick={async () => {
               await signOut()
-              window.location.href = '/'
+              window.location.hash = ''
+              window.location.reload()
             }}
             className="text-2xl font-bold mb-8 text-white hover:text-gray-300 transition-colors"
           >
