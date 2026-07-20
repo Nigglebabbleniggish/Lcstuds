@@ -131,12 +131,7 @@ function App() {
     )
   }
 
-  // Show landing page if not logged in
-  if (!user) {
-    if (showAuth) {
-      return <Auth onBack={() => setShowAuth(false)} initialMode={authMode} />
-    }
-
+  const renderLandingPage = () => {
     return (
       <div className="min-h-screen bg-black">
         {/* Navigation */}
@@ -429,6 +424,15 @@ function App() {
         </footer>
       </div>
     )
+  }
+
+  // Show landing page if not logged in
+  if (!user) {
+    if (showAuth) {
+      return <Auth onBack={() => setShowAuth(false)} initialMode={authMode} />
+    }
+
+    return renderLandingPage()
   }
 
   const tabs = [
