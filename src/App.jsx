@@ -18,7 +18,8 @@ import {
   Briefcase,
   FileText,
   Target,
-  Bell
+  Bell,
+  Film
 } from 'lucide-react'
 import Affiliates from './components/Affiliates'
 import Verifier from './components/Verifier'
@@ -385,7 +386,7 @@ function App() {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'your-clips', label: 'Your Clips', icon: Video },
+    { id: 'your-clips', label: 'Your Clips', icon: Film },
     { id: 'affiliates', label: 'Campaign', icon: Users },
     { id: 'verifier', label: 'Accounts', icon: ShieldCheck },
     { id: 'earnings', label: 'Earnings', icon: DollarSign },
@@ -394,7 +395,7 @@ function App() {
 
   // Admin-only tabs
   const adminTabs = [
-    { id: 'admin-clips', label: 'Clips Management', icon: Video },
+    { id: 'admin-clips', label: 'Clips Management', icon: Film },
     { id: 'admin-security', label: 'Security Admin Layer', icon: Shield },
     { id: 'admin-support', label: 'Support Management', icon: MessageCircle },
     { id: 'admin-submissions', label: 'Submissions', icon: FileText },
