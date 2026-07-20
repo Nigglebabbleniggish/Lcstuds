@@ -98,6 +98,16 @@ function YourClips() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-400 capitalize">{clip.platform}</p>
+                  {clip.video_url && (
+                    <a
+                      href={clip.video_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-400 hover:underline truncate block mt-1"
+                    >
+                      {clip.video_url}
+                    </a>
+                  )}
                 </div>
                 
                 <div className="flex items-center gap-6 text-sm flex-shrink-0">
