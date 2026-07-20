@@ -473,11 +473,7 @@ function App() {
       >
         <div className="p-6">
           <button
-            onClick={() => {
-              setActiveTab('dashboard')
-              // Navigate to main landing page by clearing user session temporarily
-              // or by showing the landing page with logged in state
-            }}
+            onClick={() => setActiveTab('dashboard')}
             className="text-2xl font-bold mb-8 text-white hover:text-gray-300 transition-colors"
           >
             LC Studio
