@@ -38,64 +38,42 @@
 
 @keyframes fall-left {
   0% {
-    transform: translateY(-100px) rotate(0deg);
+    transform: translateY(-50px) translateX(0) rotate(0deg);
     opacity: 0;
   }
-  5% {
-    opacity: 0.4;
-    transform: translateY(0px) rotate(90deg);
+  10% {
+    opacity: 0.5;
   }
-  25% {
-    transform: translateY(25vh) rotate(180deg);
-  }
-  50% {
-    transform: translateY(50vh) rotate(360deg);
-  }
-  75% {
-    transform: translateY(75vh) rotate(540deg);
-  }
-  95% {
-    opacity: 0.4;
-    transform: translateY(95vh) rotate(720deg);
+  90% {
+    opacity: 0.5;
   }
   100% {
-    transform: translateY(100vh) rotate(720deg);
+    transform: translateY(100vh) translateX(-100px) rotate(360deg);
     opacity: 0;
   }
 }
 
 .animate-fall-left {
-  animation: fall-left 25s linear infinite;
+  animation: fall-left 20s linear infinite;
 }
 
 @keyframes fall-right {
   0% {
-    transform: translateY(-100px) rotate(0deg);
+    transform: translateY(-50px) translateX(0) rotate(0deg);
     opacity: 0;
   }
-  5% {
-    opacity: 0.4;
-    transform: translateY(0px) rotate(-90deg);
+  10% {
+    opacity: 0.5;
   }
-  25% {
-    transform: translateY(25vh) rotate(-180deg);
-  }
-  50% {
-    transform: translateY(50vh) rotate(-360deg);
-  }
-  75% {
-    transform: translateY(75vh) rotate(-540deg);
-  }
-  95% {
-    opacity: 0.4;
-    transform: translateY(95vh) rotate(-720deg);
+  90% {
+    opacity: 0.5;
   }
   100% {
-    transform: translateY(100vh) rotate(-720deg);
+    transform: translateY(100vh) translateX(100px) rotate(-360deg);
     opacity: 0;
   }
 }
 
 .animate-fall-right {
-  animation: fall-right 30s linear infinite;
+  animation: fall-right 22s linear infinite;
 }
