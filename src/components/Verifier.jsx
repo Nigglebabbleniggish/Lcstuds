@@ -456,17 +456,46 @@ function Verifier() {
     }
   }
 
-  const processVerificationData = (data, account, apiKey) => {
+  const processVerificationData = async (data, account, apiKey) => {
       
       // Check if verification code exists in bio or description
       // TikTok uses data.profile.bio structure, Instagram may differ
       // YouTube Data API uses data.items[0].snippet.description
       let bio = ''
+      let followers = 0
+      let views = 0
       
       // YouTube Data API specific format
       if (account.platform === 'youtube' && data.items && data.items.length > 0) {
         bio = data.items[0].snippet.description || ''
         console.log('YouTube description extracted:', bio)
+        
+        // Fetch channel statistics for subscriber count and view count
+        try {
+          const channelId = data.items[0].id
+          let youtubeApiKey = localStorage.getItem('YOUTUBE_API_KEY') || import.meta.env.VITE_YOUTUBE_API_KEY
+          
+          if (!youtubeApiKey) {
+            youtubeApiKey = 'AIzaSyA7NWd90TxdR1PPDSKZWSPdZiRfb8OzAEQ'
+          }
+          
+          const statsEndpoint = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${youtubeApiKey}`
+          const statsResponse = await fetch(statsEndpoint, {
+            headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store'
+          })
+          
+          if (statsResponse.ok) {
+            const statsData = await statsResponse.json()
+            console.log('YouTube channel stats:', statsData)
+            if (statsData.items && statsData.items.length > 0) {
+              followers = parseInt(statsData.items[0].statistics.subscriberCount) || 0
+              views = parseInt(statsData.items[0].statistics.viewCount) || 0
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching YouTube stats:', error)
+        }
       }
       
       // Try direct fields (for other platforms)
@@ -477,36 +506,54 @@ function Verifier() {
       // Try nested in data object
       if (!bio && data.data) {
         bio = data.data.bio || data.data.description || data.data.signature || data.data.bio_text || ''
+        // Try to get follower/view counts from other platforms
+        if (data.data.followers) followers = parseInt(data.data.followers) || 0
+        if (data.data.views) views = parseInt(data.data.views) || 0
+        if (data.data.followerCount) followers = parseInt(data.data.followerCount) || 0
+        if (data.data.viewCount) views = parseInt(data.data.viewCount) || 0
       }
       
       // Try nested in user object
       if (!bio && data.user) {
         bio = data.user.bio || data.user.signature || data.user.description || ''
+        if (data.user.followers) followers = parseInt(data.user.followers) || 0
+        if (data.user.views) views = parseInt(data.user.views) || 0
       }
       
       // Try nested in data.user object
       if (!bio && data.data?.user) {
         bio = data.data.user.bio || data.data.user.signature || data.data.user.description || ''
+        if (data.data.user.followers) followers = parseInt(data.data.user.followers) || 0
+        if (data.data.user.views) views = parseInt(data.data.user.views) || 0
       }
       
       // Try TikTok specific structure: data.profile.bio
       if (!bio && data.profile) {
         bio = data.profile.bio || data.profile.description || ''
+        if (data.profile.followers) followers = parseInt(data.profile.followers) || 0
+        if (data.profile.views) views = parseInt(data.profile.views) || 0
+        if (data.profile.followerCount) followers = parseInt(data.profile.followerCount) || 0
+        if (data.profile.viewCount) views = parseInt(data.profile.viewCount) || 0
       }
       
       // Try data.data.profile.bio (some APIs double nest)
       if (!bio && data.data?.profile) {
         bio = data.data.profile.bio || data.data.profile.description || ''
+        if (data.data.profile.followers) followers = parseInt(data.data.profile.followers) || 0
+        if (data.data.profile.views) views = parseInt(data.data.profile.views) || 0
       }
       
       // Try Instagram specific structure: data.data.biography
       if (!bio && data.data?.biography) {
         bio = data.data.biography || ''
+        if (data.data.followers) followers = parseInt(data.data.followers) || 0
+        if (data.data.edge_followed_by) followers = parseInt(data.data.edge_followed_by?.count) || 0
       }
       
       // Try other common Instagram fields
       if (!bio && data.biography) {
         bio = data.biography || ''
+        if (data.followers) followers = parseInt(data.followers) || 0
       }
       
       console.log('Bio fields checked:', {
@@ -518,7 +565,9 @@ function Verifier() {
         dataProfileBio: !!data.data?.profile?.bio,
         dataBiography: !!data.data?.biography,
         biography: !!data.biography,
-        finalBio: bio
+        finalBio: bio,
+        followers,
+        views
       })
       
       if (!bio) {
@@ -529,9 +578,44 @@ function Verifier() {
       const codeFound = bio.includes(account.verificationCode)
 
       if (codeFound) {
-        setAccounts(accounts.map(acc => 
-          acc.id === account.id ? { ...acc, verified: true } : acc
-        ))
+        // Update account with verification status and stats
+        const updatedAccount = { 
+          ...account, 
+          verified: true,
+          followers: followers,
+          views: views
+        }
+        
+        // Update in database for authenticated users
+        if (profile?.id && !profile.id.startsWith('local_')) {
+          try {
+            const { error } = await supabase
+              .from('social_accounts')
+              .update({
+                verified: true,
+                followers: followers,
+                views: views
+              })
+              .eq('id', account.id)
+            
+            if (error) throw error
+            
+            // Reload accounts from database
+            await loadSocialAccounts()
+          } catch (error) {
+            console.error('Error updating account in database:', error)
+            // Fallback to local state update
+            setAccounts(accounts.map(acc => 
+              acc.id === account.id ? updatedAccount : acc
+            ))
+          }
+        } else {
+          // For local users, update state only
+          setAccounts(accounts.map(acc => 
+            acc.id === account.id ? updatedAccount : acc
+          ))
+        }
+        
         alert('Account verified successfully!')
       } else {
         alert(`Verification code not found in profile. Please make sure you've posted "${account.verificationCode}" in your bio.`)
