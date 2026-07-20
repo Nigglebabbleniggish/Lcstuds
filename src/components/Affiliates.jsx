@@ -308,6 +308,10 @@ function Affiliates() {
   }
 
   const openEditModal = () => {
+    if (!selectedReward) {
+      alert('No campaign selected for editing. Please select a campaign first.')
+      return
+    }
     setNewReward({
       title: selectedReward.title,
       description: selectedReward.description,
@@ -1183,7 +1187,7 @@ function Affiliates() {
             <div className="sticky top-0 bg-zinc-900/90 backdrop-blur border-b border-zinc-800 p-4">
               <div className="flex items-center justify-between max-w-6xl mx-auto">
                 <button
-                  onClick={() => { setSelectedReward(null); setIsCampaignView(false) }}
+                  onClick={() => { setIsCampaignView(false) }}
                   className="flex items-center gap-2 text-gray-400 hover:text-white"
                 >
                   <ArrowLeft size={20} />
