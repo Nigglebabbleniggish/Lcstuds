@@ -253,6 +253,12 @@ function Affiliates() {
 
   const handleEditReward = async (e) => {
     e.preventDefault()
+    
+    if (!selectedReward || !selectedReward.id) {
+      alert('No campaign selected for editing')
+      return
+    }
+    
     try {
       const updateData = {
         title: newReward.title,
@@ -1272,67 +1278,101 @@ function Affiliates() {
                   {!profile?.is_admin && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Apply to Campaign</h3>
-                      {userSubmissions.some(s => s.campaign_id === selectedReward.id) ? (
-                        <div className="text-center py-4">
-                          <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <CheckCircle className="text-green-400" size={32} />
-                          </div>
-                          <p className="text-yellow-400 font-semibold text-lg mb-2">Pending</p>
-                          <p className="text-gray-400 text-sm">You have already applied to this campaign</p>
-                        </div>
-                      ) : selectedReward.questions && selectedReward.questions.length > 0 ? (
-                        <div>
-                          <p className="text-xs text-gray-500 mb-3">You can only submit one application per campaign.</p>
-                          <form onSubmit={(e) => {
-                            e.preventDefault()
-                            const formData = new FormData(e.target)
-                            const answers = {}
-                            selectedReward.questions.forEach((q, i) => {
-                              answers[q] = formData.get(`q${i}`)
-                            })
-                            handleSubmission(selectedReward.id, answers)
-                          }} className="space-y-3">
-                            {selectedReward.questions.map((q, i) => (
-                              <div key={i}>
-                                <label className="block text-sm text-gray-400 mb-1">{q}</label>
-                                <textarea
-                                  name={`q${i}`}
-                                  required
-                                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white resize-none"
-                                  rows={2}
-                                  placeholder="Your answer..."
-                                />
+                      {(() => {
+                        const submission = userSubmissions.find(s => s.campaign_id === selectedReward.id)
+                        if (submission) {
+                          if (submission.status === 'pending') {
+                            return (
+                              <div className="text-center py-4">
+                                <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                                  <Clock className="text-yellow-400" size={32} />
+                                </div>
+                                <p className="text-yellow-400 font-semibold text-lg mb-2">Pending</p>
+                                <p className="text-gray-400 text-sm">Your application is being reviewed</p>
                               </div>
-                            ))}
-                            <button
-                              type="submit"
-                              className="w-full px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
-                            >
-                              Submit Application
-                            </button>
-                          </form>
-                        </div>
-                      ) : (
-                        <div className="text-center py-4">
-                          <p className="text-gray-400 text-sm mb-4">No application questions required</p>
-                          <button
-                            onClick={() => handleSubmission(selectedReward.id, {})}
-                            className="w-full px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
-                          >
-                            Join Campaign
-                          </button>
-                        </div>
-                      )}
+                            )
+                          } else if (submission.status === 'approved') {
+                            return (
+                              <div className="text-center py-4">
+                                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                                  <CheckCircle className="text-green-400" size={32} />
+                                </div>
+                                <p className="text-green-400 font-semibold text-lg mb-2">Approved</p>
+                                <p className="text-gray-400 text-sm">You have been accepted to this campaign</p>
+                              </div>
+                            )
+                          } else if (submission.status === 'rejected') {
+                            return (
+                              <div className="text-center py-4">
+                                <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                                  <XCircle className="text-red-400" size={32} />
+                                </div>
+                                <p className="text-red-400 font-semibold text-lg mb-2">Rejected</p>
+                                <p className="text-gray-400 text-sm">Your application was not accepted</p>
+                              </div>
+                            )
+                          }
+                        }
+                        // No submission yet - show application form
+                        return (
+                          <div>
+                            <p className="text-xs text-gray-500 mb-3">You can only submit one application per campaign.</p>
+                            {selectedReward.questions && selectedReward.questions.length > 0 ? (
+                              <form onSubmit={(e) => {
+                                e.preventDefault()
+                                const formData = new FormData(e.target)
+                                const answers = {}
+                                selectedReward.questions.forEach((q, i) => {
+                                  answers[q] = formData.get(`q${i}`)
+                                })
+                                handleSubmission(selectedReward.id, answers)
+                              }} className="space-y-3">
+                                {selectedReward.questions.map((q, i) => (
+                                  <div key={i}>
+                                    <label className="block text-sm text-gray-400 mb-1">{q}</label>
+                                    <textarea
+                                      name={`q${i}`}
+                                      required
+                                      className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-white resize-none"
+                                      rows={2}
+                                      placeholder="Your answer..."
+                                    />
+                                  </div>
+                                ))}
+                                <button
+                                  type="submit"
+                                  className="w-full px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
+                                >
+                                  Submit Application
+                                </button>
+                              </form>
+                            ) : (
+                              <div className="text-center py-4">
+                                <p className="text-gray-400 text-sm mb-4">No application questions required</p>
+                                <button
+                                  onClick={() => handleSubmission(selectedReward.id, {})}
+                                  className="w-full px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
+                                >
+                                  Join Campaign
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })()}
                     </div>
                   )}
 
                   {/* Video Submission Section - Only for users who have been accepted to the campaign and no pending clips */}
                   {!profile?.is_admin && (() => {
-                    const hasPendingCampaign = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending')
-                    const hasApprovedCampaign = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved')
+                    const campaignSubmissions = userSubmissions.filter(s => s.campaign_id === selectedReward.id)
+                    const hasPendingCampaign = campaignSubmissions.some(s => s.status === 'pending')
+                    const hasApprovedCampaign = campaignSubmissions.some(s => s.status === 'approved')
                     const hasPendingClip = videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending')
-                    const shouldShow = !hasPendingCampaign && hasApprovedCampaign && !hasPendingClip
-                    console.log('Video submission check:', { hasPendingCampaign, hasApprovedCampaign, hasPendingClip, shouldShow, selectedRewardId: selectedReward.id, userSubmissions, videoSubmissions })
+                    // If user has pending campaign (and no approved), don't show video submission
+                    // If user has approved campaign, show video submission (approved takes precedence)
+                    const shouldShow = hasApprovedCampaign && !hasPendingClip
+                    console.log('Video submission check:', { hasPendingCampaign, hasApprovedCampaign, hasPendingClip, shouldShow, selectedRewardId: selectedReward.id, campaignSubmissions, videoSubmissions })
                     return shouldShow
                   })() && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
@@ -1340,10 +1380,11 @@ function Affiliates() {
                       <button
                         onClick={() => {
                           // Double-check campaign approval before opening modal
-                          const isApproved = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved')
-                          const isPending = userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending')
-                          console.log('Campaign check:', { isApproved, isPending, selectedRewardId: selectedReward.id, userSubmissions })
-                          if (isApproved && !isPending) {
+                          const campaignSubmissions = userSubmissions.filter(s => s.campaign_id === selectedReward.id)
+                          const isApproved = campaignSubmissions.some(s => s.status === 'approved')
+                          const isPending = campaignSubmissions.some(s => s.status === 'pending')
+                          console.log('Campaign check:', { isApproved, isPending, selectedRewardId: selectedReward.id, campaignSubmissions })
+                          if (isApproved) {
                             setShowVideoSubmitModal(true)
                           } else {
                             alert('You must be accepted to this campaign before submitting videos.')
