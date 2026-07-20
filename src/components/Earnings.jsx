@@ -141,13 +141,6 @@ function Earnings() {
               </div>
               
               <div className="bg-zinc-800 rounded-lg p-4">
-                <h4 className="font-semibold text-white mb-2">Threads - $0.25 per 1k views</h4>
-                <ul className="text-sm text-gray-400 space-y-1">
-                  <li>• 20k views in the past month</li>
-                </ul>
-              </div>
-              
-              <div className="bg-zinc-800 rounded-lg p-4">
                 <h4 className="font-semibold text-white mb-2">Instagram Reels - $0.85 per 1k views</h4>
                 <ul className="text-sm text-gray-400 space-y-1">
                   <li>• 50k Views in the past month</li>
