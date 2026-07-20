@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS user_clips (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  campaign_id UUID REFERENCES content_rewards(id) ON DELETE CASCADE,
   platform VARCHAR(50) NOT NULL,
   video_url TEXT NOT NULL,
   title TEXT,

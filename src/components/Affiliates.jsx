@@ -137,16 +137,17 @@ function Affiliates() {
       return
     }
     
-    // Check if user has pending submissions
+    // Check if user has pending submissions for this campaign
     try {
       const { data: pendingSubmissions, error: pendingError } = await supabase
         .from('user_clips')
         .select('*')
         .eq('user_id', profile.id)
+        .eq('campaign_id', selectedReward.id)
         .eq('status', 'pending')
 
       if (pendingSubmissions && pendingSubmissions.length > 0) {
-        alert('You already have a pending submission. Please wait for it to be reviewed before submitting another video.')
+        alert('You already have a pending submission for this campaign. Please wait for it to be reviewed before submitting another video.')
         return
       }
     } catch (error) {
@@ -176,6 +177,7 @@ function Affiliates() {
     try {
       const { error } = await supabase.from('user_clips').insert({
         user_id: profile.id,
+        campaign_id: selectedReward.id,
         platform: newVideoSubmission.platform,
         video_url: newVideoSubmission.video_url,
         title: selectedReward.title || 'Campaign Submission',
@@ -1328,7 +1330,7 @@ function Affiliates() {
                   {!profile?.is_admin && 
                    userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
                    !userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
-                   !videoSubmissions.some(v => v.status === 'pending') && (
+                   !videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Submit Video</h3>
                       <button
@@ -1352,7 +1354,7 @@ function Affiliates() {
                   {!profile?.is_admin && 
                    !userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
                    userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
-                   videoSubmissions.some(v => v.status === 'pending') && (
+                   videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Video Submission</h3>
                       <div className="text-center py-4">
