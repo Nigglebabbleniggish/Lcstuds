@@ -1305,8 +1305,8 @@ function Affiliates() {
                     </div>
                   )}
 
-                  {/* Video Submission Section - Only for users who have joined */}
-                  {!profile?.is_admin && userSubmissions.some(s => s.campaign_id === selectedReward.id) && (
+                  {/* Video Submission Section - Only for users who have joined and no pending clips */}
+                  {!profile?.is_admin && userSubmissions.some(s => s.campaign_id === selectedReward.id) && !videoSubmissions.some(v => v.status === 'pending') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Submit Video</h3>
                       <button
@@ -1315,6 +1315,20 @@ function Affiliates() {
                       >
                         Submit New Video
                       </button>
+                    </div>
+                  )}
+
+                  {/* Show pending clip status */}
+                  {!profile?.is_admin && videoSubmissions.some(v => v.status === 'pending') && (
+                    <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
+                      <h3 className="text-lg font-semibold text-white mb-4">Video Submission</h3>
+                      <div className="text-center py-4">
+                        <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <Clock className="text-yellow-400" size={32} />
+                        </div>
+                        <p className="text-yellow-400 font-semibold text-lg mb-2">Pending Review</p>
+                        <p className="text-gray-400 text-sm">Your video submission is being reviewed</p>
+                      </div>
                     </div>
                   )}
 
