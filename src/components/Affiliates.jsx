@@ -65,6 +65,14 @@ function Affiliates() {
       setVideoSubmissions(videoSubmissionsData.data || [])
       setAllVideoSubmissions(allVideoSubmissionsData.data || [])
       setProfiles(profilesData.data || [])
+      
+      // Preserve selectedReward by updating it with fresh data if it exists
+      if (selectedReward && rewardsData.data) {
+        const updatedReward = rewardsData.data.find(r => r.id === selectedReward.id)
+        if (updatedReward) {
+          setSelectedReward(updatedReward)
+        }
+      }
     } catch (error) {
       console.error('Error fetching data:', error.message)
     } finally {
@@ -1403,7 +1411,6 @@ function Affiliates() {
                     const hasPendingClip = videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending')
                     // If user has pending campaign, don't show video submission regardless of approved status
                     const shouldShow = !hasPendingCampaign && hasApprovedCampaign && !hasPendingClip
-                    console.log('Video submission check:', { hasPendingCampaign, hasApprovedCampaign, hasPendingClip, shouldShow, selectedRewardId: selectedReward.id, campaignSubmissions, videoSubmissions })
                     return shouldShow
                   })() && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
@@ -1414,7 +1421,6 @@ function Affiliates() {
                           const campaignSubmissions = userSubmissions.filter(s => s.campaign_id === selectedReward.id)
                           const isApproved = campaignSubmissions.some(s => s.status === 'approved')
                           const isPending = campaignSubmissions.some(s => s.status === 'pending')
-                          console.log('Campaign check:', { isApproved, isPending, selectedRewardId: selectedReward.id, campaignSubmissions })
                           if (isApproved && !isPending) {
                             setShowVideoSubmitModal(true)
                           } else {
