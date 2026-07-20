@@ -1231,8 +1231,9 @@ function Affiliates() {
                     </div>
                   </div>
 
-                  {/* Campaign Templates Section - Only for approved users */}
-                  {userSubmissions.some(sub => sub.campaign_id === selectedReward.id && sub.status === 'approved') && (
+                  {/* Campaign Templates Section - Only for approved users, not pending */}
+                  {!userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
+                   userSubmissions.some(sub => sub.campaign_id === selectedReward.id && sub.status === 'approved') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-xl font-semibold text-white mb-4">Campaign Resources</h3>
                       {selectedReward.resources && selectedReward.resources.length > 0 ? (
@@ -1349,8 +1350,8 @@ function Affiliates() {
 
                   {/* Show pending clip status - only if user has been accepted to campaign and campaign is not pending */}
                   {!profile?.is_admin && 
-                   userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
                    !userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'pending') &&
+                   userSubmissions.some(s => s.campaign_id === selectedReward.id && s.status === 'approved') && 
                    videoSubmissions.some(v => v.status === 'pending') && (
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Video Submission</h3>
