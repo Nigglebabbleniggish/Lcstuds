@@ -123,9 +123,41 @@ function Affiliates() {
     }
   }
 
+  const extractYouTubeVideoId = (url) => {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+    const match = url.match(regex)
+    return match ? match[1] : null
+  }
+
+  const fetchYouTubeViewCount = async (videoId) => {
+    try {
+      let youtubeApiKey = localStorage.getItem('YOUTUBE_API_KEY') || import.meta.env.VITE_YOUTUBE_API_KEY
+      if (!youtubeApiKey) {
+        youtubeApiKey = 'AIzaSyA7NWd90TxdR1PPDSKZWSPdZiRfb8OzAEQ'
+      }
+
+      const endpoint = `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${youtubeApiKey}`
+      const response = await fetch(endpoint, {
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store'
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.items && data.items.length > 0) {
+          return parseInt(data.items[0].statistics.viewCount) || 0
+        }
+      }
+      return 0
+    } catch (error) {
+      console.error('Error fetching YouTube view count:', error)
+      return 0
+    }
+  }
+
   const handleVideoSubmit = async (e) => {
     e.preventDefault()
-    
+
     // Check if user has been accepted to the campaign
     try {
       const { data: campaignSubmission, error: campaignError } = await supabase
@@ -144,7 +176,7 @@ function Affiliates() {
       alert('You must be accepted to this campaign before submitting videos.')
       return
     }
-    
+
     // Check if user has pending submissions for this campaign
     try {
       const { data: pendingSubmissions, error: pendingError } = await supabase
@@ -161,7 +193,7 @@ function Affiliates() {
     } catch (error) {
       console.error('Error checking pending submissions:', error)
     }
-    
+
     // Check if user has a verified social account for the selected platform
     try {
       const { data: socialAccounts, error: socialError } = await supabase
@@ -183,13 +215,24 @@ function Affiliates() {
     }
 
     try {
+      let initialViewCount = 0
+
+      // Fetch view count from YouTube API if it's a YouTube video
+      if (newVideoSubmission.platform === 'youtube') {
+        const videoId = extractYouTubeVideoId(newVideoSubmission.video_url)
+        if (videoId) {
+          initialViewCount = await fetchYouTubeViewCount(videoId)
+        }
+      }
+
       const { error } = await supabase.from('user_clips').insert({
         user_id: profile.id,
         campaign_id: selectedReward.id,
         platform: newVideoSubmission.platform,
         video_url: newVideoSubmission.video_url,
         title: selectedReward.title || 'Campaign Submission',
-        status: 'pending'
+        status: 'pending',
+        view_count: initialViewCount
       })
 
       if (error) throw error
@@ -308,10 +351,6 @@ function Affiliates() {
   }
 
   const openEditModal = () => {
-    if (!selectedReward) {
-      alert('No campaign selected for editing. Please select a campaign first.')
-      return
-    }
     setNewReward({
       title: selectedReward.title,
       description: selectedReward.description,
@@ -1187,7 +1226,7 @@ function Affiliates() {
             <div className="sticky top-0 bg-zinc-900/90 backdrop-blur border-b border-zinc-800 p-4">
               <div className="flex items-center justify-between max-w-6xl mx-auto">
                 <button
-                  onClick={() => { setIsCampaignView(false) }}
+                  onClick={() => { setSelectedReward(null); setIsCampaignView(false) }}
                   className="flex items-center gap-2 text-gray-400 hover:text-white"
                 >
                   <ArrowLeft size={20} />
