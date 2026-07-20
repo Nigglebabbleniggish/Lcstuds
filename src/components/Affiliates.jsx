@@ -345,15 +345,23 @@ function Affiliates() {
   const handleSubmission = async (campaignId, answers) => {
     try {
       // Check if user already submitted for this campaign
-      const { data: existingSubmission } = await supabase
+      const { data: existingSubmissions, error: checkError } = await supabase
         .from('campaign_submissions')
         .select('*')
         .eq('campaign_id', campaignId)
         .eq('user_id', profile?.id)
-        .single()
 
-      if (existingSubmission) {
-        alert('You have already submitted an application for this campaign. Only one submission is allowed.')
+      if (checkError) throw checkError
+
+      if (existingSubmissions && existingSubmissions.length > 0) {
+        const existing = existingSubmissions[0]
+        if (existing.status === 'pending') {
+          alert('Your campaign application is already pending review. You cannot submit another application.')
+        } else if (existing.status === 'approved') {
+          alert('You have already been accepted to this campaign. You cannot submit another application.')
+        } else if (existing.status === 'rejected') {
+          alert('Your previous application was rejected. You cannot submit another application.')
+        }
         return
       }
 
@@ -365,8 +373,8 @@ function Affiliates() {
       })
 
       if (error) throw error
-      alert('Form submitted successfully!')
-      setSelectedReward(null)
+      alert('Application submitted successfully! Your application is now pending review.')
+      fetchData()
     } catch (error) {
       console.error('Error submitting application:', error.message)
       alert('Failed to submit application')
@@ -1322,7 +1330,7 @@ function Affiliates() {
                               <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
                                 <Clock className="text-yellow-400" size={32} />
                               </div>
-                              <p className="text-yellow-400 font-semibold text-lg mb-2">Pending</p>
+                              <p className="text-yellow-400 font-semibold text-lg mb-2">Campaign Submission Pending</p>
                               <p className="text-gray-400 text-sm">Your application is being reviewed</p>
                             </div>
                           )
