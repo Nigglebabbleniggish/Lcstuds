@@ -45,15 +45,16 @@ function Dashboard() {
     }
 
     try {
-      const [campaignsData, earningsData, socialData] = await Promise.all([
+      const [campaignsData, earningsData, socialData, clipsData] = await Promise.all([
         supabase.from('content_rewards').select('*'),
         profile?.is_admin 
           ? supabase.from('earnings').select('*').order('created_at', { ascending: false }).limit(10)
           : supabase.from('earnings').select('*').eq('user_id', profile.id).order('created_at', { ascending: false }).limit(10),
-        supabase.from('social_accounts').select('*').eq('user_id', profile.id)
+        supabase.from('social_accounts').select('*').eq('user_id', profile.id),
+        supabase.from('user_clips').select('*').eq('user_id', profile.id)
       ])
 
-      const totalViews = socialData.data?.reduce((sum, s) => sum + (s.views || 0), 0) || 0
+      const totalViews = clipsData.data?.reduce((sum, clip) => sum + (clip.view_count || 0), 0) || 0
       const totalFollowers = socialData.data?.reduce((sum, s) => sum + (s.followers || 0), 0) || 0
       const avgEngagement = socialData.data?.length > 0 
         ? socialData.data.reduce((sum, s) => sum + (s.engagement_rate || 0), 0) / socialData.data.length 
