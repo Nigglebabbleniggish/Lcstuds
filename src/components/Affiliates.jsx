@@ -1279,39 +1279,42 @@ function Affiliates() {
                     <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">Apply to Campaign</h3>
                       {(() => {
-                        const submission = userSubmissions.find(s => s.campaign_id === selectedReward.id)
-                        if (submission) {
-                          if (submission.status === 'pending') {
-                            return (
-                              <div className="text-center py-4">
-                                <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                                  <Clock className="text-yellow-400" size={32} />
-                                </div>
-                                <p className="text-yellow-400 font-semibold text-lg mb-2">Pending</p>
-                                <p className="text-gray-400 text-sm">Your application is being reviewed</p>
+                        const campaignSubmissions = userSubmissions.filter(s => s.campaign_id === selectedReward.id)
+                        // Prioritize approved status over pending
+                        const approvedSubmission = campaignSubmissions.find(s => s.status === 'approved')
+                        const pendingSubmission = campaignSubmissions.find(s => s.status === 'pending')
+                        const rejectedSubmission = campaignSubmissions.find(s => s.status === 'rejected')
+                        
+                        if (approvedSubmission) {
+                          return (
+                            <div className="text-center py-4">
+                              <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <CheckCircle className="text-green-400" size={32} />
                               </div>
-                            )
-                          } else if (submission.status === 'approved') {
-                            return (
-                              <div className="text-center py-4">
-                                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                                  <CheckCircle className="text-green-400" size={32} />
-                                </div>
-                                <p className="text-green-400 font-semibold text-lg mb-2">Approved</p>
-                                <p className="text-gray-400 text-sm">You have been accepted to this campaign</p>
+                              <p className="text-green-400 font-semibold text-lg mb-2">Approved</p>
+                              <p className="text-gray-400 text-sm">You have been accepted to this campaign</p>
+                            </div>
+                          )
+                        } else if (pendingSubmission) {
+                          return (
+                            <div className="text-center py-4">
+                              <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <Clock className="text-yellow-400" size={32} />
                               </div>
-                            )
-                          } else if (submission.status === 'rejected') {
-                            return (
-                              <div className="text-center py-4">
-                                <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                                  <XCircle className="text-red-400" size={32} />
-                                </div>
-                                <p className="text-red-400 font-semibold text-lg mb-2">Rejected</p>
-                                <p className="text-gray-400 text-sm">Your application was not accepted</p>
+                              <p className="text-yellow-400 font-semibold text-lg mb-2">Pending</p>
+                              <p className="text-gray-400 text-sm">Your application is being reviewed</p>
+                            </div>
+                          )
+                        } else if (rejectedSubmission) {
+                          return (
+                            <div className="text-center py-4">
+                              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <XCircle className="text-red-400" size={32} />
                               </div>
-                            )
-                          }
+                              <p className="text-red-400 font-semibold text-lg mb-2">Rejected</p>
+                              <p className="text-gray-400 text-sm">Your application was not accepted</p>
+                            </div>
+                          )
                         }
                         // No submission yet - show application form
                         return (
@@ -1369,9 +1372,8 @@ function Affiliates() {
                     const hasPendingCampaign = campaignSubmissions.some(s => s.status === 'pending')
                     const hasApprovedCampaign = campaignSubmissions.some(s => s.status === 'approved')
                     const hasPendingClip = videoSubmissions.some(v => v.campaign_id === selectedReward.id && v.status === 'pending')
-                    // If user has pending campaign (and no approved), don't show video submission
-                    // If user has approved campaign, show video submission (approved takes precedence)
-                    const shouldShow = hasApprovedCampaign && !hasPendingClip
+                    // If user has pending campaign, don't show video submission regardless of approved status
+                    const shouldShow = !hasPendingCampaign && hasApprovedCampaign && !hasPendingClip
                     console.log('Video submission check:', { hasPendingCampaign, hasApprovedCampaign, hasPendingClip, shouldShow, selectedRewardId: selectedReward.id, campaignSubmissions, videoSubmissions })
                     return shouldShow
                   })() && (
@@ -1384,7 +1386,7 @@ function Affiliates() {
                           const isApproved = campaignSubmissions.some(s => s.status === 'approved')
                           const isPending = campaignSubmissions.some(s => s.status === 'pending')
                           console.log('Campaign check:', { isApproved, isPending, selectedRewardId: selectedReward.id, campaignSubmissions })
-                          if (isApproved) {
+                          if (isApproved && !isPending) {
                             setShowVideoSubmitModal(true)
                           } else {
                             alert('You must be accepted to this campaign before submitting videos.')
