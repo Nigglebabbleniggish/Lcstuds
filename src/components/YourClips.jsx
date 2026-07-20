@@ -16,6 +16,73 @@ function YourClips() {
     }
   }, [profile?.id])
 
+  const extractYouTubeVideoId = (url) => {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+    const match = url.match(regex)
+    return match ? match[1] : null
+  }
+
+  const fetchYouTubeViewCount = async (videoId) => {
+    try {
+      let youtubeApiKey = localStorage.getItem('YOUTUBE_API_KEY') || import.meta.env.VITE_YOUTUBE_API_KEY
+      if (!youtubeApiKey) {
+        youtubeApiKey = 'AIzaSyA7NWd90TxdR1PPDSKZWSPdZiRfb8OzAEQ'
+      }
+
+      const endpoint = `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${youtubeApiKey}`
+      const response = await fetch(endpoint, {
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store'
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.items && data.items.length > 0) {
+          return parseInt(data.items[0].statistics.viewCount) || 0
+        }
+      }
+      return 0
+    } catch (error) {
+      console.error('Error fetching YouTube view count:', error)
+      return 0
+    }
+  }
+
+  const updateClipViewCount = async (clip) => {
+    if (clip.platform !== 'youtube' || !clip.video_url) return
+
+    const videoId = extractYouTubeVideoId(clip.video_url)
+    if (!videoId) return
+
+    // Check if last update was more than 2 days ago
+    const lastUpdated = clip.last_updated ? new Date(clip.last_updated) : new Date(0)
+    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+    
+    if (lastUpdated > twoDaysAgo && clip.view_count > 0) return
+
+    const newViewCount = await fetchYouTubeViewCount(videoId)
+    if (newViewCount > 0) {
+      try {
+        const { error } = await supabase
+          .from('user_clips')
+          .update({ 
+            view_count: newViewCount,
+            last_updated: new Date().toISOString()
+          })
+          .eq('id', clip.id)
+
+        if (!error) {
+          // Update local state
+          setApprovedClips(prev => prev.map(c => 
+            c.id === clip.id ? { ...c, view_count: newViewCount, last_updated: new Date().toISOString() } : c
+          ))
+        }
+      } catch (error) {
+        console.error('Error updating view count:', error)
+      }
+    }
+  }
+
   const fetchApprovedClips = async () => {
     if (!profile?.id) return
     try {
@@ -27,6 +94,13 @@ function YourClips() {
 
       if (error) throw error
       setApprovedClips(data || [])
+
+      // Update view counts for clips that need it
+      data?.forEach(clip => {
+        if (clip.platform === 'youtube') {
+          updateClipViewCount(clip)
+        }
+      })
     } catch (error) {
       console.error('Error fetching approved clips:', error.message)
     } finally {
